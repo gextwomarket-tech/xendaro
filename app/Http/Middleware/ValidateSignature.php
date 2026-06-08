@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ValidateSignature as Middleware;
+
+class ValidateSignature extends Middleware
+{
+    /**
+     * The names of the query string parameters that should be ignored during signature validation.
+     *
+     * @var array<int, string>
+     */
+    protected $ignore = [
+        // 'fbclid',
+        // 'utm_campaign',
+        // 'utm_content',
+        // 'utm_medium',
+        // 'utm_source',
+        // 'utm_term',
+    ];
+}

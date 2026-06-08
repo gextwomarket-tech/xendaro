@@ -1,0 +1,788 @@
+{
+  "platform": {
+    "name": "Brocker",
+    "type": "SaaS Trading Platform",
+    "scope": "Client-side only (admin via Filament)",
+    "design": {
+      "colors": {
+        "body_background": "#EFE3CA",
+        "primary": "#2C3947",
+        "secondary": "#547A95"
+      },
+      "animations": {
+        "landing_page": [
+          "particles.js (fond hero)",
+          "typed.js (headline animé)",
+          "AOS.js (animations au scroll - IntersectionObserver)",
+          "countUp.js (compteurs statistiques)",
+          "Swiper.js (slider témoignages)",
+          "Lottie (animations SVG succès/erreur)"
+        ],
+        "dashboard": [
+          "Compteurs KPI animés à l'entrée de page",
+          "Flicker rouge/vert sur P&L en temps réel",
+          "Spinner loader sur boutons submit",
+          "Confetti.js ou Lottie sur actions importantes",
+          "Shake animation sur erreurs de formulaire",
+          "Toast notifications animées",
+          "Slide-over latéral pour détails",
+          "Check animé Lottie sur succès transaction"
+        ]
+      }
+    }
+  },
+  "pages": [
+    {
+      "id": "landing_page",
+      "zone": "Public",
+      "route": "/",
+      "title": "Landing Page",
+      "description": "Page d'accueil publique avec 8+ sections, animations JS avancées. Sert de conteneur principal pour toutes les modales de pages statiques.",
+      "sections": [
+        {
+          "id": "navbar",
+          "name": "Navigation Bar",
+          "type": "sticky header",
+          "elements": [
+            "Logo Brocker (SVG animé au hover)",
+            "Liens de navigation : Home, Markets, About Us, Our Offer, Contact Us",
+            "Bouton 'Sign In' (style outline, couleur #547A95)",
+            "Bouton 'Get Started' (style filled, couleur #2C3947, animation pulse hover)",
+            "Menu burger pour mobile (animation hamburger → X)",
+            "Scroll-spy actif (section en vue surlignée dans le nav)",
+            "Fond transparent → opaque au scroll (transition smooth)"
+          ],
+          "background": [
+            "IntersectionObserver pour scroll-spy",
+            "Gestion du state mobile open/close"
+          ]
+        },
+        {
+          "id": "hero",
+          "name": "Hero Section",
+          "type": "section",
+          "max_height_px": 250,
+          "elements": [
+            "Titre principal animé avec typed.js (ex: 'Tradez comme un Pro')",
+            "Sous-titre statique",
+            "Bouton CTA principal '#2C3947' avec animation pulse",
+            "Bouton secondaire 'En savoir plus' outline",
+            "Fond avec animation particles.js (réseau de points interconnectés)",
+            "Badge de confiance (ex: '10 000+ traders actifs')"
+          ],
+          "background": [
+            "particles.js initialisé sur canvas en arrière-plan",
+            "typed.js sur l'élément headline",
+            "Prefetch des routes auth au survol du CTA"
+          ]
+        },
+        {
+          "id": "stats",
+          "name": "Section Statistiques",
+          "type": "section",
+          "elements": [
+            "4 cards compteurs animées (countUp.js) : Clients actifs, Volume tradé, Actifs disponibles, Années d'expérience",
+            "Icônes SVG par card",
+            "Animation déclenchée au scroll (AOS.js)"
+          ],
+          "background": [
+            "IntersectionObserver pour déclencher countUp.js quand visible"
+          ]
+        },
+        {
+          "id": "how_it_works",
+          "name": "Comment ça marche",
+          "type": "section",
+          "elements": [
+            "Titre de section",
+            "3 étapes avec icônes animées : 1. Créer un compte, 2. Déposer des fonds, 3. Commencer à trader",
+            "Connecteur visuel entre les étapes (ligne pointillée animée)",
+            "Animation d'entrée par étape au scroll (AOS stagger delay)"
+          ],
+          "background": []
+        },
+        {
+          "id": "markets_preview",
+          "name": "Nos Marchés",
+          "type": "section",
+          "elements": [
+            "4 cards animées (hover lift) : Forex, Crypto, Indices, Matières premières",
+            "Icône + titre + brève description par card",
+            "Prix en temps réel ou statiques sur quelques paires emblématiques",
+            "Bouton 'Découvrir' par card"
+          ],
+          "background": [
+            "Optionnel : appel API public pour afficher prix live"
+          ]
+        },
+        {
+          "id": "why_brocker",
+          "name": "Pourquoi Brocker",
+          "type": "section",
+          "elements": [
+            "Titre de section",
+            "Grille 2x3 d'avantages (icônes SVG animées + titre + description)",
+            "Exemples : Plateforme intuitive, Execution rapide, Support 24/7, Régulé, Spreads compétitifs, Éducation intégrée",
+            "Animation hover reveal sur chaque item",
+            "Animation d'entrée AOS"
+          ],
+          "background": []
+        },
+        {
+          "id": "testimonials",
+          "name": "Témoignages",
+          "type": "section",
+          "elements": [
+            "Slider automatique Swiper.js",
+            "Chaque slide : avatar, prénom/nom, pays, note étoiles (★), texte témoignage",
+            "Dots de navigation",
+            "Autoplay 4s avec pause au hover"
+          ],
+          "background": [
+            "Swiper.js initialisé avec autoplay et loop"
+          ]
+        },
+        {
+          "id": "pricing",
+          "name": "Tarifs / Plans",
+          "type": "section",
+          "elements": [
+            "Toggle switch Mensuel / Annuel (animation flip des prix)",
+            "3 cards de plans : Standard, Gold, VIP",
+            "Badge 'Le plus populaire' sur le plan Gold",
+            "Chaque card : prix, liste features avec check/cross, bouton CTA",
+            "Animation scale-up sur la card premium",
+            "Fond #2C3947 ou border highlight sur plan recommandé"
+          ],
+          "background": [
+            "JS toggle pour switch mensuel/annuel et recalcul des prix"
+          ]
+        },
+        {
+          "id": "cta_final",
+          "name": "Section CTA Finale",
+          "type": "section",
+          "position": "juste avant le footer",
+          "elements": [
+            "Fond plein #2C3947",
+            "Titre accrocheur (texte couleur #EFE3CA)",
+            "Sous-titre",
+            "Bouton principal animé (couleur #547A95 → white au hover)",
+            "Optionnel : compteur live 'X traders ont rejoint cette semaine'"
+          ],
+          "background": []
+        },
+        {
+          "id": "footer",
+          "name": "Footer",
+          "type": "footer",
+          "elements": [
+            "Logo + slogan court",
+            "Colonnes liens : Plateforme, Légal, Support",
+            "Liens légaux : Privacy Policy, Terms & Conditions (ouvrent leurs modales respectives)",
+            "Liens réseaux sociaux (Twitter/X, LinkedIn, Telegram, Instagram)",
+            "Input newsletter + bouton Subscribe",
+            "Copyright",
+            "Avertissement risque trading (requis légalement)"
+          ],
+          "background": [
+            "Formulaire newsletter connecté à l'API backend"
+          ]
+        },
+        {
+          "id": "floating_elements",
+          "name": "Éléments flottants",
+          "type": "overlay",
+          "elements": [
+            "Scroll-to-top bouton (apparaît après 300px de scroll, animation fade-in)",
+            "Cookie consent banner (bas de page, slide-up animé, boutons Accepter/Refuser)",
+            "Live chat widget flottant (bulle en bas à droite)"
+          ],
+          "background": [
+            "Cookie consent stocké en localStorage",
+            "Gestion du scroll event pour scroll-to-top"
+          ]
+        }
+      ],
+      "modals": [
+        "modal_about_us",
+        "modal_contact_us",
+        "modal_our_offer",
+        "modal_privacy_policy",
+        "modal_terms_conditions"
+      ]
+    },
+    {
+      "id": "login",
+      "zone": "Auth",
+      "route": "/login",
+      "title": "Page Login",
+      "description": "Authentification sécurisée avec animations d'entrée et gestion des erreurs",
+      "features": {
+        "visible": [
+          "Logo centré animé (fade-in à l'entrée de page)",
+          "Titre 'Bon retour !'",
+          "Champ Email (validation format en temps réel)",
+          "Champ Mot de passe avec toggle afficher/masquer (icône œil)",
+          "Checkbox 'Se souvenir de moi'",
+          "Lien 'Mot de passe oublié ?' (ouvre modal ou redirige vers page reset)",
+          "Bouton 'Se connecter' animé (loader spinner pendant la requête)",
+          "Séparateur 'OU'",
+          "Bouton OAuth Google (si activé)",
+          "Bouton OAuth Apple (si activé)",
+          "Lien 'Pas encore inscrit ? Créer un compte'",
+          "Message d'erreur animé (shake animation si identifiants incorrects, texte rouge)",
+          "Fond avec illustration géométrique ou pattern animé subtil"
+        ],
+        "background": [
+          "Envoi requête POST /api/auth/login",
+          "Validation JWT et stockage token sécurisé (httpOnly cookie)",
+          "Rate limiting côté client : désactivation bouton 60s après 5 tentatives",
+          "Redirect automatique vers dashboard si déjà authentifié",
+          "Gestion erreurs HTTP 401 / 422 / 500 avec messages adaptés"
+        ]
+      }
+    },
+    {
+      "id": "register",
+      "zone": "Auth",
+      "route": "/register",
+      "title": "Page Register",
+      "description": "Inscription multi-étapes avec KYC intégré et progress bar animée",
+      "features": {
+        "visible": [
+          "Progress bar 3 étapes animée (Infos perso → Documents KYC → Confirmation)",
+          "Indicateur d'étape actuelle avec numéros et labels",
+          "ÉTAPE 1 - Informations personnelles : Prénom, Nom, Email, Téléphone, Date de naissance, Pays (select avec drapeaux), Mot de passe, Confirmation mot de passe",
+          "Indicateur de force du mot de passe (barre colorée : faible/moyen/fort)",
+          "Validation champ par champ en temps réel (bordure verte si valide, rouge si invalide)",
+          "ÉTAPE 2 - Documents KYC : Type de document (select : Carte nationale, Passeport, Permis), Dropzone drag&drop pour upload recto, Dropzone pour upload verso ou selfie, Preview des fichiers uploadés, Bouton supprimer fichier",
+          "ÉTAPE 3 - Confirmation : Récapitulatif des informations saisies, Case à cocher 'J'accepte les CGU' (lien ouvre modale Terms), Case à cocher 'J'accepte la Politique de confidentialité', Bouton 'Créer mon compte' (loader + animation succès confetti/Lottie)",
+          "Boutons Précédent / Suivant animés entre les étapes",
+          "Lien 'Déjà inscrit ? Se connecter'"
+        ],
+        "background": [
+          "Sauvegarde temporaire du formulaire en localStorage entre les étapes (anti-perte de données)",
+          "Upload sécurisé des documents via pre-signed URL ou multipart FormData",
+          "Envoi requête POST /api/auth/register",
+          "Email de vérification envoyé automatiquement après soumission",
+          "Création du statut KYC en DB (statut: pending)",
+          "Nettoyage du localStorage après inscription réussie"
+        ]
+      }
+    },
+    {
+      "id": "verify_email",
+      "zone": "Auth",
+      "route": "/verify-email",
+      "title": "Vérification Email",
+      "description": "Page de confirmation d'email après inscription",
+      "features": {
+        "visible": [
+          "Logo",
+          "Illustration animée enveloppe (Lottie)",
+          "Titre 'Vérifiez votre email'",
+          "Message avec email masqué affiché (ex: j***@gmail.com)",
+          "Instruction d'action",
+          "Bouton 'Renvoyer l'email' avec countdown de 60s après clic (désactivé pendant le délai)",
+          "Lien 'Changer d'adresse email'",
+          "Redirect automatique vers dashboard si token URL valide"
+        ],
+        "background": [
+          "Lecture du token dans les query params de l'URL",
+          "Requête POST /api/auth/verify-email avec le token",
+          "Mise à jour champ email_verified_at en DB",
+          "Expiration automatique du token après 24h",
+          "Génération nouveau token à la demande de renvoi"
+        ]
+      }
+    },
+    {
+      "id": "forgot_password",
+      "zone": "Auth",
+      "route": "/forgot-password",
+      "title": "Mot de passe oublié",
+      "description": "Récupération de compte en 2 étapes (demande + reset)",
+      "features": {
+        "visible": [
+          "ÉTAPE 1 - Demande : Champ email, Bouton 'Envoyer le lien de réinitialisation', Message de succès animé (check vert), Lien retour vers Login",
+          "ÉTAPE 2 - Reset (via lien email) : Champ nouveau mot de passe, Champ confirmation mot de passe, Indicateur de force du mot de passe, Bouton 'Réinitialiser', Animation de succès + redirect automatique vers login après 3s"
+        ],
+        "background": [
+          "POST /api/auth/forgot-password avec l'email",
+          "Génération token unique en DB avec expiration 1h",
+          "Envoi email avec lien contenant le token",
+          "Validation du token à l'ouverture de la page reset",
+          "POST /api/auth/reset-password avec token + nouveau mdp",
+          "Invalidation immédiate du token après utilisation réussie",
+          "Invalidation de toutes les sessions actives après reset"
+        ]
+      }
+    },
+    {
+      "id": "dashboard_home",
+      "zone": "Dashboard",
+      "route": "/dashboard",
+      "title": "Dashboard Home",
+      "description": "Vue d'ensemble du compte client avec KPIs animés et données en temps réel",
+      "features": {
+        "visible": [
+          "Header : message de bienvenue (Bonjour [Prénom]), date du jour, avatar utilisateur cliquable",
+          "Barre de notifications : icône cloche avec badge count non lues (ouvre dropdown)",
+          "4 cards KPI avec compteurs animés (countUp.js à l'entrée) : Solde total ($), P&L du jour ($ et %), Positions ouvertes (count), Marge utilisée (%)",
+          "Flèche up/down colorée (vert/rouge) sur chaque KPI avec variation",
+          "Mini-graphique courbe du solde sur 7 jours (Chart.js line, couleur #547A95)",
+          "Section 'Positions actives' : tableau compact (Actif, Direction BUY/SELL badge, Volume, Prix entrée, P&L live avec clignotement rouge/vert), bouton 'Clôturer' par ligne",
+          "Section 'Dernières transactions' : liste 5 items (icône type, montant, statut badge, horodatage relatif)",
+          "Ticker défilant horizontal en temps réel (WebSocket) : paires Forex et prix Crypto, variation colorée",
+          "Card 'Compléter votre profil' (visible si KYC incomplet) : progress bar %, liste des étapes manquantes, bouton 'Compléter'",
+          "Raccourcis rapides : 3 boutons animés (Déposer, Trader, Retirer)",
+          "Dropdown notifications : liste des alertes avec icône type, message, date, bouton marquer comme lu"
+        ],
+        "background": [
+          "WebSocket connexion pour ticker de prix et mise à jour P&L des positions",
+          "GET /api/dashboard/summary pour solde, KPIs, positions ouvertes",
+          "GET /api/transactions?limit=5 pour les dernières transactions",
+          "Polling fallback si WebSocket indisponible (toutes les 5s)",
+          "Calcul P&L flottant côté client (prix live - prix entrée × volume)",
+          "GET /api/notifications?unread=true pour le badge count",
+          "Vérification du niveau KYC pour afficher la card de complétion"
+        ]
+      }
+    },
+    {
+      "id": "workspace_trading",
+      "zone": "Dashboard",
+      "route": "/dashboard/trade",
+      "title": "Workspace de Trading",
+      "description": "Plateforme de trading complète intégrée, équivalent MetaTrader, avec graphiques live et passage d'ordres",
+      "features": {
+        "visible": [
+          "Barre supérieure : sélecteur d'actif (search + dropdown catégorisé : Forex, Crypto, Indices, Matières premières), prix Bid/Ask live avec spread affiché, variation 24h",
+          "Sélecteur de timeframe : M1, M5, M15, M30, H1, H4, D1, W1",
+          "Graphique principal OHLC / chandeliers japonais (TradingView Lightweight Charts ou Chart.js financial)",
+          "Outils de dessin sur graphique : ligne de tendance, horizontal, Fibonacci retracement, rectangle, annotation texte",
+          "Toolbar indicateurs techniques : MA, EMA, RSI, MACD, Bollinger Bands (toggle activer/désactiver avec paramètres)",
+          "Bouton plein écran graphique",
+          "Layout redimensionnable (splitter drag entre graphe et panneaux)",
+          "PANNEAU PASSAGE D'ORDRE : Boutons BUY (vert) / SELL (rouge) proéminents, Champ Volume/Lots avec +/- rapide, Champ Stop Loss (optionnel), Champ Take Profit (optionnel), Select type d'ordre (Market / Limit / Stop), Prix limite (si Limit/Stop), Affichage marge requise calculée dynamiquement, Bouton 'Placer l'ordre' avec confirmation modale animée récapitulative",
+          "Modale de confirmation ordre : récapitulatif (actif, direction, volume, prix, SL, TP, marge), boutons Confirmer / Annuler, animation de succès après validation",
+          "PANNEAU POSITIONS OUVERTES (tableau live) : Symbole, Direction, Volume, Prix entrée, Prix actuel, SL, TP, P&L ($) clignotant, Durée ouverte, Bouton Modifier (SL/TP inline), Bouton Clôturer",
+          "PANNEAU ORDRES EN ATTENTE (tableau) : Type, Symbole, Volume, Prix déclencheur, SL, TP, Date création, Bouton Modifier, Bouton Annuler",
+          "PANNEAU HISTORIQUE DES TRADES (tableau paginé) : Date ouverture/clôture, Actif, Direction, Volume, Prix entrée/sortie, Résultat ($), Résultat (pips)",
+          "Barre de compte en bas ou côté : Solde, Équité, Marge, Marge libre, Niveau de marge (%), tous en temps réel",
+          "Bouton 'Clôturer tout' avec modale de confirmation",
+          "Toast notification à chaque ouverture/clôture d'ordre"
+        ],
+        "background": [
+          "WebSocket connexion permanente pour prix Bid/Ask en temps réel",
+          "Abonnement au flux de l'actif sélectionné à chaque changement de symbole",
+          "GET /api/charts/{symbol}/{timeframe} pour données OHLC historiques",
+          "POST /api/orders pour placer un ordre (Market/Limit/Stop)",
+          "PUT /api/orders/{id} pour modifier SL/TP d'un ordre",
+          "DELETE /api/orders/{id} pour annuler un ordre en attente",
+          "POST /api/positions/{id}/close pour clôturer une position",
+          "POST /api/positions/close-all pour clôturer toutes les positions",
+          "Calcul P&L flottant en temps réel côté client",
+          "Calcul équité = solde + somme P&L flottants",
+          "Calcul marge libre = équité - marge utilisée",
+          "Détection margin call (niveau marge < seuil) avec alerte visuelle",
+          "Mise à jour des panneaux via WebSocket events (order_opened, order_closed, position_updated)"
+        ]
+      }
+    },
+    {
+      "id": "wallet",
+      "zone": "Dashboard",
+      "route": "/dashboard/wallet",
+      "title": "Wallet",
+      "description": "Gestion complète du solde, dépôts, retraits et historique des transactions",
+      "features": {
+        "visible": [
+          "Card solde principal : montant animé (countUp.js), devise affichée, icône wallet, indication 'Solde disponible'",
+          "Cards secondaires : Solde en trading, Total déposé, Total retiré",
+          "SECTION FORMULAIRES (2 formulaires côte à côte, responsive stack mobile) :",
+          "Formulaire DEPOSIT : Champ montant (validation min/max selon méthode), Select méthode de paiement (Carte bancaire, Virement bancaire, Crypto, Mobile Money), Champs dynamiques selon méthode (ex: adresse crypto, numéro carte), Upload preuve de paiement si virement (dropzone), Bouton 'Déposer' avec loader + animation check Lottie au succès",
+          "Formulaire WITHDRAW : Champ montant (validation solde disponible), Select méthode (Virement bancaire, Crypto, Mobile Money), Champs dynamiques (IBAN/BIC, adresse crypto ou numéro), Tooltip délai de traitement par méthode, Bouton 'Retirer' (peut déclencher 2FA si activé)",
+          "Message statut transaction récente : badge animé (En attente / Approuvé / Rejeté / En cours de traitement)",
+          "Tooltip info sur délais par méthode de paiement",
+          "TABLEAU HISTORIQUE DES TRANSACTIONS (paginé 10/page) : Date, Type (Deposit/Withdraw badge coloré), Montant, Méthode, Statut (badge), Référence, Action (voir reçu)",
+          "Filtres tableau : Type (Tous/Deposit/Withdraw), Statut (Tous/En attente/Approuvé/Rejeté), Date range picker",
+          "Bouton Export CSV",
+          "Pagination avec numéros de pages",
+          "SECTION MÉTHODES SAUVEGARDÉES : liste des méthodes enregistrées (logo + derniers chiffres ou adresse tronquée), bouton Supprimer, bouton Ajouter nouvelle méthode"
+        ],
+        "background": [
+          "GET /api/wallet/balance pour le solde et les totaux",
+          "POST /api/transactions/deposit pour créer une demande de dépôt",
+          "POST /api/transactions/withdraw pour créer une demande de retrait",
+          "GET /api/transactions avec filtres et pagination pour l'historique",
+          "Vérification des limites de retrait selon le niveau KYC en DB",
+          "Vérification solde disponible avant autorisation du retrait",
+          "Trigger vérification 2FA avant soumission du retrait si activé",
+          "Upload sécurisé des preuves de paiement",
+          "Webhook ou polling (30s) pour mise à jour statut transaction",
+          "Génération CSV côté client ou via API",
+          "GET /api/payment-methods pour les méthodes sauvegardées",
+          "DELETE /api/payment-methods/{id} pour supprimer une méthode"
+        ]
+      }
+    },
+    {
+      "id": "markets",
+      "zone": "Dashboard",
+      "route": "/dashboard/markets",
+      "title": "Marchés",
+      "description": "Exploration de tous les actifs disponibles avec cotations live et favoris",
+      "features": {
+        "visible": [
+          "Tabs catégories : Tous | Forex | Crypto | Indices | Matières Premières",
+          "Tab supplémentaire : Mes Favoris (étoile)",
+          "Barre de recherche rapide (filtre la liste en temps réel)",
+          "Filtre spread et volatilité (dropdown)",
+          "Tableau des actifs : Symbole (avec icône), Prix Bid, Prix Ask, Spread (pips), Variation 24h (% coloré), Mini-sparkline 24h, Bouton étoile favoris, Bouton 'Trader'",
+          "Variation 24h avec micro-animation flicker vert/rouge à chaque mise à jour",
+          "Tri des colonnes (clic sur en-tête, ASC/DESC, indicateur de tri actif)",
+          "Bouton 'Trader' → redirige vers workspace avec l'actif pré-sélectionné",
+          "Toggle étoile favoris (animation fill animé)",
+          "Virtualisation de liste si > 200 actifs",
+          "Indicateur 'Marché ouvert / fermé' par actif"
+        ],
+        "background": [
+          "WebSocket abonnement aux prix de tous les actifs visibles à l'écran",
+          "Désabonnement des actifs hors viewport (optimisation)",
+          "GET /api/instruments pour la liste complète",
+          "Stockage des favoris en DB utilisateur (POST/DELETE /api/favorites/{symbol})",
+          "Calcul spread dynamique (Ask - Bid) côté client",
+          "Mise à jour différentielle (seule la cellule modifiée re-render)"
+        ]
+      }
+    },
+    {
+      "id": "trade_history",
+      "zone": "Dashboard",
+      "route": "/dashboard/history",
+      "title": "Historique des Trades",
+      "description": "Historique complet des trades clôturés avec analytics et export",
+      "features": {
+        "visible": [
+          "Cards de résumé en haut : Total trades, Win Rate (%), Profit total ($), Perte totale ($), Meilleur trade ($), Pire trade ($), Durée moyenne",
+          "Graphique P&L cumulatif (courbe ligne Chart.js, couleur #547A95, fond EFE3CA)",
+          "Filtres : Période (date range picker avec presets 7j/30j/3m/1an/tout), Symbole (select ou search), Direction (Tous/Buy/Sell), Résultat (Tous/Profit/Perte)",
+          "Bouton Réinitialiser filtres",
+          "Tableau paginé (20/page) : Date ouverture, Date clôture, Symbole, Direction (badge), Volume, Prix entrée, Prix sortie, SL, TP, Résultat ($), Résultat (pips), Durée",
+          "Clic sur ligne → slide-over latéral avec détail complet du trade et graphique de la période",
+          "Tri des colonnes",
+          "Bouton Export CSV",
+          "Bouton Export PDF (rapport de performance)",
+          "Pagination avec numéros de pages"
+        ],
+        "background": [
+          "GET /api/trades/history avec filtres et pagination côté serveur",
+          "GET /api/trades/stats pour les métriques de résumé (calculées côté serveur)",
+          "GET /api/trades/chart-data pour les données du graphique cumulatif",
+          "Génération PDF via librairie client (jsPDF) ou endpoint API",
+          "Cache des stats agrégées avec invalidation sur nouveau trade"
+        ]
+      }
+    },
+    {
+      "id": "analytics",
+      "zone": "Dashboard",
+      "route": "/dashboard/analytics",
+      "title": "Analytics & Performance",
+      "description": "Tableau de bord analytique avancé des performances de trading",
+      "features": {
+        "visible": [
+          "Sélecteur de période global (7j, 30j, 3m, 6m, 1an, tout)",
+          "Graphique évolution du solde (courbe lissée, Chart.js, filtrable par période)",
+          "Donut chart répartition des trades par actif/symbole (top 5 + autres)",
+          "Bar chart performances par jour de la semaine (P&L moyen par jour)",
+          "Card Win Rate avec jauge animée circulaire",
+          "Card Ratio Profit / Perte (Profit Factor)",
+          "Card Drawdown maximum (avec période)",
+          "Card Nombre de trades total",
+          "Card Durée moyenne par trade",
+          "Card Actif le plus tradé",
+          "Heatmap des horaires de trading (grille heure × jour de semaine, couleur selon P&L moyen)",
+          "Comparaison avec période précédente : flèches animées up/down et delta en % pour chaque métrique",
+          "Graphique scatter plot : durée vs P&L (identifier les patterns)"
+        ],
+        "background": [
+          "GET /api/analytics/performance avec la période sélectionnée",
+          "Calcul de toutes les statistiques côté serveur",
+          "Cache Redis des données agrégées avec TTL selon la période",
+          "Re-fetch automatique si nouvelle clôture de trade détectée"
+        ]
+      }
+    },
+    {
+      "id": "profile",
+      "zone": "Dashboard",
+      "route": "/dashboard/profile",
+      "title": "Profil Utilisateur",
+      "description": "Gestion complète du profil personnel, KYC et sécurité",
+      "features": {
+        "visible": [
+          "Header profil : avatar (grand format) avec bouton de modification (overlay caméra au hover), Nom complet, Email, Date d'inscription",
+          "SECTION INFORMATIONS PERSONNELLES : Prénom, Nom, Email (readonly), Téléphone, Date de naissance, Pays, Ville, Adresse, Devise préférée. Bouton 'Modifier' ouvre les champs en mode édition inline. Bouton 'Sauvegarder' avec loader. Message de succès toast.",
+          "SECTION KYC : Badge de statut animé (Pending / Verified / Rejected), Liste des documents soumis avec statut individuel, Preview des documents (clic → modale lightbox), Bouton 're-uploader' si document rejeté, Message de raison de rejet si applicable, Barre de progression KYC niveau (Basic → Standard → Advanced)",
+          "SECTION SÉCURITÉ : Sous-section changement mot de passe (ancien + nouveau + confirmation + indicateur force), Sous-section 2FA (statut Activé/Désactivé, bouton 'Activer 2FA' → modale QR code + code TOTP de confirmation + codes de secours), Sous-section sessions actives (liste : navigateur, OS, IP, date dernière activité, bouton 'Déconnecter cette session')",
+          "SECTION PRÉFÉRENCES : Sélecteur langue interface, Sélecteur devise d'affichage, Toggles notifications email (par catégorie : trades, transactions, marketing, système)",
+          "SECTION DANGER ZONE : Bouton 'Supprimer mon compte' (couleur rouge, ouvre modale de confirmation avec saisie du mot de passe + texte de confirmation 'SUPPRIMER')"
+        ],
+        "background": [
+          "GET /api/profile pour charger les données utilisateur",
+          "PUT /api/profile pour sauvegarder les modifications",
+          "POST /api/profile/avatar pour upload de l'avatar (resize + stockage S3)",
+          "PUT /api/auth/password pour le changement de mot de passe",
+          "POST /api/auth/2fa/enable pour générer le secret TOTP et le QR code",
+          "POST /api/auth/2fa/confirm pour activer le 2FA après vérification du code",
+          "DELETE /api/auth/2fa pour désactiver le 2FA",
+          "GET /api/auth/sessions pour la liste des sessions actives",
+          "DELETE /api/auth/sessions/{id} pour révoquer une session",
+          "DELETE /api/account pour la suppression du compte (avec confirmation côté serveur)",
+          "Envoi email de confirmation si l'email est modifié"
+        ]
+      }
+    },
+    {
+      "id": "notifications_center",
+      "zone": "Dashboard",
+      "route": "/dashboard/notifications",
+      "title": "Centre de Notifications",
+      "description": "Gestion complète des notifications avec filtres et préférences",
+      "features": {
+        "visible": [
+          "Titre de page + badge count non lues",
+          "Bouton 'Tout marquer comme lu'",
+          "Bouton 'Tout supprimer'",
+          "Filtres par type : Tous | Trades | Transactions | Système | Promotions",
+          "Liste des notifications (infinite scroll ou pagination) : Icône type, Titre, Message, Horodatage relatif ('il y a 2h'), Badge 'Non lu' (point bleu), Bouton supprimer (hover reveal), Fond plus clair si non lue",
+          "Clic sur notification → marque comme lue + redirection vers la page concernée",
+          "État vide (illustration + message si aucune notification)",
+          "SLIDE-OVER PRÉFÉRENCES (bouton 'Paramètres de notifications') : Toggles par catégorie et par canal (Email / Push / In-app), Toggle notifications push globales (prompt permission navigateur si non accordée)"
+        ],
+        "background": [
+          "GET /api/notifications avec pagination et filtres",
+          "PUT /api/notifications/read-all pour marquer toutes comme lues",
+          "PUT /api/notifications/{id}/read pour marquer une comme lue",
+          "DELETE /api/notifications/{id} pour supprimer",
+          "WebSocket event 'notification.new' pour les nouvelles notifications en temps réel",
+          "Mise à jour du badge count dans le layout principal via état global",
+          "GET/PUT /api/notification-preferences pour les préférences",
+          "Service Worker pour les push notifications (si accordées)"
+        ]
+      }
+    },
+    {
+      "id": "support",
+      "zone": "Dashboard",
+      "route": "/dashboard/support",
+      "title": "Support & Tickets",
+      "description": "Support client intégré avec live chat, tickets et FAQ",
+      "features": {
+        "visible": [
+          "Tabs principaux : Live Chat | Mes Tickets | FAQ",
+          "ONGLET LIVE CHAT : Interface chat bulle (messages bulles gauche/droite), Statut agent ('Agent disponible' vert / 'Hors ligne' gris), Indicateur 'Agent en train de taper...' animé (3 points), Champ saisie message + bouton Envoyer + bouton upload fichier, Historique de conversation scrollable, Horodatage des messages",
+          "ONGLET MES TICKETS : Bouton 'Nouveau ticket', Tableau des tickets (ID, Sujet, Catégorie, Statut badge, Priorité badge, Date création, Date dernière réponse), Clic sur ticket → page détail ticket",
+          "PAGE DÉTAIL TICKET : Titre du ticket, Info (statut, priorité, catégorie, date), Fil de conversation (messages alternés client/admin avec avatars), Formulaire de réponse (textarea + upload pièce jointe), Bouton 'Fermer ce ticket', Bouton 'Rouvrir' si fermé",
+          "FORMULAIRE NOUVEAU TICKET : Champ Sujet, Select Catégorie (Technique, Financier, KYC, Autre), Select Priorité, Textarea Description, Dropzone pièce jointe, Bouton Soumettre",
+          "ONGLET FAQ : Barre de recherche FAQ, Accordion catégorisé (questions/réponses animées), Lien 'Cette réponse vous a-t-elle aidé ? Oui / Non'",
+          "Rating post-conversation live chat (1-5 étoiles) à la fermeture"
+        ],
+        "background": [
+          "WebSocket pour le live chat temps réel (envoi et réception de messages)",
+          "GET/POST /api/tickets pour la liste et la création de tickets",
+          "GET /api/tickets/{id} pour le détail d'un ticket",
+          "POST /api/tickets/{id}/replies pour ajouter une réponse",
+          "PUT /api/tickets/{id}/close ou /api/tickets/{id}/reopen",
+          "Upload pièces jointes vers stockage cloud",
+          "WebSocket event 'ticket.reply' pour notification en temps réel d'une réponse admin",
+          "GET /api/faq pour la liste des questions/réponses"
+        ]
+      }
+    },
+    {
+      "id": "referral",
+      "zone": "Dashboard",
+      "route": "/dashboard/referral",
+      "title": "Programme de Parrainage",
+      "description": "Gestion du parrainage, suivi des filleuls et des commissions",
+      "features": {
+        "visible": [
+          "Card lien de parrainage unique : URL complète affichée tronquée, bouton 'Copier' avec toast confirmation 'Copié !'",
+          "QR code du lien de parrainage (canvas généré côté client), bouton 'Télécharger QR'",
+          "Boutons de partage direct : WhatsApp, Telegram, Twitter/X, Email (liens directs avec message pré-rempli)",
+          "Cards KPI parrainage : Total filleuls, Filleuls actifs, En attente validation, Commissions totales gagnées ($)",
+          "Card 'Commissions disponibles' avec bouton 'Retirer vers mon wallet'",
+          "Tableau des filleuls : Prénom masqué (ex: J***), Date inscription, Statut (Actif/Inactif/En attente), Dépôt effectué (Oui/Non), Commission générée ($)",
+          "Graphique évolution des commissions (bar chart mensuel)",
+          "Section Règles du programme : accordion avec conditions, pourcentages de commission, paliers",
+          "Historique des commissions versées (tableau : date, montant, filleul, statut)"
+        ],
+        "background": [
+          "GET /api/referral/info pour le code unique et les statistiques",
+          "Génération QR code via librairie client (qrcode.js)",
+          "GET /api/referral/referees pour la liste des filleuls",
+          "GET /api/referral/commissions pour l'historique",
+          "POST /api/referral/withdraw pour déclencher le retrait des commissions vers le wallet",
+          "Cookie de tracking parrainage posé lors du clic sur lien de parrainage (attribution sur 30j)"
+        ]
+      }
+    }
+  ],
+  "modals": [
+    {
+      "id": "modal_about_us",
+      "zone": "Modal Public",
+      "trigger": "Lien nav ou footer 'About Us'",
+      "title": "About Us",
+      "description": "Modale popup plein écran avec hero, histoire et équipe",
+      "structure": {
+        "hero_section": {
+          "title": "About Us",
+          "breadcrumb": ["Home", "About Us"],
+          "background_color": "#2C3947",
+          "elements": ["Titre de page", "Breadcrumb cliquable", "Image ou pattern géométrique en fond"]
+        },
+        "sections": [
+          "Section Histoire & Mission (texte narratif, timeline animée de la création de la société)",
+          "Section Chiffres clés (compteurs animés : années d'expérience, clients, volume tradé, pays couverts)",
+          "Section Notre Équipe (grid de cards : photo, prénom, nom, rôle, liens LinkedIn)",
+          "Section Réglementations & Licences (logos des régulateurs avec badges de certification, texte de conformité)"
+        ]
+      },
+      "background": [
+        "Gestion de l'URL hash (#about) pour partage direct et navigation back",
+        "Focus trap dans la modale pour accessibilité",
+        "Fermeture via bouton X, clic backdrop ou touche Escape"
+      ]
+    },
+    {
+      "id": "modal_contact_us",
+      "zone": "Modal Public",
+      "trigger": "Lien nav ou footer 'Contact Us'",
+      "title": "Contact Us",
+      "description": "Modale popup avec formulaire de contact et informations",
+      "structure": {
+        "hero_section": {
+          "title": "Contact Us",
+          "breadcrumb": ["Home", "Contact Us"],
+          "background_color": "#2C3947"
+        },
+        "sections": [
+          "Formulaire de contact : Champ Nom, Champ Email, Select Sujet (Support, Partenariat, Presse, Autre), Textarea Message, Bouton 'Envoyer', Message de succès animé après envoi",
+          "Coordonnées : Adresse email support, Numéro de téléphone, Adresse postale, Horaires de support",
+          "Carte Google Maps intégrée (embed iframe)",
+          "Liens réseaux sociaux"
+        ]
+      },
+      "background": [
+        "POST /api/contact pour l'envoi du formulaire",
+        "Anti-spam : honeypot field caché",
+        "Rate limiting sur le formulaire de contact",
+        "Email de confirmation envoyé à l'utilisateur"
+      ]
+    },
+    {
+      "id": "modal_our_offer",
+      "zone": "Modal Public",
+      "trigger": "Lien nav 'Our Offer' ou bouton CTA",
+      "title": "Our Offer",
+      "description": "Modale détaillant les offres de trading et les types de comptes",
+      "structure": {
+        "hero_section": {
+          "title": "Our Offer",
+          "breadcrumb": ["Home", "Our Offer"],
+          "background_color": "#2C3947"
+        },
+        "sections": [
+          "Grid des actifs disponibles (Forex, Crypto, Indices, Matières premières) avec icônes, description et specs",
+          "Tableau comparatif des types de comptes : Standard, Gold, VIP (dépôt min, spread, levier, accès actifs, support)",
+          "Section avantages de chaque plan (icônes check animées)",
+          "Section plateformes disponibles (web, mobile)",
+          "CTA vers Register avec bouton animé"
+        ]
+      },
+      "background": []
+    },
+    {
+      "id": "modal_privacy_policy",
+      "zone": "Modal Public",
+      "trigger": "Lien footer 'Privacy Policy'",
+      "title": "Privacy Policy",
+      "description": "Modale politique de confidentialité avec navigation ancres",
+      "structure": {
+        "hero_section": {
+          "title": "Privacy Policy",
+          "breadcrumb": ["Home", "Privacy Policy"],
+          "background_color": "#2C3947"
+        },
+        "sections": [
+          "Sommaire ancré (liens cliquables vers chaque section) : Table des matières en haut",
+          "Contenu légal structuré (h2/h3) : Collecte des données, Utilisation des données, Cookies, Partage des données, Droits RGPD, Contact DPO",
+          "Date de dernière mise à jour",
+          "Bouton 'Haut de page' flottant dans la modale"
+        ]
+      },
+      "background": [
+        "Fermeture via bouton X ou Escape",
+        "Gestion du hash URL #privacy"
+      ]
+    },
+    {
+      "id": "modal_terms_conditions",
+      "zone": "Modal Public",
+      "trigger": "Lien footer 'Terms & Conditions' ou lien dans formulaire Register",
+      "title": "Terms & Conditions",
+      "description": "Modale conditions générales d'utilisation avec table des matières",
+      "structure": {
+        "hero_section": {
+          "title": "Terms & Conditions",
+          "breadcrumb": ["Home", "Terms & Conditions"],
+          "background_color": "#2C3947"
+        },
+        "sections": [
+          "Table des matières cliquable (sommaire ancré)",
+          "Contenu légal structuré : Définitions, Accès à la plateforme, Risques de trading, Responsabilités, Propriété intellectuelle, Loi applicable",
+          "Avertissement risque trading en encadré visible",
+          "Date de mise à jour",
+          "Bouton 'J'accepte' en bas (visible uniquement si modale appelée depuis le Register)"
+        ]
+      },
+      "background": [
+        "Gestion du hash URL #terms",
+        "Si appelée depuis Register : callback sur 'J'accepte' pour cocher la case automatiquement"
+      ]
+    }
+  ],
+  "navigation": {
+    "public_layout": {
+      "navbar": ["Landing Page", "About Us (modale)", "Our Offer (modale)", "Contact Us (modale)", "Sign In", "Get Started"],
+      "footer_links": ["Privacy Policy (modale)", "Terms & Conditions (modale)", "Contact Us (modale)", "About Us (modale)"]
+    },
+    "dashboard_layout": {
+      "sidebar_items": [
+        { "label": "Dashboard", "route": "/dashboard", "icon": "home" },
+        { "label": "Trade", "route": "/dashboard/trade", "icon": "chart-line" },
+        { "label": "Marchés", "route": "/dashboard/markets", "icon": "globe" },
+        { "label": "Wallet", "route": "/dashboard/wallet", "icon": "wallet" },
+        { "label": "Historique", "route": "/dashboard/history", "icon": "clock" },
+        { "label": "Analytics", "route": "/dashboard/analytics", "icon": "bar-chart" },
+        { "label": "Parrainage", "route": "/dashboard/referral", "icon": "gift" },
+        { "label": "Support", "route": "/dashboard/support", "icon": "message" },
+        { "label": "Profil", "route": "/dashboard/profile", "icon": "user" }
+      ],
+      "topbar_items": ["Notifications (cloche + badge)", "Avatar + menu dropdown (Profil, Paramètres, Déconnexion)"]
+    }
+  },
+  "global_ui": {
+    "toast_system": "Notifications toast en haut à droite (succès, erreur, info, warning) avec auto-dismiss 5s",
+    "loading_states": "Skeleton loaders sur tous les tableaux et cards pendant le chargement initial",
+    "error_boundaries": "Pages d'erreur pour 404, 500, connexion perdue avec bouton 'Réessayer'",
+    "offline_detection": "Banner 'Connexion perdue' si WebSocket ou réseau indisponible",
+    "responsive": "Fully responsive : sidebar collapsée en mobile (drawer), tableaux scrollables horizontalement",
+    "theme": "Theme unique (pas de dark mode pour coller à la charte #EFE3CA)"
+  }
+}

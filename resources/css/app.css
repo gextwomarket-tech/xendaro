@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../vendor/filament/**/*.blade.php';
+@source '../../vendor/livewire/**/*.blade.php';
+@source '../../vendor/laravel/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Filament Modern Styles */
+@layer components {
+    /* Cards with shadows */
+    .fi-section {
+        @apply rounded-xl shadow-sm border border-gray-200 dark:border-gray-700;
+    }
+
+    /* Table improvements */
+    .fi-table {
+        @apply rounded-lg overflow-hidden;
+    }
+
+    .fi-table thead {
+        @apply bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900;
+    }
+
+    .fi-table tbody tr {
+        @apply hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors;
+    }
+
+    /* Badge colors */
+    .fi-badge-success {
+        @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400;
+    }
+
+    .fi-badge-danger {
+        @apply bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400;
+    }
+
+    .fi-badge-warning {
+        @apply bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
+    }
+
+    .fi-badge-info {
+        @apply bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400;
+    }
+
+    /* Form inputs */
+    .fi-input {
+        @apply rounded-lg border-gray-300 focus:border-cyan-500 focus:ring-cyan-500 transition-all;
+    }
+
+    /* Buttons */
+    .fi-btn {
+        @apply rounded-lg transition-all duration-200;
+    }
+
+    .fi-btn-primary {
+        @apply bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white shadow-md hover:shadow-lg;
+    }
+}

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+    <head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>Puprime Fox - Maîtrisez le Futur</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&amp;family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#232b2c",
+                        "surface-variant": "#2e3637",
+                        "outline": "#849495",
+                        "outline-variant": "#3a494b",
+                        "surface-bright": "#333b3b",
+                        "on-secondary-container": "#500050",
+                        "on-tertiary-fixed-variant": "#474646",
+                        "on-error": "#690005",
+                        "primary": "#e1fdff",
+                        "primary-container": "#00f2ff",
+                        "on-background": "#dce4e4",
+                        "secondary-container": "#fe00fe",
+                        "primary-fixed": "#74f5ff",
+                        "surface-tint": "#00dbe7",
+                        "secondary-fixed-dim": "#ffabf3",
+                        "secondary-fixed": "#ffd7f5",
+                        "primary-fixed-dim": "#00dbe7",
+                        "tertiary-container": "#dddad9",
+                        "on-primary-container": "#006a71",
+                        "background": "#0d1515",
+                        "tertiary-fixed": "#e5e2e1",
+                        "on-primary-fixed-variant": "#004f54",
+                        "on-tertiary": "#313030",
+                        "inverse-on-surface": "#2a3232",
+                        "on-primary": "#00363a",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed": "#380038",
+                        "inverse-primary": "#00696f",
+                        "surface-container-lowest": "#080f10",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#810081",
+                        "on-primary-fixed": "#002022",
+                        "on-tertiary-container": "#615f5f",
+                        "surface-container-highest": "#2e3637",
+                        "on-surface": "#dce4e4",
+                        "tertiary-fixed-dim": "#c9c6c5",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "surface": "#0d1515",
+                        "on-surface-variant": "#b9cacb",
+                        "surface-dim": "#0d1515",
+                        "surface-container": "#192122",
+                        "on-secondary": "#5b005b",
+                        "tertiary": "#faf6f6",
+                        "secondary": "#ffabf3",
+                        "surface-container-low": "#151d1e",
+                        "inverse-surface": "#dce4e4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "column-gap": "32px",
+                        "margin-desktop": "64px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Roboto"],
+                        "headline-md": ["Poppins"],
+                        "data-mono": ["Roboto"],
+                        "headline-lg-mobile": ["Poppins"],
+                        "body-md": ["Roboto"],
+                        "headline-xl": ["Poppins"],
+                        "label-caps": ["Poppins"],
+                        "headline-lg": ["Poppins"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "data-mono": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-xl": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .clip-polygon { clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
+        .clip-hexagon { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+        .clip-diamond { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        .clip-triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+        .clip-octagon { clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%); }
+        .glass-panel { background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(0, 219, 231, 0.1); }
+        .glass-panel:hover { border-color: rgba(0, 219, 231, 1); box-shadow: 0 0 10px rgba(0, 219, 231, 0.5); }
+        .btn-glow { transition: all 0.3s ease; }
+        .btn-glow:hover { box-shadow: 0 0 15px rgba(0, 219, 231, 0.8); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-primary/20 shadow-[0_0_15px_rgba(0,219,231,0.1)] flex justify-between items-center px-margin-desktop h-20">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tighter">Puprime Fox</div>
+<div class="hidden md:flex gap-4 items-center">
+<div class="flex gap-gutter items-center mr-4">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/10 transition-all duration-300 px-3 py-2" href="#">Marchés</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/10 transition-all duration-300 px-3 py-2" href="#">Copy Trading</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/10 transition-all duration-300 px-3 py-2" href="#">Services</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/10 transition-all duration-300 px-3 py-2" href="#">Sécurité</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors hover:bg-primary/10 transition-all duration-300 px-3 py-2" href="#">FAQ</a>
+</div>
+<div class="flex items-center gap-2 border-l border-primary/20 pl-4 mr-4">
+<button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors px-1">EN</button>
+<span class="text-primary/30 text-xs">|</span>
+<button class="font-label-caps text-label-caps text-primary px-1 font-bold">FR</button>
+</div>
+<button class="hidden md:block bg-primary text-on-primary font-label-caps text-label-caps px-6 py-3 clip-polygon btn-glow hover:bg-primary-container uppercase">Créer mon compte</button>
+</div>
+</nav>
+<main class="pt-20">
+<!-- 1. Hero Section -->
+<section class="h-[300px] max-w-7xl mx-auto px-margin-desktop flex items-center gap-column-gap mt-12">
+<div class="flex-1">
+<h1 class="font-headline-xl text-headline-xl text-primary mb-6">Maîtrisez le Futur</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-8">Précision basée sur les données. Exécution à faible latence. Votre terminal pour les marchés à haute vélocité.</p>
+<div class="flex gap-4">
+<button class="bg-transparent border-2 border-primary text-primary font-label-caps text-label-caps px-8 py-4 clip-polygon hover:bg-primary/10 transition-all uppercase">Connexion</button>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-8 py-4 clip-polygon btn-glow uppercase">Inscription</button>
+</div>
+</div>
+<div class="flex-1 h-full relative">
+<div class="absolute inset-0 bg-gradient-to-r from-background to-transparent z-10 w-24"></div>
+<img alt="Visualisation abstraite du trading financier de haute technologie avec des lignes néon cyan et magenta incandescentes sur un fond noir sidéral profond." class="w-full h-full object-cover clip-polygon opacity-80 border border-primary/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClX9kh86OdMd0iDIhn2xYl4A9H1HTYHzPcDLqxV6URELiApNmAuk2_X4wFMqeWHOGJ300NcfTBHHxHcpgbRfTWWDuCG6_Tvt01UpJMMCGDbDre722_t88gshS8hcf3FVBrKNQVKk_1pVHOSmj2jTcD01_Ax51oVkPBmx463nGr2ClPXcvF6Ky5f58gM26qacLAfNlcRLhxJ0sgZL1fB2PX6AictXUJLmNM00NPFm02wEYuplwQEP9zrxOPS0ZXL9idPAVvVq8ZwiE"/>
+</div>
+</section>
+<!-- 2. Market Pulse -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-16 grid grid-cols-1 md:grid-cols-2 gap-column-gap items-center">
+<div class="glass-panel p-6 clip-polygon">
+<h3 class="font-label-caps text-label-caps text-primary mb-4 border-b border-primary/20 pb-2">Télémétrie en Direct</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center border-b border-primary/10 pb-2">
+<span class="font-data-mono text-data-mono text-on-surface">BTC/USD</span>
+<span class="font-data-mono text-data-mono text-primary-container">64,230.50</span>
+<span class="font-data-mono text-data-mono text-secondary-container">+2.4%</span>
+</div>
+<div class="flex justify-between items-center border-b border-primary/10 pb-2">
+<span class="font-data-mono text-data-mono text-on-surface">ETH/USD</span>
+<span class="font-data-mono text-data-mono text-primary-container">3,450.20</span>
+<span class="font-data-mono text-data-mono text-secondary-container">+1.8%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-data-mono text-data-mono text-on-surface">EUR/USD</span>
+<span class="font-data-mono text-data-mono text-error">1.0845</span>
+<span class="font-data-mono text-data-mono text-error">-0.5%</span>
+</div>
+</div>
+</div>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Exécution à Latence Zéro</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Notre infrastructure est colocalisée avec les principaux fournisseurs de liquidité pour garantir que vos ordres soient exécutés en microsecondes. Éliminez le glissement et dominez les marchés volatils avec nos algorithmes de routage propriétaires.</p>
+</div>
+</section>
+<!-- 3. Copy Trading -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-16 grid grid-cols-1 md:grid-cols-2 gap-column-gap items-center bg-surface-container/50">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Miroir Algorithmique</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Répliquez automatiquement les stratégies des traders quantitatifs de premier plan. Filtrez par mesures de risque, drawdown et alpha historique pour construire un portefeuille diversifié de stratégies automatisées fonctionnant 24h/24 et 7j/7.</p>
+</div>
+<div class="relative flex justify-center">
+<img alt="Tableau de bord de visualisation de données affichant des graphiques financiers complexes avec un thème néon cyan éclatant." class="w-[400px] h-[400px] object-cover clip-hexagon border-2 border-primary/40 glass-panel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqYIFSURy9JrmwRLYmhDc6eHDjLbBiWZNQZeu-YpRCkjoFLkZd8U-I58OPWeoNmMThLy0yBZrMMvIB6Z8dxQd2Biq39BdTdZhJALeuH4n2kDrn-XOUy9KkpLNfA0mIiRv6Q3NgCTvhRonYKMw7cZX8D1VePGVo8aexrDDCvJZ29JgERk7krzmrR3J1B3jCBJ44PhWxnZoiDR237ybEXBEQOVsS3W5_Yb3TBxIAr7lpL6fqZ_eZLFAH5ht05oXTGpk6DtY5utwYkRs"/>
+</div>
+</section>
+<!-- 4. Intelligent Accounts -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-16 grid grid-cols-1 md:grid-cols-2 gap-column-gap items-center">
+<div class="relative flex justify-center">
+<img alt="Interface utilisateur en mode sombre d'un tableau de bord affichant des données financières en temps réel avec des accents cyan et magenta." class="w-[400px] h-[400px] object-cover clip-diamond border-2 border-secondary-container/40" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuda32bZ__0gBCEJ89A46YCO7c1XpZJw6jmJ7TgEGV6dHWOELcBRdagRBl__kN-Voqsin3gzcLo9cjvgVnroiDS6Z8wNEBnDTYsQnDONjoJrkGJjOCGFk-G1sM79OEi4NO1_88f03qWu-9J5INjshGeJv5S5Y0Kpq4XtI1WMY2vsG7ad7XABR5M3duPXYsrCTMI0-zKRV2DfLLrwjGzXeqqtXOLnoPJAyTEUClqSfiHACHyC5K8N8LINLV35jLbaYsxsVmqo_10Pc"/>
+</div>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-6">Architecture par Niveaux</h2>
+<div class="space-y-6">
+<div class="glass-panel p-4 clip-polygon border-l-4 border-l-primary">
+<h4 class="font-headline-md text-headline-md text-on-surface">Protocole Standard</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-2">Accès de base aux marchés au comptant, graphiques essentiels et routage à latence standard.</p>
+</div>
+<div class="glass-panel p-4 clip-polygon border-l-4 border-l-secondary-container">
+<h4 class="font-headline-md text-headline-md text-on-surface">Télémétrie Pro</h4>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mt-2">Accès API avancé, données de carnet d'ordres de niveau 2 et frais de transaction réduits.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Fortified Security -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-16 grid grid-cols-1 md:grid-cols-2 gap-column-gap items-center bg-surface-container/50">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Défenses Cryptographiques</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Les actifs sont sécurisés via un stockage à froid multi-signature et une détection d'anomalies en temps réel. Notre infrastructure subit des tests d'intrusion continus par des firmes de cybersécurité d'élite.</p>
+</div>
+<div class="flex justify-center items-center h-[300px]">
+<div class="w-[200px] h-[200px] bg-primary/10 clip-triangle flex items-center justify-center border border-primary/50 relative">
+<span class="material-symbols-outlined text-[80px] text-primary" style="font-variation-settings: 'FILL' 1;">shield</span>
+<div class="absolute inset-0 bg-primary/20 blur-xl rounded-full mix-blend-screen"></div>
+</div>
+</div>
+</section>
+<!-- 6. Trading Academy -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-16 grid grid-cols-1 md:grid-cols-2 gap-column-gap items-center">
+<div class="relative flex justify-center">
+<img alt="Trader professionnel analysant des graphiques complexes dans une atmosphère néon high-tech." class="w-[400px] h-[400px] object-cover clip-octagon border-2 border-primary/30 opacity-70" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDldLy5uAt57awWSBR7pc3vHezQotkL0BVZIvkCVNjpm_7LhLOs9_fTvx7vPP2RfM6SMKozkQ88GTUfFZyR7JzgsWUSrl4P37ikQBULHlwBb0kCz24A9I-ig6jmilETulVjQRb2FIDMrE8FSJh7T-IjZ0eymF0fea5_hD0HDENS_7o02HkMt-BnrCl0wK7B4M7cDOwQRmn67C4aiT_03qTsZ6lzwxj35nMyc_XHZO2cWUYTzOMMGlNJi4FsMe6ltuookfCfhdQImDg"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-[64px] text-primary drop-shadow-[0_0_10px_rgba(0,219,231,0.8)] cursor-pointer hover:scale-110 transition-transform">play_circle</span>
+</div>
+</div>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Masterclasses d'Élite</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Améliorez vos capacités analytiques. Accédez à des séminaires exclusifs sur la modélisation quantitative, les déclencheurs macro-économiques et les protocoles de gestion des risques dirigés par des vétérans institutionnels.</p>
+</div>
+</section>
+<!-- 7. CTA -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-24 text-center">
+<h2 class="font-headline-xl text-headline-xl text-primary mb-8 tracking-tighter uppercase">FORGEZ VOTRE AVENIR</h2>
+<div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+<button class="bg-primary text-on-primary font-headline-md text-headline-md px-12 py-6 clip-polygon btn-glow uppercase tracking-wide">S'APPROPRIER LE MARCHÉ</button>
+<button class="bg-transparent border-2 border-secondary-container text-secondary-container font-headline-md text-headline-md px-12 py-6 clip-polygon hover:bg-secondary-container/10 transition-all uppercase tracking-wide">ACCÈS IMMÉDIAT</button>
+</div>
+</section>
+<!-- 8. Support Hub -->
+<section class="max-w-7xl mx-auto px-margin-desktop py-16 grid grid-cols-1 md:grid-cols-2 gap-column-gap border-t border-primary/20 pt-16">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-8">FAQ du Système</h2>
+<div class="space-y-4">
+<div class="glass-panel p-4 clip-polygon border-l-2 border-primary cursor-pointer hover:bg-surface-bright/50">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-body-lg text-on-surface">Quelle est la limite de taux de l'API ?</span>
+<span class="material-symbols-outlined text-primary">expand_more</span>
+</div>
+</div>
+<div class="glass-panel p-4 clip-polygon border-l-2 border-primary cursor-pointer hover:bg-surface-bright/50">
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-body-lg text-on-surface">Comment configurer les Webhooks ?</span>
+<span class="material-symbols-outlined text-primary">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-8">Établir le Contact</h2>
+<form class="space-y-6 glass-panel p-8 clip-polygon">
+<div>
+<input class="w-full bg-surface-container-lowest border-b border-primary/30 text-on-surface font-data-mono text-data-mono p-3 focus:outline-none focus:border-primary focus:ring-0 placeholder-on-surface-variant/50" placeholder="Identifiant de l'émetteur (Email)" type="text"/>
+</div>
+<div>
+<textarea class="w-full bg-surface-container-lowest border-b border-primary/30 text-on-surface font-body-md p-3 focus:outline-none focus:border-primary focus:ring-0 placeholder-on-surface-variant/50" placeholder="Message crypté" rows="4"></textarea>
+</div>
+<button class="bg-primary text-on-primary font-label-caps text-label-caps px-8 py-3 clip-polygon btn-glow w-full uppercase" type="submit">Transmettre les Données</button>
+</form>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest w-full py-12 px-margin-desktop border-t border-outline-variant">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-column-gap max-w-7xl mx-auto">
+<div>
+<div class="font-headline-md text-headline-md text-primary mb-4">Puprime Fox</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">© 2024 Puprime Fox. Le trading à haute vélocité comporte des risques importants.</p>
+</div>
+<div class="col-span-3 flex justify-end gap-8 items-center">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all" href="#">Politique de Confidentialité</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all" href="#">Conditions d'Utilisation</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all" href="#">Divulgation des Risques</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all" href="#">Politique de Cookies</a>
+</div>
+</div>
+</footer>
+</body></html>
+
+
+
+
+
+
+ 

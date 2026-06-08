@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeForge — Simulateur de Trading Live</title>
+
+  <!-- TradingView Lightweight Charts (graphiques chandeliers) -->
+  <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+  <!-- Chart.js (mini PnL chart) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+/* ============================================================
+   CSS VARIABLES — THÈMES DARK & LIGHT
+   ============================================================ */
+:root[data-theme="dark"] {
+  --bg-primary:   #0a0c10;
+  --bg-secondary: #0f1218;
+  --bg-panel:     #131820;
+  --bg-card:      #161d27;
+  --bg-input:     #1a2231;
+  --bg-hover:     #1e2a3a;
+  --border:       #1f2d3d;
+  --border-light: #2a3f55;
+  --text-primary: #e8f0fe;
+  --text-secondary:#7a8fa8;
+  --text-muted:   #4a5f72;
+  --accent:       #00d4aa;
+  --accent-dim:   rgba(0,212,170,.12);
+  --green:        #00d4aa;
+  --green-dim:    rgba(0,212,170,.15);
+  --red:          #ff4f6a;
+  --red-dim:      rgba(255,79,106,.15);
+  --yellow:       #f5c542;
+  --blue:         #4f8fff;
+  --shadow-panel: 0 8px 40px rgba(0,0,0,.6);
+}
+:root[data-theme="light"] {
+  --bg-primary:   #f0f4f8;
+  --bg-secondary: #e8eef5;
+  --bg-panel:     #ffffff;
+  --bg-card:      #ffffff;
+  --bg-input:     #f5f8fc;
+  --bg-hover:     #edf2f7;
+  --border:       #d5e0ec;
+  --border-light: #c0d0e0;
+  --text-primary: #1a2535;
+  --text-secondary:#4a6080;
+  --text-muted:   #8a9db5;
+  --accent:       #00b890;
+  --accent-dim:   rgba(0,184,144,.1);
+  --green:        #00a878;
+  --green-dim:    rgba(0,168,120,.12);
+  --red:          #e53252;
+  --red-dim:      rgba(229,50,82,.12);
+  --yellow:       #d4a017;
+  --blue:         #2f6fdb;
+  --shadow-panel: 0 4px 24px rgba(0,0,0,.1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { font-size:13px; }
+body {
+  font-family:'JetBrains Mono',monospace;
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  height:100vh; overflow:hidden;
+  transition:background .3s,color .3s;
+}
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:var(--bg-primary); }
+::-webkit-scrollbar-thumb { background:var(--border-light); border-radius:99px; }
+
+/* ============================================================
+   LAYOUT — FIX HAUTEUR GRAPHIQUE
+   ============================================================ */
+.app-wrapper {
+  display:grid;
+  grid-template-rows:52px 1fr;
+  grid-template-columns:220px 1fr 290px;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* ---------- TOPBAR ---------- */
+.topbar {
+  grid-column:1/-1;
+  background:var(--bg-secondary);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center;
+  padding:0 16px; gap:12px; z-index:100;
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+  overflow:hidden;
+}
+.topbar-logo {
+  font-family:'Syne',sans-serif; font-weight:800; font-size:1.3rem;
+  color:var(--accent); letter-spacing:-.02em; white-space:nowrap;
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.logo-dot { width:8px; height:8px; background:var(--accent); border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.7; transform:scale(1.2); }
+}
+.topbar-divider { width:1px; height:28px; background:var(--border); flex-shrink:0; }
+.market-selector {
+  display:flex; align-items:center; gap:6px;
+  background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:5px 10px; cursor:pointer;
+  transition:border-color .2s; flex-shrink:0;
+}
+.market-selector:hover { border-color:var(--accent); }
+.market-selector select {
+  background:none; border:none; color:var(--text-primary);
+  font-family:inherit; font-size:.85rem; font-weight:600; cursor:pointer; outline:none;
+}
+.market-selector select option { background:var(--bg-card); }
+.topbar-price { font-size:1.1rem; font-weight:700; flex-shrink:0; }
+.topbar-change {
+  font-size:.75rem; font-weight:600; padding:2px 7px; border-radius:5px; flex-shrink:0;
+}
+.topbar-change.up   { color:var(--green); background:var(--green-dim); }
+.topbar-change.down { color:var(--red);   background:var(--red-dim); }
+.topbar-stats { display:flex; gap:16px; margin-left:6px; overflow:hidden; }
+.topbar-stat { display:flex; flex-direction:column; gap:1px; }
+.topbar-stat .lbl { font-size:.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+.topbar-stat .val { font-size:.75rem; color:var(--text-secondary); font-weight:500; }
+.topbar-balance { margin-left:auto; display:flex; align-items:center; gap:16px; flex-shrink:0; }
+.balance-block { display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+.balance-block .lbl { font-size:.6rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+.balance-block .val { font-size:.82rem; font-weight:700; }
+.balance-block .val.positive { color:var(--green); }
+.balance-block .val.negative { color:var(--red); }
+.balance-block .val.neutral  { color:var(--text-primary); }
+
+/* Sélecteur de langue */
+.lang-select {
+  background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary);
+  border-radius:6px; padding:4px 7px; font-family:inherit; font-size:.72rem;
+  cursor:pointer; outline:none;
+}
+.lang-select:hover { border-color:var(--accent); }
+.lang-select option { background:var(--bg-card); }
+
+/* Toggle thème */
+.theme-toggle { position:relative; width:44px; height:22px; cursor:pointer; flex-shrink:0; }
+.theme-toggle input { opacity:0; width:0; height:0; position:absolute; }
+.toggle-track {
+  position:absolute; inset:0;
+  background:var(--bg-input); border:1px solid var(--border-light); border-radius:99px;
+  transition:background .3s,border-color .3s;
+  display:flex; align-items:center; padding:0 3px; justify-content:flex-start;
+}
+.theme-toggle input:checked ~ .toggle-track { background:var(--accent-dim); border-color:var(--accent); justify-content:flex-end; }
+.toggle-thumb {
+  width:14px; height:14px; border-radius:50%; background:var(--text-muted);
+  transition:background .3s; display:flex; align-items:center; justify-content:center; font-size:.5rem;
+}
+.theme-toggle input:checked ~ .toggle-track .toggle-thumb { background:var(--accent); }
+.live-badge {
+  display:flex; align-items:center; gap:4px; background:var(--red-dim);
+  border:1px solid var(--red); border-radius:5px; padding:3px 7px;
+  font-size:.65rem; font-weight:700; color:var(--red); letter-spacing:.06em; flex-shrink:0;
+}
+.live-badge span { width:5px; height:5px; background:var(--red); border-radius:50%; animation:pulse 1.5s infinite; }
+
+/* ---------- TABS DÉMO / RÉEL (topbar) ---------- */
+.account-tabs {
+  display:flex; gap:4px; flex-shrink:0;
+}
+.account-tab {
+  font-family:inherit; font-size:.68rem; font-weight:700;
+  padding:4px 12px; border-radius:6px; border:1px solid var(--border);
+  background:none; color:var(--text-muted); cursor:pointer; transition:all .15s;
+  text-transform:uppercase; letter-spacing:.04em;
+}
+.account-tab:hover { color:var(--text-primary); background:var(--bg-hover); }
+.account-tab.active.demo  { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+.account-tab.active.real  { background:rgba(245,197,66,.12); border-color:var(--yellow); color:var(--yellow); }
+
+/* ---------- SIDEBAR GAUCHE ---------- */
+.sidebar-left {
+  background:var(--bg-secondary); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.sidebar-section { border-bottom:1px solid var(--border); }
+.section-header {
+  padding:8px 14px; font-size:.62rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.watchlist-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:7px 14px; cursor:pointer; transition:background .15s;
+  border-left:2px solid transparent;
+}
+.watchlist-item:hover { background:var(--bg-hover); }
+.watchlist-item.active { background:var(--accent-dim); border-left-color:var(--accent); }
+.watchlist-item .sym  { font-weight:700; font-size:.8rem; }
+.watchlist-item .name { font-size:.62rem; color:var(--text-muted); margin-top:1px; }
+.watchlist-item .price-col { text-align:right; }
+.watchlist-item .price-col .p { font-size:.8rem; font-weight:600; }
+.watchlist-item .price-col .c { font-size:.62rem; font-weight:600; }
+.watchlist-item .price-col .c.up   { color:var(--green); }
+.watchlist-item .price-col .c.down { color:var(--red); }
+.mini-spark { width:38px; height:18px; }
+.position-item {
+  padding:7px 14px; cursor:pointer; transition:background .15s;
+  border-left:2px solid transparent;
+}
+.position-item:hover { background:var(--bg-hover); }
+.position-item .pos-header { display:flex; justify-content:space-between; align-items:center; }
+.position-item .pos-sym { font-weight:700; font-size:.78rem; }
+.pos-type {
+  font-size:.58rem; font-weight:700; padding:1px 6px; border-radius:3px; text-transform:uppercase;
+}
+.pos-type.long  { background:var(--green-dim); color:var(--green); }
+.pos-type.short { background:var(--red-dim);   color:var(--red); }
+.position-item .pos-pnl { font-size:.8rem; font-weight:700; margin-top:2px; }
+.position-item .pos-detail { font-size:.62rem; color:var(--text-muted); display:flex; gap:10px; margin-top:1px; }
+.no-data { padding:14px; color:var(--text-muted); font-size:.72rem; text-align:center; }
+
+/* ---------- ZONE CENTRALE — FIX HAUTEUR ---------- */
+.main-area {
+  display:grid;
+  grid-template-rows:44px 1fr 200px;
+  overflow:hidden;
+  background:var(--bg-primary);
+}
+.chart-toolbar {
+  background:var(--bg-panel); border-bottom:1px solid var(--border);
+  padding:0 14px; display:flex; align-items:center; gap:6px; height:44px;
+}
+.tf-btn {
+  font-family:inherit; font-size:.7rem; font-weight:600;
+  padding:3px 8px; border-radius:4px; border:1px solid transparent;
+  background:none; color:var(--text-muted); cursor:pointer; transition:all .15s;
+}
+.tf-btn:hover { color:var(--text-primary); background:var(--bg-hover); }
+.tf-btn.active { color:var(--accent); background:var(--accent-dim); border-color:var(--accent); }
+.chart-toolbar-sep { width:1px; height:16px; background:var(--border); margin:0 2px; }
+.chart-type-btn {
+  font-size:.72rem; padding:3px 7px; border-radius:4px; border:1px solid var(--border);
+  background:var(--bg-card); color:var(--text-secondary); cursor:pointer; transition:all .15s; font-family:inherit;
+}
+.chart-type-btn.active { color:var(--accent); border-color:var(--accent); background:var(--accent-dim); }
+
+/* *** FIX PRINCIPAL : hauteur explicite au chart-area *** */
+.chart-area {
+  background:var(--bg-primary); overflow:hidden; position:relative;
+  min-height:0; /* crucial pour le grid */
+}
+#tradingChart { width:100%; height:100%; }
+.chart-overlay-info {
+  position:absolute; top:10px; left:14px; pointer-events:none; z-index:10;
+}
+.chart-ohlc {
+  display:flex; gap:12px; font-size:.68rem; color:var(--text-secondary);
+}
+.chart-ohlc span { display:flex; flex-direction:column; gap:1px; }
+.chart-ohlc .lbl { font-size:.58rem; color:var(--text-muted); }
+.chart-ohlc .val { font-weight:600; }
+.text-green { color:var(--green) !important; }
+.text-red   { color:var(--red) !important; }
+
+/* ---------- PANNEAU BAS TABS ---------- */
+.bottom-panel {
+  background:var(--bg-panel); border-top:1px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden; min-height:0;
+}
+.tabs { display:flex; border-bottom:1px solid var(--border); padding:0 12px; flex-shrink:0; }
+.tab-btn {
+  font-family:inherit; font-size:.7rem; font-weight:600; color:var(--text-muted);
+  background:none; border:none; padding:7px 10px; border-bottom:2px solid transparent;
+  cursor:pointer; transition:all .15s; display:flex; align-items:center; gap:4px; white-space:nowrap;
+}
+.tab-btn:hover { color:var(--text-primary); }
+.tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+.tab-badge {
+  font-size:.58rem; font-weight:700; background:var(--accent-dim); color:var(--accent);
+  padding:1px 5px; border-radius:99px; border:1px solid var(--accent);
+}
+.tab-content { overflow-y:auto; flex:1; min-height:0; }
+.tab-pane { display:none; padding:6px 12px; }
+.tab-pane.active { display:block; }
+
+/* Table positions */
+.positions-table { width:100%; border-collapse:collapse; font-size:.7rem; }
+.positions-table th {
+  text-align:left; color:var(--text-muted); font-size:.6rem;
+  text-transform:uppercase; letter-spacing:.06em; padding:3px 7px; white-space:nowrap;
+}
+.positions-table td { padding:5px 7px; border-top:1px solid var(--border); white-space:nowrap; }
+.positions-table tr:hover td { background:var(--bg-hover); }
+.close-pos-btn {
+  font-family:inherit; font-size:.62rem; font-weight:700;
+  background:var(--red-dim); border:1px solid var(--red); color:var(--red);
+  padding:2px 7px; border-radius:3px; cursor:pointer; transition:all .15s;
+}
+.close-pos-btn:hover { background:var(--red); color:#fff; }
+.history-row {
+  display:flex; align-items:center; gap:10px; padding:5px 0;
+  border-bottom:1px solid var(--border); font-size:.7rem; flex-wrap:wrap;
+}
+.history-row:last-child { border-bottom:none; }
+.fw7 { font-weight:700; }
+.flash-up   { animation:flashUp .5s ease; }
+.flash-down { animation:flashDown .5s ease; }
+@keyframes flashUp   { 0%,100%{background:transparent} 30%{background:rgba(0,212,170,.2)} }
+@keyframes flashDown { 0%,100%{background:transparent} 30%{background:rgba(255,79,106,.2)} }
+
+/* ---------- SIDEBAR DROITE ---------- */
+.sidebar-right {
+  background:var(--bg-secondary); border-left:1px solid var(--border);
+  display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden;
+}
+
+/* Tabs Démo/Réel dans la sidebar droite */
+.account-mode-tabs {
+  display:flex; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.acc-tab-btn {
+  flex:1; font-family:inherit; font-size:.72rem; font-weight:700;
+  padding:10px 8px; border:none; background:none; color:var(--text-muted);
+  cursor:pointer; transition:all .15s; text-transform:uppercase; letter-spacing:.04em;
+  border-bottom:2px solid transparent;
+}
+.acc-tab-btn:hover { color:var(--text-primary); background:var(--bg-hover); }
+.acc-tab-btn.active.demo { color:var(--accent); border-bottom-color:var(--accent); background:var(--accent-dim); }
+.acc-tab-btn.active.real { color:var(--yellow); border-bottom-color:var(--yellow); background:rgba(245,197,66,.08); }
+.real-badge {
+  font-size:.55rem; padding:1px 4px; border-radius:3px;
+  background:rgba(245,197,66,.15); color:var(--yellow); margin-left:3px;
+}
+
+/* En-tête instrument */
+.instrument-header {
+  padding:12px 14px; border-bottom:1px solid var(--border);
+}
+.instrument-name { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; }
+.instrument-full { font-size:.65rem; color:var(--text-muted); margin-top:1px; }
+.instrument-price-row {
+  display:flex; align-items:center; justify-content:space-between; margin-top:10px; gap:8px;
+}
+.fs-xs { font-size:.6rem; }
+.text-muted { color:var(--text-muted); }
+.instrument-bid { font-size:1.4rem; font-weight:700; color:var(--red); letter-spacing:-.02em; }
+.instrument-ask { font-size:1.4rem; font-weight:700; color:var(--green); letter-spacing:-.02em; }
+.spread-label { font-size:.62rem; color:var(--text-muted); background:var(--bg-input); padding:2px 6px; border-radius:4px; }
+
+/* Formulaire d'ordre */
+.order-form { padding:12px 14px; border-bottom:1px solid var(--border); }
+.order-tabs { display:flex; gap:3px; margin-bottom:10px; }
+.order-tab {
+  flex:1; font-family:inherit; font-size:.7rem; font-weight:700;
+  padding:6px; border-radius:6px; border:1px solid var(--border);
+  background:none; color:var(--text-muted); cursor:pointer; transition:all .15s;
+  text-transform:uppercase; letter-spacing:.04em;
+}
+.order-tab.buy.active  { background:var(--green-dim); border-color:var(--green); color:var(--green); }
+.order-tab.sell.active { background:var(--red-dim);   border-color:var(--red);   color:var(--red); }
+.order-tab:not(.active):hover { background:var(--bg-hover); color:var(--text-primary); }
+.form-row { margin-bottom:9px; }
+.form-label {
+  display:flex; justify-content:space-between;
+  font-size:.62rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px;
+}
+.form-input {
+  width:100%; background:var(--bg-input); border:1px solid var(--border);
+  border-radius:6px; padding:7px 9px; color:var(--text-primary);
+  font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:600; outline:none; transition:border-color .2s;
+}
+.form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim); }
+.form-select {
+  width:100%; background:var(--bg-input); border:1px solid var(--border);
+  border-radius:6px; padding:7px 9px; color:var(--text-primary);
+  font-family:'JetBrains Mono',monospace; font-size:.78rem; outline:none; cursor:pointer;
+}
+.form-select option { background:var(--bg-card); }
+.qty-slider { display:flex; gap:4px; margin-top:5px; }
+.qty-preset {
+  flex:1; font-family:inherit; font-size:.62rem; font-weight:700;
+  padding:4px 2px; border-radius:4px; border:1px solid var(--border);
+  background:none; color:var(--text-muted); cursor:pointer; transition:all .15s; text-align:center;
+}
+.qty-preset:hover,.qty-preset.active { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+.risk-estimator {
+  background:var(--bg-card); border:1px solid var(--border); border-radius:7px;
+  padding:9px 11px; margin-bottom:11px;
+}
+.risk-row { display:flex; justify-content:space-between; align-items:center; padding:2px 0; font-size:.7rem; }
+.risk-row .rl { color:var(--text-muted); }
+.risk-row .rv { color:var(--text-secondary); font-weight:600; }
+.risk-row .rv.pos { color:var(--green); }
+.risk-row .rv.neg { color:var(--red); }
+.order-btn {
+  width:100%; font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700;
+  letter-spacing:.02em; padding:11px; border-radius:8px; border:none; cursor:pointer; transition:all .2s;
+}
+.order-btn.buy  { background:linear-gradient(135deg,#00d4aa,#00a878); color:#fff; box-shadow:0 4px 18px rgba(0,212,170,.3); }
+.order-btn.sell { background:linear-gradient(135deg,#ff4f6a,#c0183a); color:#fff; box-shadow:0 4px 18px rgba(255,79,106,.3); }
+.order-btn:hover { transform:translateY(-1px); filter:brightness(1.08); }
+.order-btn:active { transform:translateY(0); }
+.order-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+/* Stats marché */
+.market-stats { padding:11px 14px; border-bottom:1px solid var(--border); }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:6px; padding:7px 9px; }
+.stat-card .sc-lbl { font-size:.58rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; }
+.stat-card .sc-val { font-size:.82rem; font-weight:700; margin-top:2px; }
+.stat-card .sc-val.g { color:var(--green); }
+.stat-card .sc-val.r { color:var(--red); }
+
+/* Indicateurs techniques */
+.indicators-section { padding:11px 14px; border-bottom:1px solid var(--border); }
+.indicator-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:4px 0; border-bottom:1px solid var(--border); font-size:.7rem;
+}
+.indicator-row:last-child { border-bottom:none; }
+.indicator-name { color:var(--text-secondary); }
+.indicator-value { font-weight:700; }
+.indicator-signal { font-size:.58rem; font-weight:700; padding:2px 5px; border-radius:3px; text-transform:uppercase; letter-spacing:.05em; }
+.signal-buy     { background:var(--green-dim); color:var(--green); }
+.signal-sell    { background:var(--red-dim);   color:var(--red); }
+.signal-neutral { background:var(--bg-input);  color:var(--text-muted); }
+
+/* PnL Tracker */
+.pnl-tracker { padding:11px 14px; }
+.pnl-big { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; letter-spacing:-.02em; }
+.pnl-big.pos { color:var(--green); }
+.pnl-big.neg { color:var(--red); }
+.pnl-sub { font-size:.68rem; color:var(--text-muted); margin-top:2px; }
+.equity-bar { margin-top:9px; height:5px; background:var(--bg-input); border-radius:99px; overflow:hidden; }
+.equity-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--green),var(--accent)); transition:width 1s ease; }
+.equity-fill.neg { background:linear-gradient(90deg,var(--red),#ff8a6a); }
+#pnlMiniChart { width:100%; height:55px; margin-top:8px; }
+
+/* Sync API status */
+.api-status {
+  display:flex; align-items:center; gap:5px; font-size:.62rem;
+  padding:4px 8px; border-radius:4px; margin:0 14px 8px;
+  border:1px solid var(--border);
+}
+.api-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.api-dot.ok   { background:var(--green); }
+.api-dot.err  { background:var(--red); }
+.api-dot.sync { background:var(--yellow); animation:pulse 1s infinite; }
+
+/* Toast */
+.toast-container { position:fixed; bottom:18px; right:18px; z-index:9999; display:flex; flex-direction:column; gap:7px; }
+.toast {
+  background:var(--bg-panel); border:1px solid var(--border); border-radius:9px;
+  padding:11px 14px; min-width:240px; box-shadow:var(--shadow-panel);
+  display:flex; align-items:flex-start; gap:9px; animation:slideIn .3s ease; transition:opacity .3s,transform .3s;
+}
+.toast.fade-out { opacity:0; transform:translateX(20px); }
+.toast-icon.buy  { color:var(--green); }
+.toast-icon.sell { color:var(--red); }
+.toast-icon.info { color:var(--blue); }
+.toast-icon.warn { color:var(--yellow); }
+.toast-body .toast-title { font-size:.78rem; font-weight:700; }
+.toast-body .toast-msg   { font-size:.68rem; color:var(--text-muted); margin-top:1px; }
+@keyframes slideIn { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+
+/* Modal */
+.modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+  z-index:1000; align-items:center; justify-content:center; backdrop-filter:blur(4px);
+}
+.modal-overlay.open { display:flex; }
+.modal-box {
+  background:var(--bg-panel); border:1px solid var(--border-light); border-radius:12px;
+  padding:22px 26px; min-width:300px; max-width:420px; box-shadow:var(--shadow-panel);
+  animation:modalIn .25s ease;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+.modal-title { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; margin-bottom:14px; }
+.modal-detail { font-size:.78rem; color:var(--text-secondary); line-height:1.8; margin-bottom:18px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+.modal-cancel {
+  font-family:inherit; font-size:.8rem; padding:8px 16px; border-radius:7px;
+  border:1px solid var(--border); background:none; color:var(--text-secondary); cursor:pointer; transition:all .15s;
+}
+.modal-cancel:hover { background:var(--bg-hover); }
+.modal-confirm {
+  font-family:inherit; font-size:.8rem; font-weight:700; padding:8px 16px; border-radius:7px;
+  border:none; cursor:pointer; transition:all .15s; color:#fff;
+}
+.modal-confirm.buy  { background:var(--green); }
+.modal-confirm.sell { background:var(--red); }
+.modal-confirm:hover { filter:brightness(1.1); }
+
+/* Avertissement compte réel */
+.real-account-warning {
+  background:rgba(245,197,66,.08); border:1px solid rgba(245,197,66,.3); border-radius:7px;
+  padding:8px 11px; margin-bottom:10px; font-size:.68rem; color:var(--yellow); display:none;
+}
+.real-account-warning.show { display:block; }
+
+/* Stats bottom pane */
+.stats-grid-bottom { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:6px 0; }
+.stat-mini { background:var(--bg-card); border:1px solid var(--border); border-radius:5px; padding:6px 8px; }
+.stat-mini .sl { font-size:.6rem; color:var(--text-muted); text-transform:uppercase; }
+.stat-mini .sv { font-size:.82rem; font-weight:700; margin-top:1px; }
+
+/* Export CSV btn */
+.export-btn {
+  font-family:inherit; font-size:.65rem; font-weight:600; padding:4px 9px;
+  border:1px solid var(--border); border-radius:4px; background:none; color:var(--text-muted); cursor:pointer;
+}
+.export-btn:hover { border-color:var(--accent); color:var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- =================== TOPBAR =================== -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-dot"></div>
+      <span id="appName">TradeForge</span>
+    </div>
+    <div class="topbar-divider"></div>
+
+    <!-- Tabs Démo / Réel (topbar) -->
+    <div class="account-tabs">
+      <button class="account-tab active demo" id="topTabDemo" onclick="switchAccountMode('demo')" data-i18n="account.demo">DÉMO</button>
+      <button class="account-tab real"         id="topTabReal" onclick="switchAccountMode('real')" data-i18n="account.real">RÉEL</button>
+    </div>
+    <div class="topbar-divider"></div>
+
+    <!-- Sélecteur de marché -->
+    <div class="market-selector">
+      <i class="fa-solid fa-chart-line" style="color:var(--accent);font-size:.7rem"></i>
+      <select id="symbolSelect" onchange="changeSymbol(this.value)"></select>
+    </div>
+
+    <!-- Prix + variation -->
+    <span class="topbar-price" id="topbarPrice">—</span>
+    <span class="topbar-change up" id="topbarChange">—</span>
+
+    <!-- Stats OHLCV -->
+    <div class="topbar-stats">
+      <div class="topbar-stat">
+        <span class="lbl" data-i18n="market.open">Ouv.</span>
+        <span class="val" id="statOpen">—</span>
+      </div>
+      <div class="topbar-stat">
+        <span class="lbl" data-i18n="market.high">Haut</span>
+        <span class="val text-green" id="statHigh">—</span>
+      </div>
+      <div class="topbar-stat">
+        <span class="lbl" data-i18n="market.low">Bas</span>
+        <span class="val text-red" id="statLow">—</span>
+      </div>
+      <div class="topbar-stat">
+        <span class="lbl" data-i18n="market.volume">Vol</span>
+        <span class="val" id="statVolume">—</span>
+      </div>
+      <div class="topbar-stat">
+        <span class="lbl" data-i18n="market.leverage">Levier</span>
+        <span class="val" id="statLeverage">—</span>
+      </div>
+    </div>
+
+    <!-- Balance & PnL -->
+    <div class="topbar-balance">
+      <div class="balance-block">
+        <span class="lbl" data-i18n="topbar.balance">Solde</span>
+        <span class="val" id="balanceDisplay">—</span>
+      </div>
+      <div class="balance-block">
+        <span class="lbl" data-i18n="topbar.equity">Équité</span>
+        <span class="val" id="equityDisplay">—</span>
+      </div>
+      <div class="balance-block">
+        <span class="lbl" data-i18n="topbar.openPnl">P&amp;L Ouvert</span>
+        <span class="val neutral" id="openPnlDisplay">$0.00</span>
+      </div>
+      <div class="balance-block">
+        <span class="lbl" data-i18n="topbar.dayPnl">P&amp;L Jour</span>
+        <span class="val neutral" id="dayPnlDisplay">$0.00</span>
+      </div>
+    </div>
+
+    <!-- Sélecteur de langue -->
+    <select class="lang-select" id="langSelect" onchange="setLang(this.value)">
+      <option value="fr">🇫🇷 FR</option>
+      <option value="en">🇬🇧 EN</option>
+    </select>
+
+    <!-- Toggle dark/light -->
+    <label class="theme-toggle" title="Basculer thème">
+      <input type="checkbox" id="themeToggle" onchange="toggleTheme(this)" />
+      <div class="toggle-track">
+        <div class="toggle-thumb" id="themeIcon">🌙</div>
+      </div>
+    </label>
+
+    <!-- Badge LIVE -->
+    <div class="live-badge"><span></span>LIVE</div>
+  </header>
+  <!-- /TOPBAR -->
+
+  <!-- =================== SIDEBAR GAUCHE =================== -->
+  <aside class="sidebar-left">
+    <div class="sidebar-section">
+      <div class="section-header">
+        <span data-i18n="sidebar.watchlist">Watchlist</span>
+        <i class="fa-solid fa-star" style="color:var(--yellow);font-size:.65rem"></i>
+      </div>
+      <div id="watchlistContainer"></div>
+    </div>
+    <div class="sidebar-section" style="flex:1;overflow-y:auto">
+      <div class="section-header">
+        <span data-i18n="sidebar.openPositions">Positions Ouvertes</span>
+        <span class="tab-badge" id="posCountBadge">0</span>
+      </div>
+      <div id="sidebarPositions">
+        <div class="no-data" data-i18n="positions.empty">Aucune position ouverte</div>
+      </div>
+    </div>
+  </aside>
+  <!-- /SIDEBAR GAUCHE -->
+
+  <!-- =================== ZONE CENTRALE =================== -->
+  <main class="main-area">
+
+    <!-- Toolbar graphique -->
+    <div class="chart-toolbar">
+      <button class="tf-btn" onclick="setTimeframe('1')">1m</button>
+      <button class="tf-btn" onclick="setTimeframe('5')">5m</button>
+      <button class="tf-btn" onclick="setTimeframe('15')">15m</button>
+      <button class="tf-btn" onclick="setTimeframe('60')">1h</button>
+      <button class="tf-btn" onclick="setTimeframe('240')">4h</button>
+      <button class="tf-btn active" id="tfD" onclick="setTimeframe('D')">1D</button>
+      <button class="tf-btn" onclick="setTimeframe('W')">1W</button>
+      <div class="chart-toolbar-sep"></div>
+      <button class="chart-type-btn active" onclick="setChartType('candle')" id="ctCandle">
+        <i class="fa-solid fa-chart-bar"></i> <span data-i18n="chart.candles">Bougies</span>
+      </button>
+      <button class="chart-type-btn" onclick="setChartType('line')" id="ctLine">
+        <i class="fa-solid fa-chart-line"></i> <span data-i18n="chart.line">Ligne</span>
+      </button>
+      <div class="chart-toolbar-sep"></div>
+      <button class="chart-type-btn" onclick="toggleIndicator('ma')" id="indMA">MA(20)</button>
+      <button class="chart-type-btn" onclick="toggleIndicator('bb')" id="indBB">BB</button>
+      <button class="chart-type-btn active" onclick="toggleIndicator('vol')" id="indVol">Volume</button>
+      <div style="flex:1"></div>
+      <span style="font-size:.62rem;color:var(--text-muted)" id="lastUpdate">—</span>
+    </div>
+
+    <!-- GRAPHIQUE PRINCIPAL -->
+    <div class="chart-area">
+      <div id="tradingChart"></div>
+      <div class="chart-overlay-info">
+        <div class="chart-ohlc" id="chartOHLC">
+          <span><span class="lbl">O</span><span class="val" id="ohlcO">—</span></span>
+          <span><span class="lbl">H</span><span class="val text-green" id="ohlcH">—</span></span>
+          <span><span class="lbl">L</span><span class="val text-red" id="ohlcL">—</span></span>
+          <span><span class="lbl">C</span><span class="val" id="ohlcC">—</span></span>
+          <span><span class="lbl">Vol</span><span class="val" id="ohlcV">—</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANNEAU BAS -->
+    <div class="bottom-panel">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('positions')" id="tabPositions">
+          <i class="fa-solid fa-table-list"></i>
+          <span data-i18n="tabs.positions">Positions</span>
+          <span class="tab-badge" id="tabPosBadge">0</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('history')" id="tabHistory">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span data-i18n="tabs.history">Historique</span>
+          <span class="tab-badge" id="tabHistBadge">0</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('orders')" id="tabOrders">
+          <i class="fa-solid fa-list-check"></i>
+          <span data-i18n="tabs.orders">Ordres</span>
+          <span class="tab-badge" id="tabOrdBadge">0</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('stats')" id="tabStats">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span data-i18n="tabs.stats">Statistiques</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('journal')" id="tabJournal">
+          <i class="fa-solid fa-book"></i>
+          <span data-i18n="tabs.journal">Journal</span>
+        </button>
+        <div style="flex:1"></div>
+        <button class="export-btn" onclick="exportCSV()" title="Export CSV">
+          <i class="fa-solid fa-file-export"></i> CSV
+        </button>
+      </div>
+      <div class="tab-content">
+        <!-- Positions -->
+        <div class="tab-pane active" id="panePositions">
+          <div id="positionsTableWrap">
+            <div class="no-data" data-i18n="positions.empty">Aucune position ouverte</div>
+          </div>
+        </div>
+        <!-- Historique -->
+        <div class="tab-pane" id="paneHistory">
+          <div id="historyList">
+            <div class="no-data" data-i18n="history.empty">Aucun trade clôturé</div>
+          </div>
+        </div>
+        <!-- Ordres limites -->
+        <div class="tab-pane" id="paneOrders">
+          <div id="ordersList">
+            <div class="no-data" data-i18n="orders.empty">Aucun ordre limite en attente</div>
+          </div>
+        </div>
+        <!-- Stats session -->
+        <div class="tab-pane" id="paneStats">
+          <div class="stats-grid-bottom" id="sessionStatsGrid">
+            <div class="stat-mini"><div class="sl" data-i18n="stats.trades">Trades</div><div class="sv" id="statTrades">0</div></div>
+            <div class="stat-mini"><div class="sl" data-i18n="stats.winRate">Win Rate</div><div class="sv text-green" id="statWinRate">—</div></div>
+            <div class="stat-mini"><div class="sl" data-i18n="stats.totalPnl">P&amp;L Total</div><div class="sv" id="statTotalPnl">$0.00</div></div>
+            <div class="stat-mini"><div class="sl" data-i18n="stats.avgWin">Moy. Gain</div><div class="sv text-green" id="statAvgWin">—</div></div>
+            <div class="stat-mini"><div class="sl" data-i18n="stats.avgLoss">Moy. Perte</div><div class="sv text-red" id="statAvgLoss">—</div></div>
+            <div class="stat-mini"><div class="sl" data-i18n="stats.rrRatio">R:R Ratio</div><div class="sv" id="statRR">—</div></div>
+          </div>
+        </div>
+        <!-- Journal -->
+        <div class="tab-pane" id="paneJournal">
+          <div id="journalLog" style="font-size:.7rem;color:var(--text-secondary);line-height:1.7">
+            <span style="color:var(--accent)">▶</span> TradeForge — compte simulation initialisé avec <strong id="journalStartBalance"></strong><br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <!-- /ZONE CENTRALE -->
+
+  <!-- =================== SIDEBAR DROITE =================== -->
+  <aside class="sidebar-right">
+
+    <!-- TABS DÉMO / RÉEL -->
+    <div class="account-mode-tabs">
+      <button class="acc-tab-btn active demo" id="accTabDemo" onclick="switchAccountMode('demo')">
+        <i class="fa-solid fa-flask" style="font-size:.65rem"></i>
+        <span data-i18n="account.demo">DÉMO</span>
+      </button>
+      <button class="acc-tab-btn real" id="accTabReal" onclick="switchAccountMode('real')">
+        <i class="fa-solid fa-bolt" style="font-size:.65rem"></i>
+        <span data-i18n="account.real">RÉEL</span>
+        <span class="real-badge">LIVE</span>
+      </button>
+    </div>
+
+    <!-- Avertissement compte réel -->
+    <div class="real-account-warning" id="realWarning">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span data-i18n="account.realWarning"> Compte RÉEL — Les ordres engagent votre capital. Agissez avec prudence.</span>
+    </div>
+
+    <!-- Statut sync API -->
+    <div class="api-status" id="apiStatus">
+      <div class="api-dot" id="apiDot"></div>
+      <span id="apiStatusText">API: non connectée</span>
+    </div>
+
+    <!-- En-tête instrument -->
+    <div class="instrument-header">
+      <div class="instrument-name" id="instrName">—</div>
+      <div class="instrument-full" id="instrFull">Chargement…</div>
+      <div class="instrument-price-row">
+        <div>
+          <div class="fs-xs text-muted" style="margin-bottom:2px" data-i18n="order.bid">VENTE (BID)</div>
+          <div class="instrument-bid" id="bidPrice">—</div>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div class="spread-label" id="spreadLabel">Spread: —</div>
+        </div>
+        <div>
+          <div class="fs-xs text-muted" style="margin-bottom:2px;text-align:right" data-i18n="order.ask">ACHAT (ASK)</div>
+          <div class="instrument-ask" id="askPrice">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire d'ordre -->
+    <div class="order-form">
+      <div class="order-tabs">
+        <button class="order-tab buy active" id="btnBuy" onclick="setOrderSide('buy')">
+          <i class="fa-solid fa-arrow-up"></i> <span data-i18n="order.buy">ACHAT</span>
+        </button>
+        <button class="order-tab sell" id="btnSell" onclick="setOrderSide('sell')">
+          <i class="fa-solid fa-arrow-down"></i> <span data-i18n="order.sell">VENTE</span>
+        </button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label" data-i18n="order.type">Type d'ordre</div>
+        <select class="form-select" id="orderType" onchange="updateOrderTypeFields()">
+          <option value="market" data-i18n="order.market">Ordre au Marché</option>
+          <option value="limit" data-i18n="order.limit">Ordre Limite</option>
+          <option value="stop" data-i18n="order.stop">Ordre Stop</option>
+          <option value="stop_limit" data-i18n="order.stopLimit">Stop-Limite</option>
+        </select>
+      </div>
+
+      <div class="form-row" id="limitPriceRow" style="display:none">
+        <div class="form-label"><span data-i18n="order.limitPrice">Prix Limite</span> <span id="limitPriceHint"></span></div>
+        <input class="form-input" type="number" id="limitPrice" placeholder="0.00" step="0.01" oninput="updateRisk()" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">
+          <span data-i18n="order.qty">Quantité / Lots</span>
+          <span id="qtyUsdValue" style="color:var(--text-secondary)"></span>
+        </div>
+        <input class="form-input" type="number" id="orderQty" placeholder="1" min="0.01" step="0.01" value="1" oninput="updateRisk()" />
+        <div class="qty-slider" id="qtyPresets"></div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">
+          <span data-i18n="order.stopLoss">Stop Loss</span>
+          <span id="slPipsLabel" style="color:var(--red);font-size:.6rem"></span>
+        </div>
+        <input class="form-input" type="number" id="stopLoss" placeholder="Optionnel" step="0.01" oninput="updateRisk()" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-label">
+          <span data-i18n="order.takeProfit">Take Profit</span>
+          <span id="tpPipsLabel" style="color:var(--green);font-size:.6rem"></span>
+        </div>
+        <input class="form-input" type="number" id="takeProfit" placeholder="Optionnel" step="0.01" oninput="updateRisk()" />
+      </div>
+
+      <!-- Estimateur de risque -->
+      <div class="risk-estimator">
+        <div class="risk-row"><span class="rl" data-i18n="risk.posValue">Valeur position</span><span class="rv" id="riskPosValue">—</span></div>
+        <div class="risk-row"><span class="rl" data-i18n="risk.margin">Marge requise</span><span class="rv" id="riskMargin">—</span></div>
+        <div class="risk-row"><span class="rl" data-i18n="risk.maxLoss">Risque max (SL)</span><span class="rv neg" id="riskMaxLoss">—</span></div>
+        <div class="risk-row"><span class="rl" data-i18n="risk.maxGain">Gain potentiel (TP)</span><span class="rv pos" id="riskMaxGain">—</span></div>
+        <div class="risk-row"><span class="rl" data-i18n="risk.rr">Ratio R:R</span><span class="rv" id="riskRR">—</span></div>
+        <div class="risk-row"><span class="rl" data-i18n="risk.riskPct">% Capital risqué</span><span class="rv" id="riskPct">—</span></div>
+      </div>
+
+      <button class="order-btn buy" id="orderBtn" onclick="openOrderModal()">
+        <span data-i18n="order.buyMarket">ACHETER AU MARCHÉ</span>
+      </button>
+    </div>
+
+    <!-- Stats marché -->
+    <div class="market-stats">
+      <div class="section-header" style="padding:0 0 7px">
+        <span data-i18n="sidebar.marketStats">Stats du Marché</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="sc-lbl" data-i18n="market.high24">Haut 24h</div>
+          <div class="sc-val" id="stat52H">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-lbl" data-i18n="market.low24">Bas 24h</div>
+          <div class="sc-val" id="stat52L">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-lbl" data-i18n="market.cap">Market Cap</div>
+          <div class="sc-val" id="statMarketCap">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="sc-lbl" data-i18n="market.leverage">Levier Dispo</div>
+          <div class="sc-val" id="statLeverage2">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicateurs techniques -->
+    <div class="indicators-section">
+      <div class="section-header" style="padding:0 0 7px">
+        <span data-i18n="sidebar.indicators">Indicateurs Techniques</span>
+      </div>
+      <div id="indicatorsList">
+        <div class="indicator-row">
+          <span class="indicator-name">RSI(14)</span>
+          <span class="indicator-value" id="indRSI">—</span>
+          <span class="indicator-signal signal-neutral" id="sigRSI">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">MACD</span>
+          <span class="indicator-value" id="indMACD">—</span>
+          <span class="indicator-signal signal-neutral" id="sigMACD">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">MA(20)</span>
+          <span class="indicator-value" id="indMA20">—</span>
+          <span class="indicator-signal signal-neutral" id="sigMA20">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">MA(50)</span>
+          <span class="indicator-value" id="indMA50">—</span>
+          <span class="indicator-signal signal-neutral" id="sigMA50">—</span>
+        </div>
+        <div class="indicator-row">
+          <span class="indicator-name">Momentum</span>
+          <span class="indicator-value" id="indMomentum">—</span>
+          <span class="indicator-signal signal-neutral" id="sigMomentum">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PnL Tracker -->
+    <div class="pnl-tracker">
+      <div class="section-header" style="padding:0 0 7px">
+        <span data-i18n="sidebar.performance">Performance Session</span>
+      </div>
+      <div class="pnl-big" id="pnlBig">$0.00</div>
+      <div class="pnl-sub" id="pnlSub" data-i18n="pnl.noTrade">Aucun trade clôturé</div>
+      <div class="equity-bar"><div class="equity-fill" id="equityFill" style="width:50%"></div></div>
+      <canvas id="pnlMiniChart"></canvas>
+    </div>
+
+  </aside>
+  <!-- /SIDEBAR DROITE -->
+
+</div>
+<!-- /app-wrapper -->
+
+<!-- Modal confirmation -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Confirmer l'ordre</div>
+    <div class="modal-detail" id="modalDetail"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()" data-i18n="modal.cancel">Annuler</button>
+      <button class="modal-confirm buy" id="modalConfirmBtn" onclick="confirmOrder()" data-i18n="modal.confirm">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
