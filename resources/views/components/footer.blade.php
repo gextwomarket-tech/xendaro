@@ -5,7 +5,7 @@
       
       <!-- Company Info -->
       <div>
-        <h3 class="font-bold text-slate-900 dark:text-white mb-4">Moon Trade</h3>
+        <h3 class="font-bold text-slate-900 dark:text-white mb-4">Purprime Fox</h3>
         <p class="text-sm text-slate-600 dark:text-slate-400">Institutional-grade trading platform for modern wealth management.</p>
       </div>
 
@@ -46,7 +46,7 @@
     <!-- Divider -->
     <div class="border-t border-slate-200 dark:border-slate-800 pt-8">
       <div class="flex flex-col md:flex-row justify-between items-center">
-        <p class="text-sm text-slate-600 dark:text-slate-400">© 2024 Moon Trade. All rights reserved.</p>
+        <p class="text-sm text-slate-600 dark:text-slate-400">© 2024 Purprime Fox. All rights reserved.</p>
         <div class="flex gap-4 mt-4 md:mt-0">
           <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Twitter</a>
           <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Discord</a>

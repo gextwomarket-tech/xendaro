@@ -139,6 +139,7 @@ Route::middleware('auth')->group(function () {
         // ── NOTIFICATIONS ───────────────────────────────────────────
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+        Route::get('/notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
         Route::put('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
@@ -192,13 +193,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/trade/positions', [TradeController::class, 'getPositions'])->name('trade.positions.json');
         Route::get('/trade/history-data', [TradeController::class, 'getHistoryData'])->name('trade.history.json');
         Route::get('/trade/balance', [TradeController::class, 'getBalance'])->name('trade.balance.json');
+        Route::post('/trade/balance/update', [TradeController::class, 'updateBalance'])->name('trade.balance.update');
         Route::post('/trade/foxbot', [TradeController::class, 'foxbotTrade'])->name('trade.foxbot');
+        Route::post('/trade/foxbot/tick', [TradeController::class, 'foxbotTick'])->name('trade.foxbot.tick');
         Route::get('/trade/positions/{id}/pnl', [TradeController::class, 'getLivePositionPnL'])->name('trade.position.pnl');
         Route::get('/trade/positions/pnl/all', [TradeController::class, 'getAllLivePositionsPnL'])->name('trade.positions.pnl.all');
         
         // ── COINGECKO PROXY (CORS bypass) ────────────────────────────
         Route::get('/trade/api/coingecko/price', [TradeController::class, 'getCoinGeckoPrice'])->name('trade.api.coingecko.price');
         Route::get('/trade/api/coingecko/ohlc', [TradeController::class, 'getCoinGeckoOHLC'])->name('trade.api.coingecko.ohlc');
+        Route::post('/trade/bot/reconnect-gain', [TradeController::class, 'applyReconnectGain'])->name('trade.bot.reconnect-gain');
         
         // ── SEED INSTRUMENTS (DEV) ──────────────────────────────────
         Route::post('/trade/seed-instruments', [TradeController::class, 'seedInstruments'])->name('trade.seed-instruments');

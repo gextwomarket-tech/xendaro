@@ -60,7 +60,31 @@ class PaymentMethodResource extends Resource
                         ->addButtonLabel('Ajouter une ligne')
                         ->reorderable()
                         ->columnSpanFull(),
-                ]),
+
+                    Forms\Components\Textarea::make('instructions')
+                        ->label('Instructions de paiement')
+                        ->helperText('Affichées au client lors du dépôt/retrait pour ce moyen de paiement.')
+                        ->rows(3)
+                        ->nullable()
+                        ->columnSpanFull(),
+
+                    Forms\Components\TextInput::make('address')
+                        ->label('Adresse (crypto, IBAN…)')
+                        ->helperText('Affichée avec un bouton de copie côté client.')
+                        ->nullable(),
+
+                    Forms\Components\TextInput::make('numero')
+                        ->label('Numéro de compte / téléphone')
+                        ->helperText('Affiché avec un bouton de copie côté client.')
+                        ->nullable(),
+
+                    Forms\Components\Textarea::make('qrcode')
+                        ->label('Donnée du QR code')
+                        ->helperText('Texte ou URI encodé automatiquement en QR code côté client (ex: adresse crypto, lien de paiement). Laisser vide pour ne pas afficher de QR code.')
+                        ->rows(2)
+                        ->nullable()
+                        ->columnSpanFull(),
+                ])->columns(2),
 
             Forms\Components\Section::make('Statut')
                 ->schema([

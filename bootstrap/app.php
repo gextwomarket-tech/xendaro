@@ -21,5 +21,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson()) {
+                return null;
+            }
+            $path = $request->path();
+            if ($path === '/' || $path === 'dashboard' || str_starts_with($path, 'dashboard/')) {
+                return null;
+            }
+            return auth()->check()
+                ? redirect()->route('dashboard')
+                : redirect('/');
+        });
     })->create();

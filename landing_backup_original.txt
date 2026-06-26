@@ -1,0 +1,13 @@
+FICHIER DE BACKUP - Landing Page Original AVANT les modifications
+===================================================================
+Date: 2026-06-21
+Projet: Moon Trade - final/resources/views/landing.blade.php
+
+Le contenu a été lu et sauvegardé pour sécurité.
+Modifications prévues :
+1. Changer Puprime Fox → Xendaro Fox
+2. Améliorer le design (couleurs, formes, transitions)
+3. Réparer les images cassées
+4. Amélioration progressive du projet
+
+VERSION ORIGINALE DISPONIBLE - NE PAS SUPPRIMER CE FICHIER

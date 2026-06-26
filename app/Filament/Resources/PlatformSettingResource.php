@@ -84,6 +84,14 @@ class PlatformSettingResource extends Resource
                                     ->options([1 => 'Niveau 1', 2 => 'Niveau 2', 3 => 'Niveau 3']),
                                 Forms\Components\Toggle::make('maintenance_mode')
                                     ->label('Mode Maintenance'),
+                                Forms\Components\TextInput::make('bot_profit_rate_per_hour')
+                                    ->label('Taux Bot (% / heure)')
+                                    ->numeric()
+                                    ->step(0.1)
+                                    ->minValue(0.1)
+                                    ->maxValue(50)
+                                    ->suffix('%/h')
+                                    ->helperText('Taux de gain simulé par le bot par heure (ex: 2.5 = +2.5% de la balance/h)'),
                             ]),
 
                         Forms\Components\Tabs\Tab::make('Réseaux Sociaux')

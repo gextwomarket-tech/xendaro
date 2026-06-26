@@ -33,12 +33,6 @@ class MarketController extends Controller
     {
         $user = $request->user();
 
-        // Defense in depth: Verify KYC status (middleware already does this, but safety check)
-        if ($user->kyc_status !== 'verified') {
-            return redirect()->route('kyc.show')
-                ->with('info', 'Veuillez compléter votre vérification KYC pour accéder aux marchés.');
-        }
-
         $instruments = Instrument::where('is_active', true)
             ->orderBy('symbol')
             ->get();

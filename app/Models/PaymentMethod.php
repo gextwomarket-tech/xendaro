@@ -13,6 +13,10 @@ class PaymentMethod extends Model
         'type',
         'label',
         'details',
+        'instructions',
+        'qrcode',
+        'numero',
+        'address',
         'is_default',
     ];
 

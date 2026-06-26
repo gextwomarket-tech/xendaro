@@ -234,10 +234,10 @@
   <!-- Welcome Banner -->
   <div class="welcome-banner">
     <h2>Bienvenue, {{ $user->first_name }}! 👋</h2>
-    <p>Vous êtes connecté à votre compte Moon Trade. Commencez à trader dès maintenant.</p>
+    <p>Vous êtes connecté à votre compte Purprime Fox. Commencez à trader dès maintenant.</p>
   </div>
 
-  {{-- Alerte KYC : affichée si non vérifié --}}
+  {{-- Rappel KYC : affichée si non vérifié (n'empêche pas l'accès) --}}
   @if($user->kyc_status !== 'verified')
     <div id="kycAlertBanner" style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;margin-bottom:20px;border-radius:12px;
       {{ $user->kyc_status === 'pending' ? 'background:#fefce8;border:1px solid #fde047;color:#713f12;' : 'background:#eff6ff;border:1px solid #93c5fd;color:#1e3a5f;' }}">
@@ -246,11 +246,11 @@
       </span>
       <div style="flex:1">
         @if($user->kyc_status === 'pending')
-          <p style="font-weight:600;font-size:14px;margin-bottom:2px">Vérification KYC en cours</p>
-          <p style="font-size:13px;opacity:.85">Vos documents sont en cours d'examen (1 à 24 h). Vous pouvez utiliser la plateforme en attendant.</p>
+          <p style="font-weight:600;font-size:14px;margin-bottom:2px">✓ Vérification KYC en cours</p>
+          <p style="font-size:13px;opacity:.85">Vos documents sont en cours d'examen (1 à 24 h). Vous pouvez utiliser la plateforme sans restriction en attendant. Merci de votre patience!</p>
         @else
-          <p style="font-weight:600;font-size:14px;margin-bottom:2px">Vérification d'identité requise</p>
-          <p style="font-size:13px;opacity:.85">Complétez votre KYC pour débloquer toutes les fonctionnalités de trading.</p>
+          <p style="font-weight:600;font-size:14px;margin-bottom:2px">ℹ Rappel : Complétez votre KYC</p>
+          <p style="font-size:13px;opacity:.85">Terminez votre vérification d'identité pour débloquer toutes les fonctionnalités premium de trading.</p>
         @endif
       </div>
       <div style="display:flex;align-items:center;gap:8px">
@@ -320,7 +320,7 @@
             <div class="quick-action-icon">💳</div>
             <span>Wallet</span>
           </a>
-          <a href="{{ route('transactions.index') }}" class="quick-action">
+          <a href="{{ route('wallet.index') }}" class="quick-action">
             <div class="quick-action-icon">🔄</div>
             <span>Transactions</span>
           </a>
@@ -351,7 +351,7 @@
       <div class="card-section">
         <div class="section-title">
           <span>Trades Récents</span>
-          <a href="{{ route('transactions.index') }}" class="view-all">Voir tout →</a>
+          <a href="{{ route('trades.history') }}" class="view-all">Voir tout →</a>
         </div>
         <div class="space-y-0">
           @forelse($recentTrades as $trade)

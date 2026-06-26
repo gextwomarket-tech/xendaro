@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Moon Trade — Inscription</title>
+  <title>Purprime Fox — Inscription</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -346,7 +346,7 @@
       <div class="orb orb-2"></div>
       <div class="orb orb-3"></div>
 
-      <img src="{{ asset('auth.png') }}" alt="Authentication" style="width: calc(100% - 72px); height: 200px; object-fit: cover; border-radius: 24px; margin-bottom: 20px; display: block;" />
+      <img src="{{ asset('register.png') }}" alt="Register" style="width: calc(100% - 72px); height: 200px; object-fit: contain; border-radius: 16px; margin-bottom: 20px; display: block;" />
 
       <div class="left-content">
         <h1>Rejoignez-nous !</h1>

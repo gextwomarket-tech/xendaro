@@ -3,7 +3,7 @@
   <div class="h-full px-6 flex items-center justify-between">
     <!-- Left: Copyright -->
     <div class="text-xs text-slate-500 dark:text-slate-400">
-      © 2024 Moon Trade. Tous droits réservés.
+      © 2024 Purprime Fox. Tous droits réservés.
     </div>
 
     <!-- Center: Quick Stats (optional) -->

@@ -16,7 +16,7 @@ class PlatformSettingSeeder extends Seeder
             ['id' => 1],
             [
                 // Platform Identity
-                'platform_name' => 'Moon Trade',
+                'platform_name' => 'Purprime Fox',
                 'platform_slogan' => 'Plateforme professionnelle de trading de cryptomonnaies',
                 'platform_logo' => null,
                 
@@ -39,7 +39,7 @@ class PlatformSettingSeeder extends Seeder
                 // Business Information
                 'business_registration_number' => 'SIRET123456789',
                 'business_license' => 'License-2026-001',
-                'business_description' => 'Moon Trade est une plateforme de trading de cryptomonnaies professionnelle offrant des services avancés aux traders du monde entier.',
+                'business_description' => 'Purprime Fox est une plateforme de trading de cryptomonnaies professionnelle offrant des services avancés aux traders du monde entier.',
                 
                 // Social Media
                 'social_facebook' => 'https://facebook.com/moontrade',
@@ -49,7 +49,7 @@ class PlatformSettingSeeder extends Seeder
                 'social_youtube' => 'https://youtube.com/moontrade',
                 
                 // Company Details
-                'company_name' => 'Moon Trade SAS',
+                'company_name' => 'Purprime Fox SAS',
                 'company_ceo' => 'CEO Name',
                 'company_cfo' => 'CFO Name',
                 'company_mission' => 'Democratiser le trading de cryptomonnaies avec une plateforme sécurisée et intuitive.',

@@ -24,12 +24,6 @@ class WalletController extends Controller
     {
         $user = $request->user();
         
-        // Defense in depth: Verify KYC status (middleware already does this, but safety check)
-        if ($user->kyc_status !== 'verified') {
-            return redirect()->route('kyc.show')
-                ->with('info', 'Veuillez compléter votre vérification KYC pour accéder à votre portefeuille.');
-        }
-
         // Refresh wallet data from database
         $wallet = Wallet::where('user_id', $user->id)->first();
         $isWalletNull = is_null($wallet);
@@ -86,7 +80,7 @@ class WalletController extends Controller
     /**
      * Store a deposit request
      */
-    public function storeDeposit(Request $request)
+    public function storeDeposit(Request $request): JsonResponse
     {
         $user = $request->user();
         $wallet = $user->wallet;
@@ -117,73 +111,195 @@ class WalletController extends Controller
                 ],
             ]);
 
-            return redirect()->route('wallet.index')
-                ->with('success', 'Demande de dépôt soumise. En attente de validation.');
+            $amount   = number_format((float) $validated['amount'], 2);
+            $currency = $wallet->currency ?? 'USD';
+
+            DB::table('notifications')->insert([
+                'id'              => Str::uuid()->toString(),
+                'type'            => 'deposit',
+                'notifiable_type' => User::class,
+                'notifiable_id'   => $user->id,
+                'data'            => json_encode([
+                    'message' => "Demande de dépôt de {$amount} {$currency} soumise. En attente de validation.",
+                    'amount'  => $validated['amount'],
+                    'ref'     => $transaction->reference,
+                ]),
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            try {
+                Mail::raw(
+                    "Bonjour {$user->name},\n\nVotre demande de dépôt de {$amount} {$currency} a bien été reçue et est en attente de validation.\nRéférence : {$transaction->reference}\n\nPurprime Fox",
+                    fn($m) => $m->to($user->email)->subject('Demande de dépôt reçue - Purprime Fox')
+                );
+            } catch (\Exception) {
+                // Mail non bloquant
+            }
+
+            return response()->json([
+                'message' => 'Demande de dépôt soumise. En attente de validation.',
+                'data' => [
+                    'reference' => $transaction->reference,
+                    'amount'    => $validated['amount'],
+                ],
+            ], 200);
 
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Erreur lors de la soumission du dépôt.')
-                ->withInput();
+            return response()->json([
+                'message' => 'Erreur lors de la soumission du dépôt.',
+            ], 500);
         }
     }
 
     /**
      * Store a withdrawal request
      */
-    public function storeWithdraw(Request $request)
+    public function storeWithdraw(Request $request): JsonResponse
     {
         $user = $request->user();
         $wallet = $user->wallet;
         $limits = PlatformHelper::withdrawalLimits();
 
+        // Validation de base
         $validated = $request->validate([
-            'payment_method_id' => 'required|exists:payment_methods,id',
             'amount' => "required|numeric|min:{$limits['min']}|max:{$limits['max']}",
+            'payment_method' => 'required|in:bank_transfer,cryptocurrency,card',
         ], [
             'amount.min' => "Montant minimum: {$limits['min']}",
             'amount.max' => "Montant maximum: {$limits['max']}",
         ]);
 
-        $paymentMethod = PaymentMethod::findOrFail($validated['payment_method_id']);
-
         // Verify amount is not greater than balance
         if ($validated['amount'] > $wallet->balance) {
-            return redirect()->back()
-                ->with('error', 'Solde insuffisant pour effectuer ce retrait.')
-                ->withInput();
+            return response()->json([
+                'message' => 'Solde insuffisant pour effectuer ce retrait.',
+            ], 422);
         }
+
+        // Validation des champs spécifiques à la méthode
+        $methodValidation = match ($validated['payment_method']) {
+            'bank_transfer' => [
+                'bank_account_holder' => 'required|string|min:2|max:100',
+                'bank_account_number' => 'required|string|min:15|max:34',
+                'bank_name' => 'required|string|min:2|max:100',
+                'bank_swift' => 'nullable|string|max:11',
+            ],
+            'cryptocurrency' => [
+                'crypto_type' => 'required|in:bitcoin,ethereum,litecoin,ripple,dogecoin,usdt',
+                'crypto_address' => 'required|string|min:26|max:100',
+            ],
+            'card' => [
+                'card_holder_name' => 'required|string|min:2|max:100',
+                'card_number' => 'required|string|size:4',
+                'card_expiry' => 'required|regex:/^\d{2}\/\d{2}$/',
+                'card_bank_name' => 'required|string|min:2|max:100',
+            ],
+            default => []
+        };
+
+        // Effectuer la validation complète
+        $fullValidation = array_merge($validated, $request->validate($methodValidation));
 
         try {
             // Calculate withdrawal fees (1%)
-            $amount = $validated['amount'];
+            $amount = $fullValidation['amount'];
             $fees = $amount * 0.01;
             $netAmount = $amount - $fees;
 
-            // Create transaction with pending status
+            // Create withdrawal request (new model)
+            $withdrawalRequest = \App\Models\WithdrawalRequest::create([
+                'user_id' => $user->id,
+                'amount' => $amount,
+                'fees' => $fees,
+                'net_amount' => $netAmount,
+                'currency' => $wallet->currency ?? 'USD',
+                'payment_method' => $fullValidation['payment_method'],
+                'status' => 'pending',
+                'reference' => Str::upper(Str::random(10)),
+                'bank_account_number' => $fullValidation['bank_account_number'] ?? null,
+                'bank_account_holder' => $fullValidation['bank_account_holder'] ?? null,
+                'bank_swift' => $fullValidation['bank_swift'] ?? null,
+                'bank_name' => $fullValidation['bank_name'] ?? null,
+                'crypto_type' => $fullValidation['crypto_type'] ?? null,
+                'crypto_address' => $fullValidation['crypto_address'] ?? null,
+                'card_holder_name' => $fullValidation['card_holder_name'] ?? null,
+                'card_number' => $fullValidation['card_number'] ?? null,
+                'card_expiry' => $fullValidation['card_expiry'] ?? null,
+                'card_bank_name' => $fullValidation['card_bank_name'] ?? null,
+            ]);
+
+            // Also create transaction record for history
             $transaction = Transaction::create([
                 'user_id' => $user->id,
                 'type' => 'withdraw',
                 'amount' => $amount,
-                'method' => $paymentMethod->label,
+                'method' => 'Retrait - ' . $this->getPaymentMethodLabel($fullValidation['payment_method']),
                 'status' => 'pending',
                 'currency' => $wallet->currency ?? 'USD',
-                'reference' => Str::upper(Str::random(10)),
+                'reference' => $withdrawalRequest->reference,
                 'details' => [
-                    'payment_method_type' => $paymentMethod->type,
-                    'payment_method_details' => $paymentMethod->details,
+                    'withdrawal_request_id' => $withdrawalRequest->id,
+                    'payment_method' => $fullValidation['payment_method'],
                     'fees' => $fees,
                     'net_amount' => $netAmount,
                 ],
             ]);
 
-            return redirect()->route('wallet.index')
-                ->with('success', 'Demande de retrait soumise. En attente de validation.');
+            $currency = $wallet->currency ?? 'USD';
+
+            DB::table('notifications')->insert([
+                'id'              => Str::uuid()->toString(),
+                'type'            => 'withdraw',
+                'notifiable_type' => User::class,
+                'notifiable_id'   => $user->id,
+                'data'            => json_encode([
+                    'message' => 'Demande de retrait de ' . number_format($amount, 2) . " {$currency} soumise. En attente de validation.",
+                    'amount'  => $amount,
+                    'ref'     => $withdrawalRequest->reference,
+                ]),
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            try {
+                Mail::raw(
+                    "Bonjour {$user->name},\n\nVotre demande de retrait de " . number_format($amount, 2) . " {$currency} a bien été reçue et est en attente de validation.\nMontant net après frais : " . number_format($netAmount, 2) . " {$currency}\nRéférence : {$withdrawalRequest->reference}\n\nPurprime Fox",
+                    fn($m) => $m->to($user->email)->subject('Demande de retrait reçue - Purprime Fox')
+                );
+            } catch (\Exception) {
+                // Mail non bloquant
+            }
+
+            return response()->json([
+                'message' => 'Demande de retrait soumise. En attente de validation.',
+                'data' => [
+                    'reference'  => $withdrawalRequest->reference,
+                    'amount'     => $amount,
+                    'fees'       => $fees,
+                    'net_amount' => $netAmount,
+                ],
+            ], 200);
 
         } catch (\Exception $e) {
-            return redirect()->back()
-                ->with('error', 'Erreur lors de la soumission du retrait.')
-                ->withInput();
+            return response()->json([
+                'message' => 'Erreur lors de la soumission du retrait.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
+    }
+
+    /**
+     * Get payment method label
+     */
+    private function getPaymentMethodLabel(string $method): string
+    {
+        return match ($method) {
+            'bank_transfer' => 'Virement bancaire',
+            'cryptocurrency' => 'Cryptomonnaie',
+            'card' => 'Retrait par Carte bancaire',
+            default => 'Retrait'
+        };
     }
 
     /**
@@ -302,13 +418,13 @@ class WalletController extends Controller
                 $ref       = $senderTx->reference;
 
                 Mail::raw(
-                    "Bonjour {$sender->name},\n\nVotre transfert de {$amount} {$currency} vers {$validated['recipient_email']} a bien été effectué.\nRéférence : {$ref}\n\nMoon Trade",
-                    fn($m) => $m->to($sender->email)->subject('Transfert envoyé - Moon Trade')
+                    "Bonjour {$sender->name},\n\nVotre transfert de {$amount} {$currency} vers {$validated['recipient_email']} a bien été effectué.\nRéférence : {$ref}\n\nPurprime Fox",
+                    fn($m) => $m->to($sender->email)->subject('Transfert envoyé - Purprime Fox')
                 );
 
                 Mail::raw(
-                    "Bonjour {$recipient->name},\n\nVous avez reçu un transfert de {$amount} {$currency} de la part de {$sender->email}.\nCe montant est disponible dans votre portefeuille.\n\nMoon Trade",
-                    fn($m) => $m->to($recipient->email)->subject('Transfert reçu - Moon Trade')
+                    "Bonjour {$recipient->name},\n\nVous avez reçu un transfert de {$amount} {$currency} de la part de {$sender->email}.\nCe montant est disponible dans votre portefeuille.\n\nPurprime Fox",
+                    fn($m) => $m->to($recipient->email)->subject('Transfert reçu - Purprime Fox')
                 );
             } catch (\Exception) {
                 // Mail non bloquant

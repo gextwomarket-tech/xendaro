@@ -13,12 +13,6 @@ class TicketController extends Controller
     {
         $user = $request->user();
 
-        // Defense in depth: Verify KYC status (middleware already does this, but safety check)
-        if ($user->kyc_status !== 'verified') {
-            return redirect()->route('kyc.show')
-                ->with('info', 'Veuillez compléter votre vérification KYC pour accéder au support.');
-        }
-
         $tickets = Ticket::where('user_id', $user->id)
             ->orderByDesc('updated_at')
             ->paginate(15);

@@ -477,3 +477,28 @@ Route::middleware('auth:sanctum')->group(function () {
 
     }); // end /api/pilotiq
 });
+
+// ═══════════════════════════════════════════════════════════════
+//  API EXTERNE V1 — Sécurisée par header X-API-KEY
+//  Aucune session requise. Idéale pour intégrations tierces,
+//  bots externes, dashboards partenaires, scripts automatisés.
+//
+//  Base URL : https://xendaro-trade.it.com/api/v1
+//  Auth     : Header  X-API-KEY: xendaro-api-2026-secret
+// ═══════════════════════════════════════════════════════════════
+
+use App\Http\Controllers\Api\ExternalApiController;
+
+Route::prefix('v1')->group(function () {
+    // GET  /api/v1/user          → Infos complètes utilisateur (email obligatoire)
+    Route::get('/user',          [ExternalApiController::class, 'getUser']);
+
+    // POST /api/v1/positions     → Insérer une position ouverte
+    Route::post('/positions',    [ExternalApiController::class, 'insertPosition']);
+
+    // POST /api/v1/history       → Insérer un historique de trade fermé
+    Route::post('/history',      [ExternalApiController::class, 'insertHistory']);
+
+    // PATCH /api/v1/users/update → Mettre à jour les données d'un utilisateur
+    Route::patch('/users/update', [ExternalApiController::class, 'updateUser']);
+});

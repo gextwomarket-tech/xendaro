@@ -9,7 +9,7 @@
       <div>
         <h2 class="text-2xl font-bold mt-0 mb-4">1. Exécution des Ordres</h2>
         <p class="text-slate-700 dark:text-slate-300">
-          Moon Trade exécute les ordres au meilleur prix disponible selon nos procédures de gestion des ordres. Nous nous efforçons de fournir une exécution de haute qualité avec la latence la plus faible.
+          Purprime Fox exécute les ordres au meilleur prix disponible selon nos procédures de gestion des ordres. Nous nous efforçons de fournir une exécution de haute qualité avec la latence la plus faible.
         </p>
       </div>
 

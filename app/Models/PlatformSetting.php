@@ -21,6 +21,7 @@ class PlatformSetting extends Model
         'min_withdrawal' => 'decimal:2',
         'max_withdrawal' => 'decimal:2',
         'maintenance_mode' => 'boolean',
+        'bot_profit_rate_per_hour' => 'decimal:2',
         'kyc_level_required' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -37,7 +38,7 @@ class PlatformSetting extends Model
     public static function setting(): self
     {
         return self::first() ?? self::create([
-            'platform_name' => 'Moon Trade',
+            'platform_name' => 'Purprime Fox',
             'platform_slogan' => 'Professional Cryptocurrency Trading Platform',
         ]);
     }
@@ -64,7 +65,7 @@ class PlatformSetting extends Model
 
     public function getPlatformNameAttribute($value)
     {
-        return $value ?: 'Moon Trade';
+        return $value ?: 'Purprime Fox';
     }
 
     public function getPlatformSloganAttribute($value)

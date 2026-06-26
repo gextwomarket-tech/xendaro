@@ -19,7 +19,7 @@ class PlatformHelper
      */
     public static function name()
     {
-        return PlatformSetting::get('platform_name', 'Moon Trade');
+        return PlatformSetting::get('platform_name', 'Purprime Fox');
     }
 
     /**

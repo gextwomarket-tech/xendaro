@@ -11,14 +11,35 @@ class NotificationController extends Controller
     {
         $user = $request->user();
 
-        // Defense in depth: Verify KYC status (middleware already does this, but safety check)
-        if ($user->kyc_status !== 'verified') {
-            return redirect()->route('kyc.show')
-                ->with('info', 'Veuillez compléter votre vérification KYC pour accéder à vos notifications.');
-        }
-
         $notifications = $user->notifications()->paginate(15);
         return view('notifications.index', ['notifications' => $notifications]);
+    }
+
+    public function recent(Request $request)
+    {
+        $page    = max(1, (int) $request->input('page', 1));
+        $perPage = 8;
+        $query   = $request->user()->notifications()->latest();
+        $total   = $query->count();
+
+        $items = $query->skip(($page - 1) * $perPage)->take($perPage)->get()
+            ->map(fn($n) => [
+                'id'      => $n->id,
+                'title'   => $n->data['title']   ?? $n->data['subject'] ?? class_basename($n->type),
+                'message' => $n->data['message'] ?? $n->data['body']    ?? $n->data['content'] ?? '',
+                'read'    => ! is_null($n->read_at),
+                'time'    => $n->created_at->diffForHumans(),
+                'url'     => $n->data['url'] ?? null,
+            ]);
+
+        return response()->json([
+            'notifications' => $items,
+            'unread_count'  => $request->user()->unreadNotifications()->count(),
+            'total'         => $total,
+            'page'          => $page,
+            'per_page'      => $perPage,
+            'total_pages'   => (int) ceil($total / $perPage) ?: 1,
+        ]);
     }
 
     public function unreadCount(Request $request)
@@ -31,12 +52,22 @@ class NotificationController extends Controller
     public function markAllAsRead(Request $request)
     {
         $request->user()->notifications()->update(['read_at' => now()]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
         return back()->with('success', 'Toutes les notifications marquées comme lues.');
     }
 
     public function markAsRead(Request $request, $id)
     {
         $request->user()->notifications()->find($id)?->update(['read_at' => now()]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
         return back();
     }
 

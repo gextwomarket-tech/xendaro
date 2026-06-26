@@ -163,7 +163,8 @@ class FoxBotController extends Controller
         ]);
 
         $user  = $request->user();
-        $trade = Trade::where('user_id', $user->id)
+        $trade = Trade::with('instrument')
+                      ->where('user_id', $user->id)
                       ->where('status', 'open')
                       ->where('is_bot', true)
                       ->find($id);
@@ -214,11 +215,28 @@ class FoxBotController extends Controller
 
             DB::commit();
 
+            $freshWallet = $wallet->fresh();
+
+            // Notification gain/perte bot avec mise & soldes
+            try {
+                $user->notify(new \App\Notifications\TradeClosedNotification(
+                    pnl:         round($pnl, 2),
+                    margin:      (float) $trade->margin,
+                    symbol:      $trade->instrument?->symbol ?? 'N/A',
+                    accountType: $trade->account_type,
+                    demoBalance: (float) $freshWallet->demo_balance,
+                    realBalance: (float) $freshWallet->balance,
+                    isBot:       true,
+                ));
+            } catch (\Throwable $ne) {
+                \Log::warning('TradeClosedNotification (bot) failed: ' . $ne->getMessage());
+            }
+
             return ApiResponse::success([
                 'trade_id' => $trade->id,
                 'pnl'      => round($pnl, 2),
                 'is_win'   => $isWin,
-                'balance'  => $this->balancePayload($wallet->fresh()),
+                'balance'  => $this->balancePayload($freshWallet),
             ], 'Bot position closed successfully');
 
         } catch (\Throwable $e) {

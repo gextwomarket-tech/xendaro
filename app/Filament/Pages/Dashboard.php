@@ -16,7 +16,7 @@ class Dashboard extends BaseDashboard
 
     public function getHeading(): string
     {
-        return 'Dashboard Admin — Moon Trade';
+        return 'Dashboard Admin — Purprime Fox';
     }
 
     public function getSubheading(): ?string

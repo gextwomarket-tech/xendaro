@@ -1,124 +1,164 @@
-<!-- KYC Warning Modal — popup informatif non-bloquant -->
+{{-- KYC Toast Notification — bas gauche, non-bloquant, avec CTA --}}
 @php
-  $user = auth()->user();
-  // Afficher si KYC non vérifié ET session flash présente (une seule fois par navigation)
-  $showKycPopup = $user && $user->kyc_status !== 'verified' && session('kyc_popup');
+    $user = auth()->user();
+    $kycStatus = $user?->kyc_status;
+    $showToast = $user && $kycStatus !== 'verified' && $kycStatus !== null;
 @endphp
 
-@if ($showKycPopup)
-<div id="kyc-modal" class="fixed inset-0 z-50 overflow-y-auto">
-  <!-- Backdrop -->
-  <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeKycModal()"></div>
-
-  <!-- Modal Content -->
-  <div class="flex items-end sm:items-center justify-center min-h-screen px-4 pt-4 pb-20 sm:p-0">
-    <div class="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl transform transition-all sm:w-full sm:max-w-md">
-      <!-- Close Button -->
-      <button 
-        onclick="closeKycModal()" 
-        class="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400"
-      >
-        <span class="material-symbols-outlined text-[24px]">close</span>
-      </button>
-
-      <!-- Modal Body -->
-      <div class="px-4 py-6 sm:px-6">
-        <!-- Icon -->
-        <div class="flex justify-center mb-4">
-          <div class="w-14 h-14 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-            <span class="material-symbols-outlined text-3xl text-amber-600 dark:text-amber-400">warning</span>
-          </div>
+@if ($showToast)
+<div
+    id="kyc-toast"
+    role="alert"
+    aria-live="polite"
+    style="
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 9999;
+        width: 340px;
+        max-width: calc(100vw - 48px);
+        background: #0f172a;
+        border: 1px solid {{ $kycStatus === 'pending' ? '#854d0e' : '#1e3a8a' }};
+        border-left: 4px solid {{ $kycStatus === 'pending' ? '#eab308' : '#3b82f6' }};
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.2);
+        padding: 16px 16px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+        font-family: 'Manrope', sans-serif;
+    "
+>
+    {{-- Header --}}
+    <div style="display:flex; align-items:flex-start; gap:10px;">
+        {{-- Icon --}}
+        <div style="
+            width:36px; height:36px; border-radius:8px; flex-shrink:0;
+            background: {{ $kycStatus === 'pending' ? 'rgba(234,179,8,.15)' : 'rgba(59,130,246,.15)' }};
+            display:flex; align-items:center; justify-content:center;
+        ">
+            <span class="material-symbols-outlined" style="font-size:20px; color:{{ $kycStatus === 'pending' ? '#eab308' : '#3b82f6' }}">
+                {{ $kycStatus === 'pending' ? 'schedule' : 'verified_user' }}
+            </span>
         </div>
 
-        <!-- Title -->
-        <h3 class="text-center text-lg font-bold text-slate-900 dark:text-white mb-2">
-          Vérification KYC Requise
-        </h3>
-
-        <!-- Description -->
-        <p class="text-center text-sm text-slate-600 dark:text-slate-400 mb-4">
-          Vous devez compléter la vérification de votre identité pour accéder à cette fonctionnalité.
-        </p>
-
-        <!-- Timeline -->
-        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-6">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[20px]">schedule</span>
-            <div>
-              <p class="text-xs text-amber-700 dark:text-amber-300 font-semibold">Délai de vérification:</p>
-              <p class="text-sm text-amber-900 dark:text-amber-200 font-bold">1 à 24 heures</p>
-            </div>
-          </div>
+        {{-- Text --}}
+        <div style="flex:1; min-width:0;">
+            <p style="font-size:13px; font-weight:700; color:#f1f5f9; margin:0 0 3px;">
+                @if($kycStatus === 'pending')
+                    Vérification KYC en cours
+                @elseif($kycStatus === 'rejected')
+                    KYC rejeté — action requise
+                @else
+                    Complétez votre KYC
+                @endif
+            </p>
+            <p style="font-size:12px; color:#94a3b8; margin:0; line-height:1.5;">
+                @if($kycStatus === 'pending')
+                    Vos documents sont en cours d'examen (1–24 h). Accès complet maintenu.
+                @elseif($kycStatus === 'rejected')
+                    Votre vérification a été rejetée. Soumettez à nouveau vos documents.
+                @else
+                    Vérifiez votre identité pour débloquer toutes les fonctionnalités.
+                @endif
+            </p>
         </div>
 
-        <!-- What's included -->
-        <div class="mb-6">
-          <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Vous aurez besoin de:</p>
-          <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-            <li class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-blue-500">check_circle</span>
-              Pièce d'identité valide
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-blue-500">check_circle</span>
-              Selfie avec votre pièce d'identité
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-blue-500">check_circle</span>
-              Informations personnelles
-            </li>
-          </ul>
-        </div>
-
-        <!-- Buttons -->
-        <div class="flex gap-3">
-          <button 
-            onclick="closeKycModal()" 
-            class="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-          >
-            Annuler
-          </button>
-          <a 
-            href="{{ route('kyc.show') }}" 
-            class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            <span class="material-symbols-outlined text-[20px]">verified_user</span>
-            Vérifier maintenant
-          </a>
-        </div>
-
-        <!-- Footer note -->
-        <p class="text-xs text-slate-500 dark:text-slate-500 text-center mt-4">
-          Vos données sont sécurisées et conformes aux normes KYC.
-        </p>
-      </div>
+        {{-- Close --}}
+        <button
+            onclick="closeKycToast()"
+            aria-label="Fermer"
+            style="background:none; border:none; cursor:pointer; padding:2px; flex-shrink:0; color:#64748b; line-height:1;"
+        >
+            <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+        </button>
     </div>
-  </div>
+
+    {{-- CTA Buttons --}}
+    <div style="display:flex; gap:8px;">
+        @if($kycStatus === 'rejected')
+            <a
+                href="{{ route('kyc.show') }}"
+                style="flex:1; text-align:center; padding:8px 12px; background:#ef4444; color:#fff; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none; transition:background .2s;"
+                onmouseover="this.style.background='#dc2626'"
+                onmouseout="this.style.background='#ef4444'"
+            >
+                Relancer le KYC →
+            </a>
+        @else
+            <a
+                href="{{ route('kyc.show') }}"
+                style="flex:1; text-align:center; padding:8px 12px; background:#3b82f6; color:#fff; border-radius:8px; font-size:12px; font-weight:700; text-decoration:none; transition:background .2s;"
+                onmouseover="this.style.background='#2563eb'"
+                onmouseout="this.style.background='#3b82f6'"
+            >
+                {{ $kycStatus === 'pending' ? 'Voir le statut →' : 'Vérifier maintenant →' }}
+            </a>
+        @endif
+        <button
+            onclick="closeKycToast()"
+            style="padding:8px 14px; background:rgba(255,255,255,.06); color:#cbd5e1; border:1px solid rgba(255,255,255,.1); border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:background .2s;"
+            onmouseover="this.style.background='rgba(255,255,255,.12)'"
+            onmouseout="this.style.background='rgba(255,255,255,.06)'"
+        >
+            Plus tard
+        </button>
+    </div>
+
+    {{-- Progress bar auto-dismiss --}}
+    <div style="height:2px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; margin-top:2px;">
+        <div
+            id="kyc-toast-bar"
+            style="height:100%; width:100%; background:{{ $kycStatus === 'pending' ? '#eab308' : '#3b82f6' }}; border-radius:2px; transition:width linear;"
+        ></div>
+    </div>
 </div>
 
 <script>
-  function closeKycModal() {
-    const m = document.getElementById('kyc-modal');
-    if (m) { m.style.opacity = '0'; m.style.transition = 'opacity .25s'; setTimeout(() => m.remove(), 260); }
-    document.body.style.overflow = 'auto';
-  }
+(function() {
+    const DISMISS_AFTER = 12000; // ms
+    const toast   = document.getElementById('kyc-toast');
+    const bar     = document.getElementById('kyc-toast-bar');
+    let timer;
 
-  // Fermer avec Escape
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeKycModal();
-  });
-
-  // Afficher automatiquement au chargement (popup non-bloquant)
-  document.addEventListener('DOMContentLoaded', function() {
-    const m = document.getElementById('kyc-modal');
-    if (m) {
-      m.style.opacity = '0';
-      m.style.transition = 'opacity .3s';
-      document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => { m.style.opacity = '1'; });
-      // Fermeture auto après 12s si l'utilisateur ne fait rien
-      setTimeout(closeKycModal, 12000);
+    function showKycToast() {
+        if (!toast) return;
+        // Entrée animée
+        requestAnimationFrame(() => {
+            toast.style.opacity  = '1';
+            toast.style.transform = 'translateY(0)';
+        });
+        // Barre de progression
+        bar.style.transitionDuration = DISMISS_AFTER + 'ms';
+        bar.style.width = '0%';
+        // Auto-dismiss
+        timer = setTimeout(closeKycToast, DISMISS_AFTER);
     }
-  });
+
+    window.closeKycToast = function() {
+        if (!toast) return;
+        clearTimeout(timer);
+        toast.style.opacity   = '0';
+        toast.style.transform = 'translateY(16px)';
+        setTimeout(() => toast.remove(), 380);
+        // Mémoriser en session (via cookie léger, 24h)
+        document.cookie = 'kyc_toast_seen=1; path=/; max-age=86400';
+    };
+
+    // N'afficher qu'une fois par session (cookie)
+    if (document.cookie.indexOf('kyc_toast_seen=1') === -1) {
+        document.addEventListener('DOMContentLoaded', showKycToast);
+    } else {
+        toast && toast.remove();
+    }
+
+    // Fermer avec Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeKycToast();
+    });
+})();
 </script>
 @endif

@@ -2,7 +2,7 @@
 # Filament Admin Setup Script
 # Run after composer install completes
 
-echo "🚀 Moon Trade - Filament Admin Setup Script"
+echo "🚀 Purprime Fox - Filament Admin Setup Script"
 echo "=============================================="
 echo ""
 

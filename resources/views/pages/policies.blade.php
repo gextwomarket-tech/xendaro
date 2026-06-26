@@ -2,7 +2,7 @@
   <x-slot name="title">Politiques</x-slot>
 
   <div class="max-w-4xl mx-auto py-16">
-    <h1 class="text-4xl font-bold mb-2 text-slate-900 dark:text-white">Politiques Moon Trade</h1>
+    <h1 class="text-4xl font-bold mb-2 text-slate-900 dark:text-white">Politiques Purprime Fox</h1>
     <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">Dernière mise à jour: Mai 2026</p>
     
     <div class="prose dark:prose-invert max-w-none space-y-6">
@@ -37,7 +37,7 @@
       <div>
         <h2 class="text-2xl font-bold mt-0 mb-4">5. Politique d'Accès</h2>
         <p class="text-slate-700 dark:text-slate-300">
-          Moon Trade se réserve le droit de suspendre ou de fermer les comptes qui violent nos conditions d'utilisation.
+          Purprime Fox se réserve le droit de suspendre ou de fermer les comptes qui violent nos conditions d'utilisation.
         </p>
       </div>
     </div>

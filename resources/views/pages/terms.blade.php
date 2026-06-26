@@ -9,14 +9,14 @@
       <div>
         <h2 class="text-2xl font-bold mt-0 mb-4">1. Acceptation des Conditions</h2>
         <p class="text-slate-700 dark:text-slate-300">
-          En accédant ou en utilisant Moon Trade, vous acceptez d'être lié par ces conditions générales. Si vous n'acceptez pas ces conditions, vous ne pouvez pas utiliser nos services.
+          En accédant ou en utilisant Purprime Fox, vous acceptez d'être lié par ces conditions générales. Si vous n'acceptez pas ces conditions, vous ne pouvez pas utiliser nos services.
         </p>
       </div>
 
       <div>
         <h2 class="text-2xl font-bold mt-0 mb-4">2. Description du Service</h2>
         <p class="text-slate-700 dark:text-slate-300">
-          Moon Trade fournit une plateforme institutionnelle de trading avec accès aux marchés financiers mondiaux. Nos services incluent l'exécution de transactions, la gestion de portefeuille et les outils d'analyse.
+          Purprime Fox fournit une plateforme institutionnelle de trading avec accès aux marchés financiers mondiaux. Nos services incluent l'exécution de transactions, la gestion de portefeuille et les outils d'analyse.
         </p>
       </div>
 
@@ -30,14 +30,14 @@
       <div>
         <h2 class="text-2xl font-bold mt-0 mb-4">4. Propriété Intellectuelle</h2>
         <p class="text-slate-700 dark:text-slate-300">
-          Tout le contenu de la plateforme est la propriété de Moon Trade et est protégé par les lois applicables sur les droits d'auteur.
+          Tout le contenu de la plateforme est la propriété de Purprime Fox et est protégé par les lois applicables sur les droits d'auteur.
         </p>
       </div>
 
       <div>
         <h2 class="text-2xl font-bold mt-0 mb-4">5. Limitation de Responsabilité</h2>
         <p class="text-slate-700 dark:text-slate-300">
-          Moon Trade ne sera pas responsable des dommages indirects, fortuits ou spéciaux résultant de votre utilisation de la plateforme.
+          Purprime Fox ne sera pas responsable des dommages indirects, fortuits ou spéciaux résultant de votre utilisation de la plateforme.
         </p>
       </div>
 

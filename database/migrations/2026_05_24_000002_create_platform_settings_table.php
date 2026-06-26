@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             // Platform Identity
-            $table->string('platform_name', 255)->default('Moon Trade');
+            $table->string('platform_name', 255)->default('Purprime Fox');
             $table->string('platform_slogan', 255)->nullable();
             $table->string('platform_logo')->nullable(); // URL to logo
             

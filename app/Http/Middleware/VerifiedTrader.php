@@ -23,17 +23,8 @@ class VerifiedTrader
                 ->with('error', 'Veuillez vérifier votre email avant de trader.');
         }
 
-        // 3. KYC non vérifié (PRIORITAIRE - les utilisateurs doivent pouvoir accéder à la page KYC)
-        if ($user->kyc_status !== 'verified') {
-            if ($user->kyc_status === 'rejected') {
-                return redirect()->route('profile.kyc')
-                    ->with('error', 'Votre vérification KYC a été rejetée. Veuillez la relancer.');
-            }
-            
-            // pending, null, ou toute autre valeur
-            return redirect()->route('profile.kyc')
-                ->with('warning', 'Vous devez compléter et faire approuver votre KYC pour accéder au trading.');
-        }
+        // 3. KYC — accès libre, notification gérée côté vue (toast)
+        // Aucune redirection KYC ici.
 
         // 4. Compte inactif ou suspendu
         if ($user->status !== 'active') {

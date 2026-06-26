@@ -34,6 +34,7 @@ $tradeConfig = [
         'getPositions'  => route('trade.positions.json'),
         'getHistory'    => route('trade.history.json'),
         'getBalance'    => route('trade.balance.json'),
+        'updateBalance' => route('trade.balance.update'),
         'foxbot'        => route('trade.foxbot'),
         'coinGeckoPrice' => route('trade.api.coingecko.price'),
         'coinGeckoOHLC'  => route('trade.api.coingecko.ohlc'),
@@ -51,7 +52,328 @@ $userAvatarBg = $userColors[$userColorIndex];
 $headInjection = '<meta name="csrf-token" content="' . $tradeConfig['csrfToken'] . '">' . "\n"
     . '<script>window.__TRADE = ' . json_encode($tradeConfig) . ';</script>' . "\n"
     . '<style>
-        .user-profile-dropdown {
+/* ═════════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN — Mobile First Approach
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Base responsive container */
+.trade-container, main, .workspace, [class*="workspace"], [class*="container"] {
+    width: 100%;
+    max-width: 100vw !important;
+    overflow-x: hidden;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Mobile-first grid system */
+.grid-responsive, [class*="grid"], .layout {
+    display: grid;
+    grid-auto-flow: row;
+    gap: 0.5rem;
+}
+
+/* Breakpoints */
+@media (min-width: 640px) {
+    .grid-responsive, [class*="grid"] {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .grid-responsive, [class*="grid"] {
+        grid-template-columns: 1fr 2fr 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1280px) {
+    .grid-responsive, [class*="grid"] {
+        grid-template-columns: 1fr 3fr 1fr;
+        gap: 2rem;
+    }
+}
+
+/* Sidebar responsiveness */
+[class*="sidebar"], [class*="panel"], .side-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    [class*="sidebar"], [class*="panel"], .side-panel {
+        width: 250px !important;
+        margin-right: 1rem;
+        margin-bottom: 0;
+        display: block !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    [class*="sidebar"], [class*="panel"], .side-panel {
+        width: 280px !important;
+    }
+}
+
+/* Tables responsiveness */
+table, [class*="table"] {
+    width: 100% !important;
+    font-size: 0.75rem;
+    overflow-x: auto !important;
+    display: block;
+}
+
+@media (min-width: 640px) {
+    table, [class*="table"] {
+        font-size: 0.875rem;
+        display: table;
+    }
+}
+
+@media (min-width: 1024px) {
+    table, [class*="table"] {
+        font-size: 1rem;
+    }
+}
+
+/* Forms responsiveness */
+form, [class*="form"], input, select, textarea, button {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+    input, select, textarea, button {
+        padding: 0.75rem;
+    }
+}
+
+/* Chart containers */
+canvas, [class*="chart"], [id*="chart"], [id*="Chart"] {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 200px;
+    max-height: 100%;
+}
+
+@media (max-height: 600px) {
+    canvas, [class*="chart"], [id*="chart"], [id*="Chart"] {
+        min-height: 150px;
+    }
+}
+
+@media (min-height: 800px) {
+    canvas, [class*="chart"], [id*="chart"], [id*="Chart"] {
+        min-height: 300px;
+    }
+}
+
+/* Typography responsiveness */
+h1, [class*="h1"], [class*="title-lg"] { font-size: 1.25rem; }
+h2, [class*="h2"], [class*="title-md"] { font-size: 1.125rem; }
+h3, [class*="h3"], [class*="title-sm"] { font-size: 1rem; }
+p, [class*="body"], span { font-size: 0.875rem; }
+small, [class*="small"], [class*="text-xs"] { font-size: 0.75rem; }
+
+@media (min-width: 768px) {
+    h1, [class*="h1"], [class*="title-lg"] { font-size: 1.875rem; }
+    h2, [class*="h2"], [class*="title-md"] { font-size: 1.5rem; }
+    h3, [class*="h3"], [class*="title-sm"] { font-size: 1.25rem; }
+    p, [class*="body"], span { font-size: 1rem; }
+    small, [class*="small"], [class*="text-xs"] { font-size: 0.875rem; }
+}
+
+/* Flex responsiveness */
+.flex-responsive, [class*="flex"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .flex-responsive-row, [class*="flex-row"] {
+        flex-direction: row;
+        gap: 1rem;
+    }
+}
+
+/* Spacing responsiveness */
+.px { padding-left: 0.5rem; padding-right: 0.5rem; }
+.py { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.mx { margin-left: 0.5rem; margin-right: 0.5rem; }
+.my { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+
+@media (min-width: 768px) {
+    .px { padding-left: 1rem; padding-right: 1rem; }
+    .py { padding-top: 1rem; padding-bottom: 1rem; }
+    .mx { margin-left: 1rem; margin-right: 1rem; }
+    .my { margin-top: 1rem; margin-bottom: 1rem; }
+}
+
+/* Hide/show elements on breakpoints */
+.hide-mobile { display: none; }
+.hide-tablet { }
+.hide-desktop { }
+
+@media (min-width: 640px) {
+    .hide-tablet { display: none; }
+    .hide-mobile { display: block; }
+}
+
+@media (min-width: 1024px) {
+    .hide-desktop { display: none; }
+    .hide-mobile { display: block; }
+    .hide-tablet { display: block; }
+}
+
+/* Navigation responsiveness */
+nav, [role="navigation"], [class*="nav"], .navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    nav, [role="navigation"], [class*="nav"], .navbar {
+        padding: 1rem;
+        gap: 1rem;
+    }
+}
+
+/* Position/Badge responsiveness */
+.badge, [class*="badge"], .tab-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .badge, [class*="badge"], .tab-badge {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Button responsiveness */
+button, [role="button"], [class*="btn"] {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    min-width: auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    button, [role="button"], [class*="btn"] {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        min-width: 120px;
+    }
+}
+
+/* Modal/Dialog responsiveness */
+[role="dialog"], .modal, [class*="modal"] {
+    width: 90vw !important;
+    max-width: 90vw !important;
+    max-height: 90vh !important;
+    padding: 1rem;
+}
+
+@media (min-width: 640px) {
+    [role="dialog"], .modal, [class*="modal"] {
+        width: 80vw !important;
+        max-width: 80vw !important;
+    }
+}
+
+@media (min-width: 768px) {
+    [role="dialog"], .modal, [class*="modal"] {
+        width: 60vw !important;
+        max-width: 600px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    [role="dialog"], .modal, [class*="modal"] {
+        width: 50vw !important;
+        max-width: 800px !important;
+    }
+}
+
+/* Tabs responsiveness */
+[role="tablist"], [class*="tabs"], .tab-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 768px) {
+    [role="tablist"], [class*="tabs"], .tab-container {
+        gap: 1rem;
+        padding: 1rem;
+    }
+}
+
+/* Scrollable containers */
+[class*="scroll"], [class*="overflow"] {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+[class*="scroll"]::-webkit-scrollbar,
+[class*="overflow"]::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+[class*="scroll"]::-webkit-scrollbar-track,
+[class*="overflow"]::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+[class*="scroll"]::-webkit-scrollbar-thumb,
+[class*="overflow"]::-webkit-scrollbar-thumb {
+    background: rgba(0, 212, 170, 0.3);
+    border-radius: 2px;
+}
+
+/* Touch-friendly targets (minimum 44x44px) */
+button, a, input[type="button"], input[type="checkbox"], input[type="radio"] {
+    min-height: 44px !important;
+    min-width: 44px !important;
+}
+
+@media (min-width: 1024px) {
+    button, a, input[type="button"], input[type="checkbox"], input[type="radio"] {
+        min-height: auto;
+        min-width: auto;
+    }
+}
+
+/* Print responsiveness */
+@media print {
+    nav, [class*="nav"], [role="navigation"], .navbar {
+        display: none;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    [class*="container"], .workspace {
+        max-width: 100%;
+    }
+}
+    .user-profile-dropdown {
             position: relative;
             display: flex;
             align-items: center;
@@ -176,29 +498,369 @@ $headInjection = '<meta name="csrf-token" content="' . $tradeConfig['csrfToken']
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        @media (max-width: 1024px) {
-            .user-profile-dropdown { padding: 5px 10px; }
-            .user-avatar { width: 26px; height: 26px; font-size: 11px; }
-            .user-name { font-size: 10px; }
-            .user-email { font-size: 8px; }
-            .dropdown-menu { min-width: 170px; }
-            .dropdown-menu a { padding: 8px 12px; font-size: 12px; }
-        }
-        @media (max-width: 768px) {
-            .user-profile-dropdown { padding: 4px 8px; gap: 6px; }
-            .user-avatar { width: 24px; height: 24px; font-size: 10px; }
-            .user-info { display: none; }
-            .dropdown-menu { min-width: 150px; right: -5px; }
-            .dropdown-menu a { padding: 8px 10px; font-size: 12px; }
-            .live-badge { padding: 4px 8px; font-size: 10px; }
-            .live-badge span:first-child { width: 6px; height: 6px; }
-        }
-        @media (max-width: 480px) {
-            .user-avatar { width: 22px; height: 22px; font-size: 9px; }
-            .dropdown-menu { min-width: 140px; }
-            .dropdown-menu a { padding: 6px 8px; font-size: 11px; gap: 8px; }
-        }
     </style>' . "\n";
+
+// ── Chart fix CSS (canvas min-height, force resize) ──────────────────
+$headInjection .= '<style>canvas{min-height:80px !important}[class*="chart"] canvas,[id*="chart"] canvas,[id*="Chart"] canvas{min-height:100px !important;height:100% !important}.pnl-chart,.chart-container,.chart-wrap{min-height:120px !important}.bot-active-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:linear-gradient(135deg,rgba(0,212,170,.2),rgba(0,212,170,.1));border:1.5px solid rgba(0,212,170,.4);border-radius:6px;font-size:12px;font-weight:600;color:#00d4aa;animation:bot-pulse 2s ease-in-out infinite}.bot-active-badge::before{content:\"\1F916\";width:10px;height:10px;border-radius:50%;background:#00d4aa;animation:bot-dot-pulse 2s ease-in-out infinite;flex-shrink:0}@keyframes bot-pulse{0%,100%{background:linear-gradient(135deg,rgba(0,212,170,.2),rgba(0,212,170,.1));box-shadow:0 0 10px rgba(0,212,170,.3)}50%{background:linear-gradient(135deg,rgba(0,212,170,.3),rgba(0,212,170,.2));box-shadow:0 0 20px rgba(0,212,170,.5)}}@keyframes bot-dot-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.2)}}.bot-notification{position:fixed;top:80px;right:20px;background:linear-gradient(135deg,#0a2527 0%,#0d3a3e 100%);border:1px solid rgba(0,212,170,.3);border-radius:8px;padding:16px;min-width:300px;box-shadow:0 8px 32px rgba(0,212,170,.15);animation:slide-in-right .4s ease-out;z-index:9999;display:none}.bot-notification.active{display:block}.bot-notification-content{display:flex;align-items:flex-start;gap:12px}.bot-notification-icon{font-size:24px;animation:bot-icon-bounce .6s ease-in-out infinite;flex-shrink:0}.bot-notification-text{display:flex;flex-direction:column;gap:4px;flex:1}.bot-notification-title{font-size:13px;font-weight:600;color:#00d4aa}.bot-notification-message{font-size:12px;color:rgba(255,255,255,.7);line-height:1.4}.bot-notification-amount{font-size:14px;font-weight:700;color:#00d4aa}@keyframes slide-in-right{from{opacity:0;transform:translateX(400px)}to{opacity:1;transform:translateX(0)}}@keyframes slide-out-right{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(400px)}}@keyframes bot-icon-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}.tab-badge-bot{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;background:linear-gradient(135deg,#00d4aa,#00b899);color:#0a0a0a;font-size:10px;font-weight:700;border-radius:11px;animation:bot-badge-pulse 2s ease-in-out infinite;margin-left:6px}@keyframes bot-badge-pulse{0%,100%{transform:scale(1);box-shadow:0 0 8px rgba(0,212,170,.4)}50%{transform:scale(1.08);box-shadow:0 0 16px rgba(0,212,170,.6)}}.position-bot-indicator{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);border-radius:4px;font-size:10px;color:#00d4aa;font-weight:600}.position-bot-indicator::before{content:\"\1F916 \";animation:bot-emoji-rotate 3s linear infinite}@keyframes bot-emoji-rotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.form-bot-overlay{position:absolute;top:0;right:0;width:200px;height:100%;background:linear-gradient(90deg,transparent,rgba(0,212,170,.05));border-radius:0 8px 8px 0;display:flex;align-items:center;justify-content:center;font-size:32px;animation:bot-form-shimmer 3s ease-in-out infinite;pointer-events:none}@keyframes bot-form-shimmer{0%,100%{opacity:.1}50%{opacity:.3}}@media (max-width:1024px){.bot-notification{min-width:280px;right:10px}}@media (max-width:768px){.bot-notification{min-width:250px;right:5px;top:70px}.bot-active-badge{font-size:11px;padding:5px 10px}}</style>' . "\n";
+
+// ── Chart fix CSS (canvas min-height, force resize) ──────────────────
+$headInjection .= '<style>canvas{min-height:80px !important}[class*="chart"] canvas,[id*="chart"] canvas,[id*="Chart"] canvas{min-height:100px !important;height:100% !important}.pnl-chart,.chart-container,.chart-wrap{min-height:120px !important}</style>' . "\n";
+
+// ── RESPONSIVE WORKSPACE — Mobile-First Override ──────────────────────
+$headInjection .= '<style>
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE TRADE WORKSPACE — XFT Final
+   Mobile-first: sidebar right (FoxBot) toujours visible
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── MOBILE : layout en colonne, tout empilé ── */
+@media (max-width: 1023px) {
+    body { overflow-y: auto !important; overflow-x: hidden !important; }
+
+    .app-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        overflow: visible !important;
+    }
+
+    /* Topbar scrollable horizontalement */
+    .topbar {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 0 10px !important;
+        gap: 8px !important;
+        min-height: 52px !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 200 !important;
+        scrollbar-width: none !important;
+    }
+    .topbar::-webkit-scrollbar { display: none !important; }
+
+    /* Cacher stats topbar non essentiels sur mobile */
+    .topbar-stats { display: none !important; }
+    .topbar-balance { gap: 6px !important; }
+    .balance-block { min-width: 60px !important; }
+    .topbar-divider { display: none !important; }
+
+    /* Sidebars cachées sur mobile */
+    .sidebar-left {
+        display: none !important;
+    }
+
+    /* Zone principale prend toute la largeur */
+    .main-area {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: visible !important;
+        min-height: 60vh !important;
+    }
+
+    /* Toolbar du chart scrollable */
+    .chart-toolbar {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        flex-wrap: nowrap !important;
+        padding: 0 8px !important;
+        scrollbar-width: none !important;
+    }
+    .chart-toolbar::-webkit-scrollbar { display: none !important; }
+
+    /* Chart area adapté */
+    .chart-area {
+        min-height: 280px !important;
+        height: 45vw !important;
+        max-height: 380px !important;
+        position: relative !important;
+    }
+
+    /* Bottom panel */
+    .bottom-panel {
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Tabs scrollables */
+    .tabs {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none !important;
+        padding: 0 6px !important;
+    }
+    .tabs::-webkit-scrollbar { display: none !important; }
+    .tab-btn {
+        flex-shrink: 0 !important;
+        font-size: 0.7rem !important;
+        padding: 6px 10px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Tab content scrollable */
+    .tab-content { min-height: 150px !important; overflow: visible !important; }
+    .tab-pane { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; }
+
+    /* Tables mobile */
+    .tab-pane table { font-size: 0.68rem !important; }
+
+    /* Sidebar droite (FoxBot + formulaire) : visible en bas sur mobile */
+    .sidebar-right {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-left: none !important;
+        border-top: 1px solid var(--border, rgba(255,255,255,0.1)) !important;
+        overflow-y: visible !important;
+        display: block !important;
+    }
+
+    /* FoxBot section toujours visible + bien stylée */
+    .bot-section {
+        margin: 8px 10px !important;
+        border-radius: 10px !important;
+        background: var(--bg-card, rgba(255,255,255,0.05)) !important;
+        border: 1.5px solid var(--fox-orange, #FF8C42) !important;
+        padding: 10px !important;
+    }
+
+    .bot-section-header {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+
+    .bot-select-row {
+        display: flex !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
+        align-items: center !important;
+    }
+
+    .bot-select { flex: 1 !important; min-width: 0 !important; }
+    .bot-start-btn { flex-shrink: 0 !important; white-space: nowrap !important; }
+
+    /* Status bar du bot visible */
+    .bot-status-bar.active {
+        display: flex !important;
+        max-height: 60px !important;
+        opacity: 1 !important;
+    }
+
+    /* Animations FoxBot conservées sur mobile */
+    .bot-pulse-ring { display: block !important; }
+    .bot-pulse-core { display: block !important; }
+    .bot-scan-overlay.active { display: block !important; }
+    .bot-ticker.show { display: flex !important; }
+
+    /* Formulaire de trade visible */
+    .order-form { padding: 10px !important; }
+
+    .order-tabs { display: flex !important; gap: 6px !important; }
+
+    .order-tab {
+        flex: 1 !important;
+        padding: 10px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .form-row { margin-bottom: 8px !important; }
+
+    /* Account tabs */
+    .account-mode-tabs {
+        display: flex !important;
+        gap: 6px !important;
+        padding: 8px 10px !important;
+    }
+
+    .acc-tab-btn { flex: 1 !important; padding: 8px !important; font-size: 0.75rem !important; }
+
+    /* Stats & indicators */
+    .market-stats, .indicators-section, .pnl-tracker { padding: 8px 10px !important; }
+
+    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+    /* Instrument header */
+    .instrument-header { padding: 8px 10px !important; }
+    .instrument-bid, .instrument-ask { font-size: 1.1rem !important; }
+
+    /* Risk estimator compact */
+    .risk-estimator { font-size: 0.72rem !important; }
+
+    /* Qty presets */
+    .qty-slider { gap: 4px !important; }
+    .qty-preset { padding: 4px 8px !important; font-size: 0.7rem !important; }
+
+    /* Order button pleine largeur */
+    .order-btn { width: 100% !important; padding: 14px !important; font-size: 1rem !important; }
+
+    /* Modal responsive */
+    .modal-box {
+        width: 94vw !important;
+        max-width: 94vw !important;
+        margin: 10px !important;
+    }
+
+    /* User profile dropdown responsive */
+    .user-profile-dropdown .dropdown-menu {
+        right: -10px !important;
+        left: auto !important;
+        min-width: 160px !important;
+        max-width: calc(100vw - 20px) !important;
+    }
+}
+
+/* ── TABLETTE : layout deux colonnes ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .app-wrapper {
+        display: grid !important;
+        grid-template-rows: 52px 1fr !important;
+        grid-template-columns: 1fr !important;
+        height: auto !important;
+    }
+
+    .main-area {
+        grid-template-rows: 44px minmax(300px, 40vh) 220px !important;
+    }
+
+    .chart-area { height: 40vh !important; max-height: 400px !important; }
+
+    /* Sidebar droite en grille 2 colonnes */
+    .sidebar-right {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        padding: 10px !important;
+    }
+
+    .bot-section { margin: 0 !important; }
+    .order-form { padding: 0 !important; }
+    .account-mode-tabs { grid-column: 1 / -1 !important; }
+    .real-account-warning, .api-status { grid-column: 1 / -1 !important; }
+    .instrument-header { grid-column: 1 / -1 !important; }
+    .market-stats, .indicators-section, .pnl-tracker { grid-column: 1 !important; }
+}
+
+/* ── DESKTOP : layout original restauré ── */
+@media (min-width: 1024px) {
+    .app-wrapper {
+        display: grid !important;
+        grid-template-rows: 52px 1fr !important;
+        grid-template-columns: 220px 1fr 290px !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    .topbar { overflow: hidden !important; }
+    .sidebar-left { display: flex !important; }
+    .main-area { display: grid !important; overflow: hidden !important; }
+    .sidebar-right { overflow-y: auto !important; }
+}
+
+/* ── NOTIFICATION RESPONSIVE (toasts bot) ── */
+.bot-notification {
+    max-width: calc(100vw - 20px) !important;
+}
+
+/* ── FOXBOT ACTIVITY PANEL — mobile safe ── */
+@media (max-width: 640px) {
+    .bot-notification {
+        left: 8px !important;
+        right: 8px !important;
+        min-width: 0 !important;
+        width: calc(100vw - 16px) !important;
+        top: 68px !important;
+    }
+    #foxbot-activity-panel {
+        bottom: 8px !important;
+        right: 8px !important;
+        left: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: 60vh !important;
+        border-radius: 16px !important;
+    }
+    #foxbot-active-banner {
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        top: 60px !important;
+        white-space: nowrap !important;
+        font-size: 10px !important;
+        padding: 4px 10px !important;
+    }
+    #foxbot-reconnect-toast {
+        left: 8px !important;
+        right: 8px !important;
+        min-width: 0 !important;
+        width: calc(100vw - 16px) !important;
+        transform: none !important;
+        top: 68px !important;
+    }
+    .dropdown-menu {
+        right: 8px !important;
+        left: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+}
+
+/* ── WORKSPACE : signaux marché + tabs + formulaire ── */
+@media (max-width: 1023px) {
+    .signal-row, [class*="signal"], [class*="market-row"] {
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        font-size: 0.7rem !important;
+    }
+    .market-watch-table, [class*="market-table"] {
+        font-size: 0.68rem !important;
+        min-width: 480px !important;
+    }
+    .tab-pane, [class*="panel-body"], [id*="tab-"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .chart-section, [class*="chart-wrap"], [id*="chartContainer"], [id*="chart-container"] {
+        min-height: 280px !important;
+        height: clamp(240px, 50vw, 380px) !important;
+        width: 100% !important;
+    }
+    .buy-btn, .sell-btn, [class*="order-btn"], button[class*="buy"], button[class*="sell"] {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 0.9rem !important;
+    }
+    .form-input, input[type="number"], input[type="text"], select {
+        font-size: 16px !important;
+    }
+    [class*="position-card"], [class*="trade-row"] {
+        font-size: 0.7rem !important;
+        padding: 8px !important;
+    }
+}
+
+/* ── FOXBOT ANIMATIONS — préservées sur tous écrans ── */
+@keyframes botRing {
+    0% { transform: scale(.5); opacity: 1 }
+    100% { transform: scale(1.8); opacity: 0 }
+}
+@keyframes botCore {
+    0%, 100% { transform: translate(-50%,-50%) scale(1) }
+    50% { transform: translate(-50%,-50%) scale(1.25) }
+}
+@keyframes scanLine {
+    0% { top: 0; opacity: .7 }
+    100% { top: 100%; opacity: .2 }
+}
+@keyframes tradeFlash {
+    0% { opacity: 0; transform: translate(-50%,-60%) scale(.8) }
+    30% { opacity: 1; transform: translate(-50%,-50%) scale(1.1) }
+    70% { opacity: 1; transform: translate(-50%,-50%) scale(1) }
+    100% { opacity: 0; transform: translate(-50%,-40%) scale(.9) }
+}
+</style>' . "\n";
 
 // ── Overrides AJAX (à insérer juste avant </body>) ─────────────────────
 // On utilise output buffering pour capturer le rendu du partial blade
@@ -332,7 +994,23 @@ console.log('[LivePnL] 📊 Système de mises à jour en temps réel chargé');
 // ── Init : charger positions + historique depuis le serveur ──────
 // ⚠️ ATTENTION: Ne PAS appeler _originalInit() pour éviter la récursion
 async function initTradeWorkspace() {
-    console.log('[Trade] 🚀 Initializing Puprime Fox workspace...');
+    console.log('[Trade] 🚀 Initializing Xendaro Fox workspace...');
+    
+    // Force refresh soldes depuis la BDD au chargement
+    try {
+        console.log('[Trade] Fetching fresh balance from server...');
+        const freshBalance = await apiGet(ROUTES.getBalance);
+        if (freshBalance && freshBalance.balance) {
+            state.demoBalance = parseFloat(freshBalance.balance.demo_balance) || window.__TRADE.demoBalance || 10000;
+            state.realBalance = parseFloat(freshBalance.balance.real_balance) || window.__TRADE.realBalance || 0;
+            console.log('[Trade] ✅ Balances loaded from server:', { demo: state.demoBalance, real: state.realBalance });
+        }
+    } catch (e) {
+        console.warn('[Trade] Could not refresh balance from server:', e.message);
+        // Fallback aux valeurs injectées en PHP
+        state.demoBalance = window.__TRADE.demoBalance || 10000;
+        state.realBalance = window.__TRADE.realBalance || 0;
+    }
     
     // ① Charger les données depuis le serveur
     const serverPositions = window.__TRADE.openPositions || []; 
@@ -412,11 +1090,283 @@ async function initTradeWorkspace() {
         // ⑦ Démarrer les mises à jour en temps réel
         startLivePnLUpdates();
         
+        // ⑧ Initialiser l'affichage du bot actif
+        initBotActiveDisplay();
+        
         console.log('[Trade] ✅ Workspace initialized successfully');
     } catch (e) {
         console.error('[Trade] ❌ Init error:', e.message);
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// 🤖 BOT ACTIVE STATUS & NOTIFICATIONS SYSTEM
+// ═══════════════════════════════════════════════════════════════════════
+
+/**
+ * Initialize bot status display and monitoring
+ */
+function initBotActiveDisplay() {
+    const botState = window.__TRADE.botState || {};
+    const isBotActive = botState.bot_active === true;
+
+    if (isBotActive) {
+        console.log('[Bot] 🤖 Bot is ACTIVE - Initializing display...');
+        
+        // Show bot badge in header
+        const headerNav = document.querySelector('[class*="header"], nav, [role="navigation"]');
+        if (headerNav) {
+            createBotActiveBadge();
+        }
+
+        // Add bot indicators to tabs
+        updateTabsWithBotIndicator();
+
+        // Show initial bot notification
+        showBotNotification('Bot Activated', 'Your FoxBot is actively trading on your account', '+0.00');
+
+        // Monitor for balance updates from server
+        monitorBotBalanceUpdates();
+    } else {
+        console.log('[Bot] Bot is inactive');
+    }
+}
+
+/**
+ * Create and inject bot active badge
+ */
+function createBotActiveBadge() {
+    // Check if badge already exists
+    if (document.querySelector('.bot-active-badge')) {
+        return;
+    }
+
+    const badge = document.createElement('div');
+    badge.className = 'bot-active-badge';
+    badge.innerHTML = '🤖 FoxBot Active';
+    badge.title = 'Your FoxBot is actively trading';
+    badge.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 120px;
+        z-index: 99;
+    `;
+
+    document.body.appendChild(badge);
+    console.log('[Bot] Bot active badge created');
+}
+
+/**
+ * Show bot notification toast
+ */
+function showBotNotification(title, message, amount = '+0.00') {
+    const notification = document.createElement('div');
+    notification.className = 'bot-notification active';
+    notification.innerHTML = `
+        <div class="bot-notification-content">
+            <div class="bot-notification-icon">🤖</div>
+            <div class="bot-notification-text">
+                <div class="bot-notification-title">${title}</div>
+                <div class="bot-notification-message">${message}</div>
+                <div class="bot-notification-amount">${amount}</div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Auto-remove after 6 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slide-out-right 0.4s ease-in forwards';
+        setTimeout(() => notification.remove(), 400);
+    }, 6000);
+
+    console.log('[Bot] Notification shown:', { title, message, amount });
+}
+
+/**
+ * Add bot indicator to tabs
+ */
+function updateTabsWithBotIndicator() {
+    // Find tab elements
+    const tabElements = document.querySelectorAll('[role="tab"], [class*="tab"]');
+    
+    tabElements.forEach(tab => {
+        const tabText = tab.innerText || tab.textContent;
+        
+        // Add bot badge to relevant tabs
+        if (tabText.includes('Position') || tabText.includes('position')) {
+            addBotBadgeToTab(tab, 'Positions');
+        } else if (tabText.includes('History') || tabText.includes('historique')) {
+            addBotBadgeToTab(tab, 'History');
+        } else if (tabText.includes('Form') || tabText.includes('formulaire')) {
+            addBotBadgeToTab(tab, 'Form');
+        }
+    });
+}
+
+/**
+ * Add bot badge to specific tab
+ */
+function addBotBadgeToTab(tabElement, tabName) {
+    // Check if badge already exists
+    if (tabElement.querySelector('.tab-badge-bot')) {
+        return;
+    }
+
+    const badge = document.createElement('span');
+    badge.className = 'tab-badge-bot';
+    badge.title = `Bot is active on ${tabName}`;
+    badge.innerText = '●';
+
+    tabElement.appendChild(badge);
+    console.log(`[Bot] Badge added to ${tabName} tab`);
+}
+
+/**
+ * Add bot indicator to open positions
+ */
+function addBotIndicatorToPosition(positionElement, isBot = true) {
+    if (!isBot || !positionElement) return;
+
+    // Check if indicator already exists
+    if (positionElement.querySelector('.position-bot-indicator')) {
+        return;
+    }
+
+    const indicator = document.createElement('div');
+    indicator.className = 'position-bot-indicator';
+    indicator.innerText = 'Auto Trading';
+    indicator.title = 'This position is managed by FoxBot';
+
+    // Insert at the beginning
+    positionElement.insertBefore(indicator, positionElement.firstChild);
+}
+
+/**
+ * Monitor bot balance updates from server
+ * Polling amélioré: chaque 10 secondes au lieu de 30 (plus réactif)
+ */
+function monitorBotBalanceUpdates() {
+    // Poll server for balance updates every 10 seconds (was 30)
+    const pollInterval = setInterval(async () => {
+        try {
+            const response = await apiGet(ROUTES.getBalance);
+            if (response && response.balance) {
+                const demoBalBefore = state.demoBalance;
+                const realBalBefore = state.realBalance;
+
+                state.demoBalance = response.balance.demo_balance || demoBalBefore;
+                state.realBalance = response.balance.real_balance || realBalBefore;
+
+                // Check if balance was updated (profit/loss from bot)
+                if (state.accountMode === 'demo' && Math.abs(state.demoBalance - demoBalBefore) > 0.01) {
+                    const increment = (state.demoBalance - demoBalBefore).toFixed(2);
+                    if (state.demoBalance > demoBalBefore) {
+                        showBotNotification(
+                            'FoxBot Profit Generated',
+                            'Automatic bot trading profit received',
+                            `+$${increment}`
+                        );
+                    } else {
+                        showBotNotification(
+                            'FoxBot Loss Recorded',
+                            'Position closed with loss',
+                            `-$${Math.abs(increment)}`
+                        );
+                    }
+                    console.log(`[Bot] Demo balance updated: ${increment >= 0 ? '+' : ''}$${increment}`);
+                    updateBalanceDisplay();
+                    // Persist to database
+                    debounceBalanceSync();
+                } else if (state.accountMode === 'real' && Math.abs(state.realBalance - realBalBefore) > 0.01) {
+                    const increment = (state.realBalance - realBalBefore).toFixed(2);
+                    if (state.realBalance > realBalBefore) {
+                        showBotNotification(
+                            'FoxBot Profit Generated',
+                            'Automatic bot trading profit received',
+                            `+$${increment}`
+                        );
+                    } else {
+                        showBotNotification(
+                            'FoxBot Loss Recorded',
+                            'Position closed with loss',
+                            `-$${Math.abs(increment)}`
+                        );
+                    }
+                    console.log(`[Bot] Real balance updated: ${increment >= 0 ? '+' : ''}$${increment}`);
+                    updateBalanceDisplay();
+                    // Persist to database
+                    debounceBalanceSync();
+                }
+            }
+        } catch (e) {
+            console.warn('[Bot] Balance update poll error:', e.message);
+        }
+    }, 10000); // Poll every 10 seconds (increased reactivity)
+
+    // Store interval ID for cleanup
+    window._botMonitorInterval = pollInterval;
+}
+
+/**
+ * Cleanup bot monitoring
+ */
+function stopBotMonitoring() {
+    if (window._botMonitorInterval) {
+        clearInterval(window._botMonitorInterval);
+        window._botMonitorInterval = null;
+        console.log('[Bot] Monitoring stopped');
+    }
+}
+
+/**
+ * Synchronize balances with the server (persist to database)
+ * PRIORITÉ: Cette fonction doit être appelée après CHAQUE transaction
+ */
+async function syncBalanceToServer() {
+    try {
+        const response = await apiPost(ROUTES.updateBalance, {
+            demo_balance: state.demoBalance,
+            real_balance: state.realBalance,
+            margin_used: state.marginUsed || 0
+        });
+        
+        if (response && response.success) {
+            console.log('[Balance] ✅ Synchronized with server:', response.balance);
+        } else {
+            console.warn('[Balance] ⚠️ Sync response unexpected:', response);
+        }
+    } catch (e) {
+        console.error('[Balance] ❌ Sync failed:', e.message);
+    }
+}
+
+/**
+ * Monitor local balance changes and sync to server
+ * Called after transactions, closures, bot trades, etc.
+ * CETTE FONCTION DOIT ÊTRE APPELÉE APRÈS CHAQUE ACTION
+ */
+window._lastSyncTime = Date.now();
+window._syncDebounceTimer = null;
+
+function debounceBalanceSync() {
+    // Avoid syncing too frequently - max once per 2 seconds
+    if (window._syncDebounceTimer) {
+        clearTimeout(window._syncDebounceTimer);
+    }
+    
+    window._syncDebounceTimer = setTimeout(async () => {
+        const now = Date.now();
+        if (now - window._lastSyncTime > 2000) {
+            window._lastSyncTime = now;
+            console.log('[Balance] Syncing to server:', { demo: state.demoBalance, real: state.realBalance });
+            await syncBalanceToServer();
+        }
+    }, 500);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
 
 // Appeler la nouvelle fonction au chargement
 window.addEventListener('load', initTradeWorkspace, { once: true });
@@ -515,6 +1465,8 @@ async function confirmOrder() {
             state.demoBalance = parseFloat(res.balance.demo_balance) || state.demoBalance;
             state.realBalance = parseFloat(res.balance.real_balance) || state.realBalance;
             updateBalanceDisplay();
+            // SYNCHRONISER vers la base de données
+            debounceBalanceSync();
         }
 
         // Ajouter la position dans l'état local avec l'ID serveur
@@ -607,6 +1559,8 @@ async function closePosition(posId, reason = 'Manuel') {
             state.demoBalance = parseFloat(res.balance.demo_balance) || state.demoBalance;
             state.realBalance = parseFloat(res.balance.real_balance) || state.realBalance;
             updateBalanceDisplay();
+            // SYNCHRONISER vers la base de données
+            debounceBalanceSync();
         }
 
         const pnl = res.pnl ?? 0;
@@ -671,7 +1625,7 @@ async function closePosition(posId, reason = 'Manuel') {
 // ═══════════════════════════════════════════════════════════════════════════
 // - 70-80% win rate (configurable)
 // - Real API integration (not local-only)
-// - Realistic delay simulation (5-25 seconds)
+// - Opérations horaires (1 cycle ~ toutes les 45-75 minutes, hold 45-90 minutes)
 // - Full BDD persistence with transaction support
 // - Dynamic risk management
 // ═══════════════════════════════════════════════════════════════════════════
@@ -680,8 +1634,8 @@ const FOXBOT_SYSTEM = {
     config: {
         minWinRate:        0.70,       // 70% minimum win rate
         maxWinRate:        0.80,       // 80% maximum win rate
-        minHoldTimeMs:     5000,       // 5 seconds minimum
-        maxHoldTimeMs:     25000,      // 25 seconds maximum
+        minHoldTimeMs:     45 * 60 * 1000,  // 45 minutes minimum
+        maxHoldTimeMs:     90 * 60 * 1000,  // 1h30 maximum
         riskPerTrade:      0.02,       // 2% of balance per trade
         maxConcurrentBots: 3,          // Max 3 concurrent positions
     },
@@ -747,8 +1701,8 @@ const FOXBOT_SYSTEM = {
     scheduleCycle() {
         if (!this.state.isRunning) return;
 
-        // Random delay between cycles (8-20 seconds)
-        const delayMs = 8000 + Math.random() * 12000;
+        // Random delay between cycles (45 - 75 minutes) — opérations horaires
+        const delayMs = 45 * 60 * 1000 + Math.random() * 30 * 60 * 1000;
         this.state.botInterval = setTimeout(() => {
             this.runCycle();
             this.scheduleCycle();
@@ -925,7 +1879,7 @@ const FOXBOT_SYSTEM = {
                        Math.random() * (this.config.maxWinRate - this.config.minWinRate);
         const isWin = Math.random() < winRate;
 
-        console.log(`[FoxBot] Trade ${tradeId}: ${isWin ? '✅ WIN' : '❌ LOSS'} in ${holdTimeMs.toFixed(0)}ms`);
+        console.log(`[FoxBot] Trade ${tradeId}: ${isWin ? '✅ WIN' : '❌ LOSS'} in ${(holdTimeMs / 60000).toFixed(0)}min`);
 
         const closeTimer = setTimeout(async () => {
             await this.closeBotPosition(tradeId, symbol, isWin);
@@ -1123,6 +2077,215 @@ window.addEventListener('beforeunload', function() {
 });
 
 console.log('[Trade] ✅ Tous les modules chargés avec succès');
+
+// ═══════════════════════════════════════════════════════════════════
+// 🚀 FOXBOT ENHANCEMENTS — Markets, Charts, Animations, Reconnect
+// ═══════════════════════════════════════════════════════════════════
+
+// ── 1. Chart resize fix ────────────────────────────────────────────
+setTimeout(function() {
+    window.dispatchEvent(new Event('resize'));
+    if (typeof Chart !== 'undefined') {
+        var instances = Chart.instances ? (Array.isArray(Chart.instances) ? Chart.instances : Object.values(Chart.instances)) : [];
+        instances.forEach(function(c) { try { c.resize(); } catch(e) {} });
+    }
+    document.querySelectorAll('canvas').forEach(function(c) {
+        if (c.offsetHeight < 10) { c.style.minHeight = '120px'; c.style.display = 'block'; }
+    });
+    try { if (typeof initChart    === 'function') initChart();    } catch(e) {}
+    try { if (typeof initPnlChart === 'function') initPnlChart(); } catch(e) {}
+}, 1500);
+
+// ── 2. Extra Instruments injection ────────────────────────────────
+setTimeout(function() {
+    if (typeof INSTRUMENTS === 'undefined') return;
+    var extra = {
+        'ADA/USD':  {leverage:20,  contractSize:1000,   decimals:5},
+        'AVAX/USD': {leverage:50,  contractSize:1,      decimals:3},
+        'LINK/USD': {leverage:50,  contractSize:1,      decimals:4},
+        'DOT/USD':  {leverage:20,  contractSize:10,     decimals:4},
+        'MATIC/USD':{leverage:20,  contractSize:1000,   decimals:5},
+        'LTC/USD':  {leverage:50,  contractSize:1,      decimals:2},
+        'UNI/USD':  {leverage:20,  contractSize:10,     decimals:4},
+        'ATOM/USD': {leverage:20,  contractSize:10,     decimals:4},
+        'USD/CHF':  {leverage:100, contractSize:100000, decimals:5},
+        'USD/CAD':  {leverage:100, contractSize:100000, decimals:5},
+        'AUD/USD':  {leverage:100, contractSize:100000, decimals:5},
+        'NZD/USD':  {leverage:100, contractSize:100000, decimals:5},
+        'EUR/GBP':  {leverage:100, contractSize:100000, decimals:5},
+        'EUR/JPY':  {leverage:100, contractSize:100000, decimals:3},
+        'GBP/JPY':  {leverage:100, contractSize:100000, decimals:3},
+        'XAG/USD':  {leverage:100, contractSize:5000,   decimals:3},
+        'USOIL':    {leverage:100, contractSize:1000,   decimals:2},
+        'UKOIL':    {leverage:100, contractSize:1000,   decimals:2},
+        'US500':    {leverage:100, contractSize:1,      decimals:2},
+        'NASDAQ':   {leverage:100, contractSize:1,      decimals:2},
+        'DOWJONES': {leverage:100, contractSize:1,      decimals:2},
+    };
+    Object.assign(INSTRUMENTS, extra);
+    try { if (typeof buildSymbolSelect === 'function') buildSymbolSelect(); } catch(e) {}
+    try { if (typeof buildWatchlist    === 'function') buildWatchlist();    } catch(e) {}
+    console.log('[Markets] +' + Object.keys(extra).length + ' extra instruments injected');
+}, 600);
+
+// ── 3. Bot Activity Panel (HTML + CSS) ────────────────────────────
+(function injectFoxbotPanel() {
+    if (document.getElementById('foxbot-activity-panel')) return;
+    var s = document.createElement('style');
+    s.textContent = '#foxbot-activity-panel{position:fixed;bottom:20px;right:20px;width:288px;max-height:370px;background:rgba(14,14,22,.97);border:1px solid rgba(0,212,170,.35);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:9999;display:none;flex-direction:column;overflow:hidden;animation:fbpIn .3s ease-out}#foxbot-activity-panel.fbp-on{display:flex}@keyframes fbpIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}#fbp-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:rgba(0,212,170,.1);border-bottom:1px solid rgba(0,212,170,.2);cursor:pointer;user-select:none}#fbp-title{font-size:12px;font-weight:700;color:#00d4aa;display:flex;align-items:center;gap:7px}#fbp-badge{background:#00d4aa;color:#000;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px;min-width:18px;text-align:center}#fbp-x{color:rgba(255,255,255,.4);font-size:14px;cursor:pointer}#fbp-x:hover{color:#fff}#fbp-stats{display:flex;gap:5px;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.05)}.fbp-s{flex:1;text-align:center;padding:4px;border-radius:6px;background:rgba(255,255,255,.04)}.fbp-sv{font-size:12px;font-weight:700;color:#eeeef5}.fbp-sl{font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.4px}#fbp-list{flex:1;overflow-y:auto;max-height:240px}#fbp-list::-webkit-scrollbar{width:3px}#fbp-list::-webkit-scrollbar-thumb{background:rgba(0,212,170,.3);border-radius:2px}.fbp-item{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:1px solid rgba(255,255,255,.04);animation:fbpItem .3s ease-out}@keyframes fbpItem{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}.fbp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.fbp-w{background:#00d4aa;box-shadow:0 0 5px rgba(0,212,170,.5)}.fbp-l{background:#ff6b6b;box-shadow:0 0 5px rgba(255,107,107,.5)}.fbp-pair{font-size:11px;font-weight:600;color:#eeeef5}.fbp-t{font-size:9px;color:rgba(255,255,255,.28)}.fbp-pnl{font-size:11px;font-weight:700;white-space:nowrap}.fbp-pw{color:#00d4aa}.fbp-pl{color:#ff6b6b}#foxbot-reconnect-toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:rgba(14,14,22,.97);border:1px solid rgba(0,212,170,.5);border-radius:12px;padding:13px 18px;min-width:258px;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;animation:fbpIn .4s ease-out}.rct-title{font-size:12px;font-weight:700;color:#00d4aa;margin-bottom:5px}.rct-gain{font-size:20px;font-weight:800;color:#00d4aa;margin:6px 0}.rct-body{font-size:11px;color:rgba(255,255,255,.65)}.rct-x{position:absolute;top:9px;right:11px;color:rgba(255,255,255,.35);cursor:pointer;font-size:14px}#foxbot-active-banner{position:fixed;top:66px;left:50%;transform:translateX(-50%);padding:5px 15px;background:rgba(0,212,170,.13);border:1px solid rgba(0,212,170,.38);border-radius:20px;font-size:11px;font-weight:600;color:#00d4aa;z-index:9997;display:none;align-items:center;gap:7px;pointer-events:none;animation:fbpIn .3s ease-out}#foxbot-active-banner.fba-on{display:flex}#foxbot-active-banner .fba-dot{width:7px;height:7px;border-radius:50%;background:#00d4aa;animation:pulse-live 1.2s ease-in-out infinite}@keyframes pnlFG{0%{background:rgba(0,212,170,0)}40%{background:rgba(0,212,170,.16)}100%{background:rgba(0,212,170,0)}}@keyframes pnlFR{0%{background:rgba(255,107,107,0)}40%{background:rgba(255,107,107,.16)}100%{background:rgba(255,107,107,0)}}.pfl-g{animation:pnlFG .8s ease-out}.pfl-r{animation:pnlFR .8s ease-out}';
+    document.head.appendChild(s);
+
+    var panel = document.createElement('div');
+    panel.id = 'foxbot-activity-panel';
+    panel.innerHTML = '<div id="fbp-hdr" onclick="fbpToggle()"><div id="fbp-title"><span>🤖</span><span>FoxBot Activity</span><span id="fbp-badge">0</span></div><span id="fbp-x" onclick="event.stopPropagation();fbpHide()">✕</span></div><div id="fbp-stats"><div class="fbp-s"><div class="fbp-sv" id="fbs-tot">0</div><div class="fbp-sl">Trades</div></div><div class="fbp-s"><div class="fbp-sv" id="fbs-win" style="color:#00d4aa">0</div><div class="fbp-sl">Wins</div></div><div class="fbp-s"><div class="fbp-sv" id="fbs-pnl" style="color:#00d4aa">+$0</div><div class="fbp-sl">P&L</div></div><div class="fbp-s"><div class="fbp-sv" id="fbs-wr" style="color:#00d4aa">0%</div><div class="fbp-sl">Win%</div></div></div><div id="fbp-list"><div style="text-align:center;padding:18px;color:rgba(255,255,255,.25);font-size:11px">En attente...</div></div>';
+    document.body.appendChild(panel);
+
+    var rct = document.createElement('div');
+    rct.id = 'foxbot-reconnect-toast';
+    rct.innerHTML = '<span class="rct-x" onclick="this.parentElement.style.display=\'none\'">✕</span><div class="rct-title">🤖 FoxBot a travaillé pendant votre absence</div><div class="rct-gain" id="rct-gain">+$0.00</div><div class="rct-body">pendant <span id="rct-elapsed">0min</span> — crédité sur votre compte</div>';
+    document.body.appendChild(rct);
+
+    var banner = document.createElement('div');
+    banner.id = 'foxbot-active-banner';
+    banner.innerHTML = '<span class="fba-dot"></span><span>🤖 FoxBot actif</span>';
+    document.body.appendChild(banner);
+})();
+
+window._fbpStats = {total:0,wins:0,losses:0,pnl:0};
+window.fbpToggle = function(){ var p=document.getElementById('foxbot-activity-panel'); if(p) p.classList.toggle('fbp-on'); };
+window.fbpHide   = function(){ var p=document.getElementById('foxbot-activity-panel'); if(p) p.classList.remove('fbp-on'); };
+window.fbpShow   = function(){ var p=document.getElementById('foxbot-activity-panel'); if(p) p.classList.add('fbp-on'); };
+
+function foxbotAddActivity(symbol, pnl, isWin, side) {
+    var st = window._fbpStats;
+    st.total++; st.pnl += pnl;
+    if (isWin) st.wins++; else st.losses++;
+    var wr = st.total > 0 ? ((st.wins/st.total)*100).toFixed(0) : 0;
+    var pc = st.pnl >= 0 ? '#00d4aa' : '#ff6b6b';
+    document.getElementById('fbs-tot').textContent = st.total;
+    document.getElementById('fbs-win').textContent = st.wins;
+    var pe = document.getElementById('fbs-pnl');
+    pe.textContent = (st.pnl >= 0 ? '+' : '') + '$' + Math.abs(st.pnl).toFixed(2);
+    pe.style.color = pc;
+    var we = document.getElementById('fbs-wr');
+    we.textContent = wr + '%';
+    we.style.color = wr >= 70 ? '#00d4aa' : '#ff6b6b';
+    var badge = document.getElementById('fbp-badge');
+    if (badge) badge.textContent = st.total;
+    var list = document.getElementById('fbp-list');
+    if (list) {
+        var ph = list.querySelector('[style*="text-align"]');
+        if (ph) ph.remove();
+        var item = document.createElement('div');
+        item.className = 'fbp-item';
+        var ps = (pnl >= 0 ? '+$' : '-$') + Math.abs(pnl).toFixed(2);
+        var ti = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        item.innerHTML = '<div class="fbp-dot ' + (isWin ? 'fbp-w' : 'fbp-l') + '"></div><div style="flex:1;min-width:0"><div class="fbp-pair">' + (isWin ? '✅' : '❌') + ' ' + side + ' ' + symbol + '</div><div class="fbp-t">' + ti + '</div></div><div class="fbp-pnl ' + (isWin ? 'fbp-pw' : 'fbp-pl') + '">' + ps + '</div>';
+        list.insertBefore(item, list.firstChild);
+        while (list.children.length > 50) list.removeChild(list.lastChild);
+    }
+    document.querySelectorAll('[id*="balance"],[id*="Balance"],[class*="balance"]').forEach(function(el) {
+        el.classList.remove('pfl-g','pfl-r'); void el.offsetWidth;
+        el.classList.add(isWin ? 'pfl-g' : 'pfl-r');
+        setTimeout(function(){ el.classList.remove('pfl-g','pfl-r'); }, 800);
+    });
+    if (st.total <= 5) fbpShow();
+}
+
+// ── 4. Patch FOXBOT_SYSTEM ────────────────────────────────────────
+(function patchFoxBot() {
+    if (typeof FOXBOT_SYSTEM === 'undefined') { setTimeout(patchFoxBot, 400); return; }
+
+    var _oClose = FOXBOT_SYSTEM.closeBotPosition;
+    FOXBOT_SYSTEM.closeBotPosition = async function(tradeId, symbol, isWin) {
+        var td = this.state.openTrades[tradeId];
+        await _oClose.call(this, tradeId, symbol, isWin);
+        if (td) {
+            var aprxPnl = isWin
+                ? Math.abs(((td.tp||td.entry*1.02) - td.entry) * (td.volume||1) * (td.contractSize||1))
+                : -Math.abs((td.entry - (td.sl||td.entry*0.985)) * (td.volume||1) * (td.contractSize||1));
+            foxbotAddActivity(symbol, aprxPnl, isWin, td.side||'BUY');
+        }
+    };
+
+    let liveSimInterval = null;
+    const simSymbols = ['EUR/USD', 'BTC/USD', 'ETH/USD', 'XAU/USD', 'GBP/USD'];
+
+    function startLiveSim() {
+        if (liveSimInterval) clearInterval(liveSimInterval);
+        liveSimInterval = setInterval(async () => {
+            if (!FOXBOT_SYSTEM.state.isRunning) return;
+            const accType = (typeof state !== 'undefined' && state.accountMode) ? state.accountMode : 'demo';
+            const bal = accType === 'demo' ? (state.demoBalance||0) : (state.realBalance||0);
+            if (bal <= 0) return;
+
+            const isWin = Math.random() < 0.80; // 80% gain, 20% perte
+            // 15 sec interval = 240 ticks/h. Gain cible 1.5%/h => ~0.00781%, Perte cible 0.5%/h => ~0.0104%
+            const rate = isWin ? 0.000078125 : 0.00010416;
+            const amount = bal * rate;
+
+            try {
+                const CSRF = window.__TRADE?.csrfToken || document.querySelector('meta[name="csrf-token"]')?.content;
+                const res = await fetch('/trade/foxbot/tick', {
+                    method: 'POST', credentials: 'include',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+                    body: JSON.stringify({ is_win: isWin, amount: amount, account_type: accType })
+                });
+                const data = await res.json();
+                if (data && data.success && data.balance) {
+                    if (typeof state !== 'undefined') {
+                        state.demoBalance = data.balance.demo_balance;
+                        state.realBalance = data.balance.real_balance;
+                        if (typeof updateBalanceDisplay === 'function') updateBalanceDisplay();
+                    }
+                    const sym = simSymbols[Math.floor(Math.random() * simSymbols.length)];
+                    const side = Math.random() > 0.5 ? 'BUY' : 'SELL';
+                    foxbotAddActivity(sym, isWin ? amount : -amount, isWin, side);
+                }
+            } catch (e) {}
+        }, 15000);
+    }
+
+    var _oStart = FOXBOT_SYSTEM.start;
+    FOXBOT_SYSTEM.start = async function(botId) {
+        await _oStart.call(this, botId);
+        var b = document.getElementById('foxbot-active-banner');
+        if (b) b.classList.add('fba-on');
+        startLiveSim();
+    };
+
+    var _oStop = FOXBOT_SYSTEM.stop;
+    FOXBOT_SYSTEM.stop = async function() {
+        await _oStop.call(this);
+        var b = document.getElementById('foxbot-active-banner');
+        if (b) b.classList.remove('fba-on');
+        if (liveSimInterval) clearInterval(liveSimInterval);
+    };
+
+    if (FOXBOT_SYSTEM.state.isRunning) startLiveSim();
+
+    console.log('[FoxBot] 🎨 Activity panel + animations patched');
+})();
+
+// ── 5. Arrêt du FoxBot à la fermeture de la page ──────────────────
+// Pas de suivi des jours d'absence : si l'utilisateur ferme la page,
+// le bot est simplement arrêté et devra être réactivé manuellement.
+window.addEventListener('beforeunload', function() {
+    if (typeof FOXBOT_SYSTEM === 'undefined' || !FOXBOT_SYSTEM.state || !FOXBOT_SYSTEM.state.isRunning) return;
+
+    FOXBOT_SYSTEM.stop();
+
+    var accType = (typeof state !== 'undefined' && state.account) ? state.account : 'demo';
+    try {
+        fetch('/api/pilotiq/settings', {
+            method: 'PATCH',
+            credentials: 'include',
+            keepalive: true,
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+            body: JSON.stringify({ bot_active: false, account_type: accType }),
+        });
+    } catch (e) {}
+});
 
 // ═══════════════════════════════════════════════════════════════════
 // 🚀 TRADE PILOTIQ — Bridge pour le nouveau UI trading.html

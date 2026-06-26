@@ -18,12 +18,6 @@ class TradeController extends Controller
     {
         $user = $request->user();
 
-        // Defense in depth: Verify KYC status (middleware already does this, but safety check)
-        if ($user->kyc_status !== 'verified') {
-            return redirect()->route('kyc.show')
-                ->with('info', 'Veuillez compléter votre vérification KYC pour accéder à la plateforme de trading.');
-        }
-
         $wallet = $user->wallet ?? Wallet::firstOrCreate(
             ['user_id' => $user->id],
             ['balance' => 0, 'trading_balance' => 0, 'demo_balance' => 10000]
@@ -146,7 +140,8 @@ class TradeController extends Controller
         ]);
 
         $user  = $request->user();
-        $trade = Trade::where('user_id', $user->id)
+        $trade = Trade::with('instrument')
+                      ->where('user_id', $user->id)
                       ->where('status', 'open')
                       ->findOrFail($id);
 
@@ -182,10 +177,27 @@ class TradeController extends Controller
 
             DB::commit();
 
+            $freshWallet = $wallet->fresh();
+
+            // Notification gain/perte avec mise & soldes
+            try {
+                $user->notify(new \App\Notifications\TradeClosedNotification(
+                    pnl:         round($pnl, 2),
+                    margin:      (float) $trade->margin,
+                    symbol:      $trade->instrument?->symbol ?? 'N/A',
+                    accountType: $trade->account_type,
+                    demoBalance: (float) $freshWallet->demo_balance,
+                    realBalance: (float) $freshWallet->balance,
+                    isBot:       (bool) ($trade->is_bot ?? false),
+                ));
+            } catch (\Throwable $ne) {
+                \Log::warning('TradeClosedNotification failed: ' . $ne->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'pnl'     => round($pnl, 2),
-                'balance' => $this->balancePayload($wallet->fresh()),
+                'balance' => $this->balancePayload($freshWallet),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -235,12 +247,84 @@ class TradeController extends Controller
         return response()->json($this->balancePayload($wallet));
     }
 
+    // ── METTRE À JOUR LES SOLDES (SYNCHRONISATION) ────────────────────────
+    public function updateBalance(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'demo_balance' => 'nullable|numeric|min:0',
+            'real_balance' => 'nullable|numeric|min:0',
+            'margin_used'  => 'nullable|numeric|min:0',
+        ]);
+
+        $wallet = $this->getOrCreateWallet($request->user()->id);
+        $updated = false;
+
+        if (isset($validated['demo_balance'])) {
+            $wallet->update(['demo_balance' => $validated['demo_balance']]);
+            $updated = true;
+        }
+
+        if (isset($validated['real_balance'])) {
+            $wallet->update(['balance' => $validated['real_balance']]);
+            $updated = true;
+        }
+
+        if (isset($validated['margin_used'])) {
+            $wallet->update(['margin_used' => $validated['margin_used']]);
+            $updated = true;
+        }
+
+        if ($updated) {
+            $wallet->refresh();
+        }
+
+        return response()->json([
+            'success' => true,
+            'balance' => $this->balancePayload($wallet)
+        ]);
+    }
+
     // ── TRADE BOT (FoxBot) ────────────────────────────────────────────────
     public function foxbotTrade(Request $request): JsonResponse
     {
         // Réutilise openPosition avec is_bot=true
         $request->merge(['is_bot' => true]);
         return $this->openPosition($request);
+    }
+
+    public function foxbotTick(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'is_win'       => 'required|boolean',
+            'amount'       => 'required|numeric|min:0',
+            'account_type' => 'required|in:demo,real',
+        ]);
+
+        $user = $request->user();
+        $botState = cache()->get('user_' . $user->id . '_bot_state', []);
+
+        if (empty($botState['bot_active'])) {
+            return response()->json(['success' => false, 'reason' => 'bot_not_active']);
+        }
+
+        $wallet = $this->getOrCreateWallet($user->id);
+        $field = $validated['account_type'] === 'demo' ? 'demo_balance' : 'balance';
+        $amount = min((float) $validated['amount'], 5000);
+
+        if ($validated['is_win']) {
+            $wallet->increment($field, $amount);
+        } else {
+            $wallet->decrement($field, $amount);
+        }
+
+        return response()->json([
+            'success' => true,
+            'balance' => $this->balancePayload($wallet->fresh()),
+            'trade_result' => [
+                'is_win' => $validated['is_win'],
+                'amount' => $amount
+            ]
+        ]);
     }
 
     // ── PAGE HISTORIQUE (VUE BLADE) ───────────────────────────────────────
@@ -584,6 +668,42 @@ class TradeController extends Controller
             'success' => true,
             'message' => "✅ $count instruments créés avec succès",
             'count' => $count,
+        ]);
+    }
+
+    // ── RECONNECT GAIN (bot simule son activité pendant l'absence) ────────
+    public function applyReconnectGain(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'gain'          => 'required|numeric|min:0|max:100000',
+            'elapsed_hours' => 'required|numeric|min:0|max:720',
+            'account_type'  => 'required|in:demo,real',
+        ]);
+
+        $user     = $request->user();
+        $botState = cache()->get('user_' . $user->id . '_bot_state', []);
+
+        if (empty($botState['bot_active'])) {
+            return response()->json(['applied' => false, 'reason' => 'bot_not_active']);
+        }
+
+        $gain   = round(min((float) $validated['gain'], 50000), 2);
+        $wallet = $user->wallet ?? Wallet::firstOrCreate(
+            ['user_id' => $user->id],
+            ['balance' => 0, 'demo_balance' => 10000]
+        );
+
+        $field = $validated['account_type'] === 'demo' ? 'demo_balance' : 'balance';
+        $wallet->increment($field, $gain);
+
+        return response()->json([
+            'applied'       => true,
+            'gain'          => $gain,
+            'elapsed_hours' => $validated['elapsed_hours'],
+            'balance'       => [
+                'demo_balance' => (float) $wallet->fresh()->demo_balance,
+                'real_balance' => (float) $wallet->fresh()->balance,
+            ],
         ]);
     }
 }

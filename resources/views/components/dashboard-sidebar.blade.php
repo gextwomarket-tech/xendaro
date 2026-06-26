@@ -27,6 +27,22 @@
           <span class="ml-auto w-2 h-2 rounded-full {{ $kycStatus === 'pending' ? 'bg-amber-500' : 'bg-red-500' }} animate-pulse"></span>
         </a>
       @endif
+
+      <!-- Notifications -->
+      <a
+        href="{{ route('notifications.index') }}"
+        id="sidebarNotifBtn"
+        class="w-full flex items-center gap-3 px-3 py-3 rounded-lg {{ request()->routeIs('notifications.*') ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800' }} transition-colors group"
+      >
+        <span class="relative flex-shrink-0">
+          <span class="material-symbols-outlined text-[24px] group-hover:scale-110 transition-transform block">notifications</span>
+          <span id="sidebarNotifDot" class="hidden absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full"></span>
+        </span>
+        <span class="text-sm font-medium whitespace-nowrap collapsed:hidden flex items-center gap-2">
+          Notifications
+          <span id="sidebarNotifCount" class="hidden bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">0</span>
+        </span>
+      </a>
     </div>
 
     <!-- Trading Section -->

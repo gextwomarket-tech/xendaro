@@ -15,12 +15,6 @@ class ReferralController extends Controller
     {
         $user = $request->user();
 
-        // Defense in depth: Verify KYC status (middleware already does this, but safety check)
-        if ($user->kyc_status !== 'verified') {
-            return redirect()->route('kyc.show')
-                ->with('info', 'Veuillez compléter votre vérification KYC pour accéder au programme de parrainage.');
-        }
-
         // Générer un code parrainage si absent
         if (!$user->referral_code) {
             $user->update(['referral_code' => strtoupper(Str::random(8))]);

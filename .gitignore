@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════
+#  .gitignore — Laravel Production
+#  Optimisé pour déploiement cPanel Git
+# ═══════════════════════════════════════════
+
+# ── Environnement & Secrets ──────────────
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+*.key
+
+# ── Dépendances (régénérées sur le serveur) ──
+/vendor/
+/node_modules/
+
+# ── Cache & Fichiers compilés ────────────
+/bootstrap/cache/*.php
+/storage/framework/cache/data/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+/storage/logs/
+*.log
+
+# ── Build Frontend ───────────────────────
+/public/build/
+/public/hot
+/public/storage
+
+# ── Tests ────────────────────────────────
+/coverage/
+/.phpunit.cache/
+.phpunit.result.cache
+
+# ── IDE & OS ─────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Fichiers temporaires ─────────────────
+*.tmp
+*.temp
+*.bak
+*.orig
+npm-debug.log*
+yarn-error.log*
+
+# ── Uploads utilisateurs (géré sur le serveur) ──
+/storage/app/public/
+/storage/app/uploads/
+
+# ── Filament ─────────────────────────────
+/storage/app/livewire-tmp/
+
+# ── Déploiement ──────────────────────────
+.deployment
+deploy.sh
