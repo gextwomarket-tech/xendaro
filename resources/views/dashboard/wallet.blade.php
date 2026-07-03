@@ -187,7 +187,97 @@
           </div>
 
           <!-- Champs dynamiques selon la méthode -->
-          <div id="withdrawFieldsContainer"></div>
+          <div id="withdrawFieldsContainer">
+            
+            <!-- Virement bancaire -->
+            <div id="fields_bank_transfer" class="withdraw-fields hidden bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
+              <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Détails de votre compte</p>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Titulaire du compte <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="bank_account_holder" placeholder="Votre nom complet" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    IBAN / Numéro de compte <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" name="bank_account_number" placeholder="FR1420041010050500013M02606" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    BIC / SWIFT
+                  </label>
+                  <input type="text" name="bank_swift" placeholder="BNPAFRPP" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Nom de la banque <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="bank_name" placeholder="Ex: BNP Paribas" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+              </div>
+            </div>
+
+            <!-- Cryptomonnaie -->
+            <div id="fields_cryptocurrency" class="withdraw-fields hidden bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
+              <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Détails du portefeuille</p>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Cryptomonnaie <span class="text-red-500">*</span>
+                </label>
+                <select name="crypto_type" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                  <option value="">Sélectionner...</option>
+                  <option value="bitcoin">Bitcoin (BTC)</option>
+                  <option value="ethereum">Ethereum (ETH)</option>
+                  <option value="litecoin">Litecoin (LTC)</option>
+                  <option value="ripple">Ripple (XRP)</option>
+                  <option value="dogecoin">Dogecoin (DOGE)</option>
+                  <option value="usdt">Tether (USDT)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Adresse du portefeuille <span class="text-red-500">*</span>
+                </label>
+                <textarea name="crypto_address" rows="3" placeholder="Copiez-collez l'adresse complète de votre portefeuille" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs" disabled></textarea>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Vérifiez 2 fois l'adresse avant de soumettre</p>
+              </div>
+            </div>
+
+            <!-- Carte Bancaire -->
+            <div id="fields_card" class="withdraw-fields hidden bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
+              <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Détails de la carte</p>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Titulaire de la carte <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="card_holder_name" placeholder="Votre nom complet" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Numéro de carte (4 derniers chiffres) <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" name="card_number" placeholder="4242" maxlength="4" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Expiration (MM/YY) <span class="text-red-500">*</span>
+                  </label>
+                  <input type="text" name="card_expiry" placeholder="12/25" maxlength="5" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Banque émettrice <span class="text-red-500">*</span>
+                </label>
+                <input type="text" name="card_bank_name" placeholder="Ex: BNP Paribas" class="withdraw-input w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" disabled />
+              </div>
+            </div>
+
+          </div>
 
           <!-- Montant -->
           <div>
@@ -907,128 +997,29 @@
     // ═════════════════════════════════════════════════════════════
     function updateWithdrawFields() {
       const method = document.querySelector('input[name="payment_method"]:checked')?.value;
-      const container = document.getElementById('withdrawFieldsContainer');
       
-      if (!method) {
-        container.innerHTML = '';
-        return;
+      // Masquer tous les blocs et désactiver leurs champs
+      document.querySelectorAll('.withdraw-fields').forEach(el => {
+        el.classList.add('hidden');
+        el.querySelectorAll('input, select, textarea').forEach(input => {
+          input.disabled = true;
+          input.required = false;
+        });
+      });
+
+      if (!method) return;
+
+      // Afficher le bloc actif et activer ses champs
+      const activeContainer = document.getElementById('fields_' + method);
+      if (activeContainer) {
+        activeContainer.classList.remove('hidden');
+        activeContainer.querySelectorAll('input, select, textarea').forEach(input => {
+          input.disabled = false;
+          if (input.classList.contains('withdraw-input')) {
+            input.required = true;
+          }
+        });
       }
-
-      let fieldsHTML = '';
-
-      if (method === 'bank_transfer') {
-        fieldsHTML = `
-          <div class="bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
-            <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Détails de votre compte</p>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Titulaire du compte <span class="text-red-500">*</span>
-              </label>
-              <input type="text" name="bank_account_holder" placeholder="Votre nom complet"
-                class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required />
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  IBAN / Numéro de compte <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="bank_account_number" placeholder="FR1420041010050500013M02606"
-                  class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  BIC / SWIFT
-                </label>
-                <input type="text" name="bank_swift" placeholder="BNPAFRPP"
-                  class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Nom de la banque <span class="text-red-500">*</span>
-              </label>
-              <input type="text" name="bank_name" placeholder="Ex: BNP Paribas"
-                class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required />
-            </div>
-          </div>
-        `;
-      } else if (method === 'cryptocurrency') {
-        fieldsHTML = `
-          <div class="bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
-            <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Détails du portefeuille</p>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Cryptomonnaie <span class="text-red-500">*</span>
-              </label>
-              <select name="crypto_type"
-                class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required>
-                <option value="">Sélectionner...</option>
-                <option value="bitcoin">Bitcoin (BTC)</option>
-                <option value="ethereum">Ethereum (ETH)</option>
-                <option value="litecoin">Litecoin (LTC)</option>
-                <option value="ripple">Ripple (XRP)</option>
-                <option value="dogecoin">Dogecoin (DOGE)</option>
-                <option value="usdt">Tether (USDT)</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Adresse du portefeuille <span class="text-red-500">*</span>
-              </label>
-              <textarea name="crypto_address" rows="3" placeholder="Copiez-collez l'adresse complète de votre portefeuille"
-                class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs"
-                required></textarea>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Vérifiez 2 fois l'adresse avant de soumettre</p>
-            </div>
-          </div>
-        `;
-      } else if (method === 'card') {
-        fieldsHTML = `
-          <div class="bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-600 rounded-lg p-4 space-y-4">
-            <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">Détails de la carte</p>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Titulaire de la carte <span class="text-red-500">*</span>
-              </label>
-              <input type="text" name="card_holder_name" placeholder="Votre nom complet"
-                class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required />
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Numéro de carte (4 derniers chiffres) <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="card_number" placeholder="4242" maxlength="4"
-                  class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Expiration (MM/YY) <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="card_expiry" placeholder="12/25" maxlength="5"
-                  class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required />
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Banque émettrice <span class="text-red-500">*</span>
-              </label>
-              <input type="text" name="card_bank_name" placeholder="Ex: BNP Paribas"
-                class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required />
-            </div>
-          </div>
-        `;
-      }
-
-      container.innerHTML = fieldsHTML;
     }
 
     // ═════════════════════════════════════════════════════════════
@@ -1084,6 +1075,26 @@
         card: 'Retrait par Carte'
       };
 
+      // Construire le payload manuellement (FormData exclut les champs disabled)
+      const withdrawPayload = {
+        payment_method: method,
+        amount: amount,
+      };
+      if (method === 'bank_transfer') {
+        withdrawPayload.bank_account_holder = document.querySelector('#fields_bank_transfer input[name="bank_account_holder"]')?.value || '';
+        withdrawPayload.bank_account_number = document.querySelector('#fields_bank_transfer input[name="bank_account_number"]')?.value || '';
+        withdrawPayload.bank_swift          = document.querySelector('#fields_bank_transfer input[name="bank_swift"]')?.value || '';
+        withdrawPayload.bank_name           = document.querySelector('#fields_bank_transfer input[name="bank_name"]')?.value || '';
+      } else if (method === 'cryptocurrency') {
+        withdrawPayload.crypto_type    = document.querySelector('#fields_cryptocurrency select[name="crypto_type"]')?.value || '';
+        withdrawPayload.crypto_address = document.querySelector('#fields_cryptocurrency textarea[name="crypto_address"]')?.value || '';
+      } else if (method === 'card') {
+        withdrawPayload.card_holder_name = document.querySelector('#fields_card input[name="card_holder_name"]')?.value || '';
+        withdrawPayload.card_number      = document.querySelector('#fields_card input[name="card_number"]')?.value || '';
+        withdrawPayload.card_expiry      = document.querySelector('#fields_card input[name="card_expiry"]')?.value || '';
+        withdrawPayload.card_bank_name   = document.querySelector('#fields_card input[name="card_bank_name"]')?.value || '';
+      }
+
       openActionConfirmModal({
         title: 'Confirmer le retrait',
         icon: 'arrow_upward',
@@ -1095,7 +1106,7 @@
           { label: 'Vous recevrez', value: `${net.toFixed(2)} ${WALLET_CURRENCY}` },
         ],
         url: '{{ route("wallet.withdraw.store") }}',
-        payload: Object.fromEntries(form),
+        payload: withdrawPayload,
         loadingMessage: 'Envoi de la demande de retrait…',
         successMessage: 'Demande de retrait envoyée !',
         successTitle: 'Retrait soumis !',

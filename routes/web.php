@@ -11,7 +11,7 @@ use App\Http\Controllers\Web\MarketController;
 use App\Http\Controllers\Web\NotificationController;
 use App\Http\Controllers\Web\TicketController;
 use App\Http\Controllers\Web\ReferralController;
-use App\Http\Controllers\Web\AnalyticsController;
+use App\Http\Controllers\Web\AnalyticsController; 
 use App\Http\Controllers\Web\SupportController;
 use App\Http\Controllers\Web\PaymentMethodController;
 use App\Http\Controllers\Web\PageController;

@@ -528,7 +528,7 @@
         <path class="chart-line-path" d="M 0,80 Q 75,60 150,50 T 300,40" fill="none" />
       </svg>
 
-      <img src="{{ asset('login.png') }}" alt="Login" style="width: calc(100% - 72px); height: 200px; object-fit: contain; border-radius: 16px; margin-bottom: 20px; display: block;" />
+      <img src="{{ asset('login.png') }}" alt="Login" style="position: relative; z-index: 10; width: calc(100% - 72px); height: 200px; object-fit: contain; border-radius: 16px; margin-bottom: 20px; display: block;" />
 
       <div class="left-content">
         <h1>Bienvenue !</h1>
