@@ -234,7 +234,7 @@
   <!-- Welcome Banner -->
   <div class="welcome-banner">
     <h2>Bienvenue, {{ $user->first_name }}! 👋</h2>
-    <p>Vous êtes connecté à votre compte Purprime Fox. Commencez à trader dès maintenant.</p>
+    <p>Vous êtes connecté à votre compte Xendaro Trade. Commencez à trader dès maintenant.</p>
   </div>
 
   {{-- Rappel KYC : affichée si non vérifié (n'empêche pas l'accès) --}}

@@ -12,7 +12,7 @@
               <path d="M9 9h6M9 13h4" stroke="white" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </div>
-          <span class="text-xl font-bold text-slate-900 dark:text-white">Purprime Fox</span>
+          <span class="text-xl font-bold text-slate-900 dark:text-white">Xendaro Trade</span>
         </a>
 
         <!-- Desktop Menu -->
