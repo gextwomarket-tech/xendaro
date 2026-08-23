@@ -24,7 +24,12 @@
         </button>
     </div>
 
-    <div x-show="mobileOpen" x-cloak x-transition class="lg:hidden border-t border-bordure-subtile bg-fond-surface px-4 py-4 space-y-3 text-sm">
+    {{--
+        Pas de x-transition ici: l'attribut nu (sans classes explicites) reste bloque en etat
+        cache apres bascule avec cette version d'Alpine embarquee par Livewire (x-show devient
+        inoperant - data reactive a jour mais display jamais reapplique). x-show simple = fiable.
+    --}}
+    <div x-show="mobileOpen" x-cloak class="lg:hidden border-t border-bordure-subtile bg-fond-surface px-4 py-4 space-y-3 text-sm">
         <a href="{{ url('/nos-services') }}" class="block text-texte-secondaire hover:text-texte-principal">{{ __('app.nav.our_services') }}</a>
         <a href="{{ url('/marches') }}" class="block text-texte-secondaire hover:text-texte-principal">{{ __('app.nav.markets') }}</a>
         <a href="{{ url('/academie') }}" class="block text-texte-secondaire hover:text-texte-principal">{{ __('app.nav.academy') }}</a>
