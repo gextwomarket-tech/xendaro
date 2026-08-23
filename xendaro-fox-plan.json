@@ -1,0 +1,694 @@
+{
+  "Nom_projet": "Xendaro Fox",
+  "Objectifs": {
+    "principal": "Livrer un MVP d'une plateforme de broker en ligne (Forex, Crypto, Or/métaux, Matières premières, Indices, Actions) inspirée de l'expérience utilisateur type MT5/MT4, pour présentation et validation par le client. Le MVP doit visuellement et fonctionnellement couvrir l'ensemble du parcours utilisateur, même si certaines connexions à des services tiers (paiement réel, flux de prix live, exécution d'ordres réelle) restent simulées ou en mode sandbox à ce stade.",
+    "objectifs_specifiques": [
+      "Proposer un site public complet (vitrine) présentant l'offre de trading de Xendaro Fox, entièrement piloté par les contenus du model site_identifier.",
+      "Permettre l'inscription, la vérification d'identité (KYC) et la connexion sécurisée des utilisateurs.",
+      "Permettre à chaque utilisateur de gérer 2 soldes (démo et réel), déposer, retirer des fonds via Wallet.",
+      "Fournir une page Trade complète, plein écran, reproduisant l'expérience MT5 (watchlist, graph, formulaire d'ordre, positions, historique).",
+      "Fournir un espace client complet: profil, sécurité, notifications, support, affiliation.",
+      "Fournir un back-office Filament réservé aux super admins avec CRUD complet sur toutes les tables SQL de la base de données, y compris les référentiels (moyens de paiement, catégories, paramètres de base, instruments de marché reliés à un fournisseur externe type TradingView).",
+      "Poser des fondations techniques propres, réutilisables et documentées pour permettre l'évolution rapide du MVP vers une v1 en production, livrable sans bug au moment du test client.",
+      "Prévoir nativement le multilingue (Français par défaut, Anglais) dès le MVP."
+    ],
+    "statut": "MVP - toutes les fonctionnalités sont représentées avec leurs Taches détaillées ; profondeur d'implémentation réelle vs simulée précisée tâche par tâche."
+  },
+  "Technologies": {
+    "backend": "Laravel (dernière version stable LTS-compatible)",
+    "api": "API REST interne Laravel (Laravel Sanctum pour l'authentification API/SPA)",
+    "frontend_client": "Blade + Livewire (interactions dynamiques et forms) + Ajax ponctuel + JS (Alpine.js pour les micro-interactions UI)",
+    "admin": "Filament (panel admin, exclusivement réservé aux super admins, CRUD complet sur toutes les tables, y compris les référentiels)",
+    "base_de_donnees": "MySQL / MariaDB",
+    "styles": "Tailwind CSS avec thème Dark custom (design tokens définis dans Instructions_de_base)",
+    "graphiques_trading": "Widget TradingView (ou équivalent) pour le graph central de la page Trade et les pages Marchés, alimenté par les instruments saisis côté admin (market_instruments)",
+    "temps_reel": "Laravel Echo + Pusher/Soketi/Laravel Reverb (prix live, notifications, positions) - prévu dès le MVP en mode simulé si pas de flux réel disponible",
+    "gestion_langue": "Fichiers de traduction Laravel (resources/lang/fr, resources/lang/en) pour les textes Blade + objets JS de langue dédiés (resources/js/lang/fr.js, resources/js/lang/en.js) pour tout texte piloté par JS (placeholder, alertes, tooltips dynamiques)",
+    "outils": ["Git / GitHub", "Composer", "NPM / Vite", "PHPUnit / Pest pour les tests"]
+  },
+  "Instructions_de_base": {
+    "architecture_cascade_json": {
+      "description": "Ce fichier suit une architecture en cascade et non des blocs séparés: Pages > fonctionnalites > taches > instructions_suggestions_tache. Chaque page contient directement ses fonctionnalites ; chaque fonctionnalite contient ses taches ; chaque tache contient sa sous-clé instructions_suggestions_tache (instructions/suggestions/exemples de code pour guider le dev ou l'IA en charge, même peu expérimenté).",
+      "regle_reutilisation": "Dès qu'un composant/pattern (ex: DataTable paginée, Modal, StatCard, Toggle) est créé sur une page, les pages suivantes qui utilisent le même type d'élément DOIVENT réutiliser ce composant au lieu d'en recréer un nouveau - les taches le rappellent explicitement via la mention 'Réutiliser le composant ...'.",
+      "statut": "Complet: 46 pages, fonctionnalites et taches détaillées avec instructions_suggestions_tache. Prêt pour démarrage du développement."
+    },
+    "design_ui_ux": {
+      "theme": "Un seul thème: Dark. Pas de mode clair prévu pour ce MVP.",
+      "sources_inspiration_ui": {
+        "composants": "Augmenter la fréquence d'utilisation des composants de uiverse.io (boutons, cards, loaders, toggles, inputs, checkboxes...) comme base d'inspiration/accélération du développement UI, à adapter systématiquement au thème Dark et à la palette du projet.",
+        "couleurs": "Les couleurs d'interface (hors les 2 couleurs pilotables du model site_identifier) doivent être choisies majoritairement depuis colorhunt.io, pour garantir des palettes harmonieuses, modernes et testées."
+      },
+      "palette_de_couleurs": {
+        "principe": "2 couleurs pilotables par l'admin (voir site_identifier.couleur_principale et couleur_secondaire) + une base neutre Dark fixe définie ci-dessous pour les fonds/surfaces/textes.",
+        "couleur_principale": "Pilotée par l'admin via site_identifier (valeur par défaut proposée: #F5A623 ambre/or)",
+        "couleur_secondaire": "Pilotée par l'admin via site_identifier (valeur par défaut proposée: #5B8CFF bleu)",
+        "fond_principal": "#0B0E14 (near-black bleuté)",
+        "fond_secondaire_surface": "#12161F",
+        "fond_card_elevee": "#171C27",
+        "bordure_subtile": "rgba(255,255,255,0.08)",
+        "texte_principal": "#F4F6F8",
+        "texte_secondaire": "#9AA4B2",
+        "succes_hausse_buy": "#16C784",
+        "danger_baisse_sell": "#EA3943",
+        "avertissement": "#F5C518",
+        "note": "Les couleurs principale/secondaire doivent rester modifiables sans impact structurel (tokens CSS générés dynamiquement depuis site_identifier)."
+      },
+      "fonts": {
+        "titres": "Sora ou Space Grotesk (Google Fonts, self-hébergées si possible)",
+        "corps_texte": "Inter",
+        "chiffres_cotations": "variante tabular-nums pour l'alignement des prix/valeurs numériques"
+      },
+      "bordures": {
+        "rayon": "Echelle cohérente: 8px (petits éléments), 12px (cards, inputs), 16-20px (modales, blocs larges)",
+        "style": "Bordures fines 1px, faible opacité sur fond sombre, jamais de bordures dures/contrastées"
+      },
+      "type_de_design": "Flat design moderne, épuré, orienté data/finance. Pas de skeuomorphisme. Priorité à la lisibilité des chiffres et graphiques.",
+      "ombres": "Ombres douces et profondes adaptées au dark mode (box-shadow sombre + léger glow coloré accent sur les éléments interactifs/CTA au survol)",
+      "popups": "95% des formulaires (dépôt, retrait, KYC, édition profil, ouverture de ticket, prise de trade rapide, etc.) s'ouvrent en popup/modale, pas en changement de page complet. Exceptions: inscription, connexion (page dédiée 2 colonnes) et la page Trade (plein écran, hors layout dashboard).",
+      "toasts": "Notifications toast en haut à droite, fond sombre, barre latérale colorée selon le type (succès/erreur/avertissement/info), icône, barre de progression d'auto-dismiss, empilables.",
+      "skeleton_loaders": "Squelettes de chargement (pulse animation) reproduisant la forme exacte du composant final (cards, lignes de tableau, graphiques) pendant les chargements Livewire/Ajax. Jamais de simple spinner seul pour du contenu de type liste/tableau/dashboard.",
+      "boutons": {
+        "primaire": "Fond couleur_principale plein, texte foncé, coins arrondis, effet glow au survol",
+        "secondaire": "Style outline/ghost, bordure subtile, fond transparent",
+        "buy": "Vert (succes_hausse_buy) légèrement foncé, texte clair",
+        "sell": "Rouge (danger_baisse_sell) plein, texte clair",
+        "icone_texte": "Boutons combinant icône + libellé pour les actions principales (Déposer, Retirer, Trader)"
+      },
+      "reference_dashboard_samify": {
+        "source": "Capture d'écran dashboard SaaS 'Samify' partagée en conversation (non sauvegardée en fichier local) - référence de PATTERNS UX, pas de palette (Samify est en light indigo/jaune, Xendaro reste 100% Dark avec ses propres tokens).",
+        "patterns_retenus": [
+          "Sidebar à 2 états: étendue (icône+label+groupes) et réduite (icônes seules), bascule via un bouton toggle - largeur ~260px étendue / ~72px réduite, transition CSS fluide.",
+          "Items de navigation regroupés par section avec un label de groupe en petites majuscules discret (ex: TRADING, COMPTE, SUPPORT au lieu de EMPLOYEE/ADMIN).",
+          "Item de nav actif mis en évidence par un fond pilule arrondi en couleur_principale/couleur_secondaire (au lieu du bleu plein Samify).",
+          "Petit badge/point de notification (danger ou couleur_principale) sur les items de nav concernés (ex: Notifications, Support).",
+          "Mini-card profil fixée en bas de la sidebar: avatar rond + nom + email, bouton 'Modifier le profil' juste en dessous - même esprit que le bloc profil de la sidebar droite de la page Trade.",
+          "Dropdown profil (déclenché depuis l'avatar de la navbar): liste d'options avec icône + libellé + chevron (Paramètres, Mon compte, Déconnexion), section 'OPTIONS DU COMPTE' en petit label.",
+          "Modale de confirmation de déconnexion avant toute déconnexion effective: titre 'Confirmer la déconnexion', texte de confirmation avec l'email du compte, boutons Annuler (outline) / Se déconnecter (plein, couleur_principale ou danger)."
+        ],
+        "application": "Appliquer ces patterns à: client-dashboard (sidebar + navbar), au bloc profil de la sidebar droite de trade (déjà conforme), et transformer logout en confirmation modale plutôt qu'une déconnexion directe."
+      },
+      "logos": "Logo \"Xendaro Fox\" construit en CSS/HTML (typographie + forme de renard stylisée en SVG inline ou pur CSS). L'admin peut néanmoins uploader path_light_logo, path_dark_logo et path_favicon_png via site_identifier pour remplacer le logo par défaut sans redéploiement.",
+      "responsive": "Mobile-first, full responsive sur l'ensemble des pages et composants (breakpoints type sm/md/lg/xl/2xl). La page Trade et les tableaux de données doivent proposer une version mobile utilisable (vues empilées/onglets, scroll horizontal contrôlé pour les tableaux larges).",
+      "internationalisation": {
+        "principe": "Tout texte visible statique (labels, titres, paragraphes, boutons) est affiché directement dans les balises Blade via le système de traduction Laravel (resources/lang), jamais codé en dur.",
+        "js_et_attributs": "Tout texte piloté depuis du JS (placeholder, messages d'alerte JS, tooltips dynamiques, textes générés côté client) doit obligatoirement être lu depuis les objets de langue JS dédiés (resources/js/lang/fr.js, resources/js/lang/en.js), jamais écrit en dur dans le JS.",
+        "langue_par_defaut": "Français (également pilotable via site_identifier.langue_par_defaut)",
+        "langues_prevues": ["Français (par défaut)", "Anglais"]
+      }
+    },
+    "modeles_de_reference_globaux": {
+      "principe": "Certaines données transverses ne sont pas des pages côté client mais des tables/models gérés exclusivement en CRUD via Filament côté admin. Elles alimentent le contenu des pages vitrines et les champs select/dropdown de toute la plateforme.",
+      "site_identifier": {
+        "description": "Model/table unique (singleton) centralisant l'identité et les contenus globaux de la plateforme, consommée par toutes les pages vitrines ainsi que par les pages Connexion/Inscription (panneau de branding).",
+        "champs": ["nom_plateforme", "slogan", "langue_par_defaut", "couleur_principale", "couleur_secondaire", "about_us", "path_light_logo", "path_dark_logo", "path_favicon_png", "phone_contact_1", "phone_contact_2", "email_pro_1", "email_pro_2", "location_adresse", "cvg (texte CGV)", "policies (texte politique de confidentialité)", "cookies (texte politique cookies)", "nos_services (contenu)", "contact (contenu complémentaire)", "reseaux_sociaux (json)"],
+        "note": "La palette de couleurs pilotée ici se limite à 2 couleurs (principale + secondaire); elle vient en complément de la base Dark fixe définie dans design_ui_ux."
+      },
+      "faq_content": {
+        "description": "Model/table listant les questions/réponses affichées sur la page FAQ, catégorisables.",
+        "champs": ["question_fr", "reponse_fr", "question_en", "reponse_en", "categorie_id", "ordre", "est_actif"],
+        "note": "Point à confirmer avec le client: contenu exact et regroupement par catégories souhaité pour la FAQ."
+      },
+      "referentiels_admin_uniquement": {
+        "description": "Données de paramétrage gérées à 100% côté admin Filament (CRUD), sans aucune page dédiée côté client/public. Alimentent les champs select/dropdown des formulaires de la plateforme.",
+        "categories": "Table générique (colonne 'type': faq/news/education...) réutilisable pour classer FAQ, actualités, académie.",
+        "parametres_base": "Listes de référence pour champs select/dropdown (ex: liste des années, pays, devises, fuseaux horaires...).",
+        "payment_methods": {
+          "description": "Moyens de paiement disponibles pour dépôt/retrait, gérés uniquement en CRUD admin (retiré de la liste des pages client), consommés comme options dans les popups de dépôt/retrait de la page Wallet.",
+          "champs": ["nom", "type (carte, virement, crypto, e-wallet)", "instructions", "frais", "delai_traitement", "est_actif"]
+        },
+        "market_instruments": {
+          "description": "Table des instruments tradables (Forex, Crypto, Or/Métaux, Matières premières, Indices, Actions), saisie par l'admin et reliée à un fournisseur de données externe (TradingView ou équivalent), afin que la saisie admin s'affiche réellement dans les graphiques et pages de trade/marchés.",
+          "champs": ["nom", "symbole_interne", "categorie", "symbole_provider_externe (ex: code symbole TradingView)", "provider (tradingview, autre)", "spread", "levier_max", "est_actif", "icone"]
+        }
+      }
+    },
+    "bonnes_pratiques_dev": {
+      "principe": "Schéma court, obligatoire à suivre par le dev/IA à chaque tâche confiée.",
+      "regles": [
+        "Toujours poser des questions/quiz (QCM si pertinent) pour clarifier l'intention derrière une demande ou une tâche en cas d'ambiguïté, avant de commencer.",
+        "Toujours travailler avec des sous-agents exécutant plusieurs tâches en simultané pour réaliser une fonctionnalité complète plus rapidement.",
+        "Tout tableau/liste avec des rangées de données doit obligatoirement intégrer un système de pagination.",
+        "Un sous-agent dédié doit gérer les commit/push/pull/etc. Git & GitHub, et documenter chaque action en résumé dans un unique fichier 'docummentations.md' à la racine du projet.",
+        "Toujours prioriser la solution ou le chemin d'exécution le plus direct, réalisable en 15-20 secondes pour une tâche de complexité faible à moyenne.",
+        "Toujours prévoir et prioriser des composants/fonctions/blocs de code réutilisables, aussi bien en backend qu'en frontend.",
+        "Ne jamais endommager le code, les fichiers, fonctionnalités ou contenus existants.",
+        "Toujours commit & push après l'exécution complète d'un groupe de tâches, et systématiquement avant d'effectuer un changement important dans un fichier (vérifier qu'une version à jour existe bien sur Git avant de modifier en profondeur).",
+        "Toute création de contenu frontend doit s'adapter au design déjà existant dans le projet, en conservant un style moderne et flat.",
+        "Le dev/IA doit suivre les instructions et suggestions fournies dans chaque tâche jusqu'aux limites du raisonnable/réalisable, en tenant compte de l'état d'avancement actuel du projet pour s'adapter.",
+        "La page Trade étant le coeur du projet, elle doit être développée avec un niveau de détail technique maximal, sans bug, prête à être testée et déployée dès sa livraison."
+      ]
+    }
+  },
+  "Pages": [
+    { "id": 1, "code": "home", "categorie": "Public / Vitrine", "nom_fr": "Accueil", "nom_en": "Home", "route_suggeree": "/", "acces": "public", "description": "Page d'atterrissage, contenu piloté par site_identifier (nom, slogan, about_us).",
+      "fonctionnalites": [
+        { "type": "hero_banner", "nom": "Bannière d'accueil", "description": "Titre + slogan (site_identifier), CTA Inscription/Connexion.", "taches": [
+          { "id": 1, "titre": "Initialiser le projet Laravel", "description": "composer create-project laravel/laravel xendaro-fox ; init Git ; premier commit 'Initial commit'.", "instructions_suggestions_tache": "Utiliser la dernière version stable de Laravel. Configurer .env (DB, APP_NAME=Xendaro Fox, APP_LOCALE=fr). Créer le repo GitHub et confier le premier push au sous-agent Git dédié, avec entrée dans docummentations.md." },
+          { "id": 2, "titre": "Installer Filament", "description": "composer require filament/filament puis php artisan filament:install --panels.", "instructions_suggestions_tache": "Créer le premier super admin via php artisan make:filament-user. Le panel admin doit être accessible sur /admin et totalement séparé du frontend client (guard distinct si besoin)." },
+          { "id": 3, "titre": "Installer Livewire, Alpine.js et Tailwind avec le thème Dark", "description": "composer require livewire/livewire ; npm install -D tailwindcss alpinejs ; configurer tailwind.config.js avec les tokens de couleurs/fonts définis dans design_ui_ux.", "instructions_suggestions_tache": "Déclarer les couleurs custom dans tailwind.config.js (theme.extend.colors) en les nommant selon les tokens (fond-principal, accent-primaire, succes, danger...). Charger Inter et Sora/Space Grotesk via Google Fonts dans le layout principal." },
+          { "id": 4, "titre": "Mettre en place la structure i18n FR/EN", "description": "Créer resources/lang/fr/*.php, resources/lang/en/*.php, et resources/js/lang/fr.js + en.js exposés via window.i18n.", "instructions_suggestions_tache": "Exemple resources/js/lang/fr.js: `window.i18n = { placeholders: { email: \"Adresse email\" } };`. Ne jamais coder un texte JS en dur, toujours passer par window.i18n[...]." },
+          { "id": 5, "titre": "Créer la migration/model/seeder site_identifier + resource Filament", "description": "php artisan make:model SiteIdentifier -m ; migration avec tous les champs listés dans modeles_de_reference_globaux.site_identifier ; seeder avec valeurs par défaut ; php artisan make:filament-resource SiteIdentifier --simple (page unique de settings).", "instructions_suggestions_tache": "Créer un service/helper `SiteIdentifierService::current()` (avec cache()) pour éviter de requêter la table à chaque rendu de vue. L'injecter via un View Composer global sur le layout public." },
+          { "id": 6, "titre": "Créer le layout public de base + composant Hero", "description": "resources/views/layouts/public.blade.php (header/footer réutilisables) + composant <x-hero-banner> consommant site_identifier.nom_plateforme et slogan.", "instructions_suggestions_tache": "Header/footer doivent être des composants Blade réutilisables sur toutes les pages vitrines (id 1 à 24). Prévoir les slots pour logo (path_light_logo/path_dark_logo) et liens légaux (cgv, policies, cookies)." }
+        ]},
+        { "type": "stats_cards", "nom": "Cards de statistiques", "description": "Ex: nombre de traders, volume échangé, instruments disponibles.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-stat-card>", "description": "Composant Blade recevant icon, label, value, trend en props.", "instructions_suggestions_tache": "Ce composant sera réutilisé sur client-dashboard, wallet, affiliate-dashboard, trade (résumé de compte). Prévoir un slot icône SVG et une variante 'compacte' pour les sidebars." },
+          { "id": 2, "titre": "Afficher les stats globales de la plateforme", "description": "Alimenter via une valeur statique/config pour le MVP (nombre de traders, volume, instruments actifs).", "instructions_suggestions_tache": "Créer un StatsPublicService::homeStats() retournant un tableau associatif, facilement remplaçable par de vraies requêtes plus tard." }
+        ]},
+        { "type": "card_grid", "nom": "Grille des catégories de marchés", "description": "Forex, Crypto, Or/Métaux, Indices, Matières premières, Actions - liens vers Marchés.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-card-grid> + <x-card-item>", "description": "Grid responsive (CSS grid Tailwind) itérant sur une collection de cards cliquables.", "instructions_suggestions_tache": "Chaque card renvoie vers /marches?categorie=xxx. Réutiliser ce composant pour promotions, education, market-news, account-types." }
+        ]},
+        { "type": "icon_block", "nom": "Bloc avantages", "description": "Sécurité, exécution rapide, support 24/7, régulation.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-icon-feature>", "description": "Icône + titre + courte description, en grille responsive.", "instructions_suggestions_tache": "Réutiliser sur about, why-us. Icônes en SVG inline (pas de dépendance FontAwesome lourde si possible)." }
+        ]},
+        { "type": "text_block", "nom": "Proposition de valeur", "description": "Texte de présentation courte de la plateforme.", "taches": [
+          { "id": 1, "titre": "Créer la section texte de présentation", "description": "Bloc Blade simple avec titre + paragraphe traduits.", "instructions_suggestions_tache": "Texte visible directement dans les balises via {{ __('home.value_prop_text') }}, jamais codé en dur." }
+        ]},
+        { "type": "floating_button", "nom": "Bouton flottant support", "description": "Accès rapide au chat/contact support.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-floating-button>", "description": "Bouton fixed bottom-right, position:fixed, avec badge optionnel.", "instructions_suggestions_tache": "Réutiliser sur toutes les pages publiques et l'espace client. Au clic: ouvre une popup de contact rapide ou redirige vers /contact." }
+        ]}
+      ]
+    },
+    { "id": 2, "code": "our-services", "categorie": "Public / Vitrine", "nom_fr": "Nos services", "nom_en": "Our Services", "route_suggeree": "/nos-services", "acces": "public", "description": "Hub présentant l'offre Xendaro Fox (contenu nos_services de site_identifier), renvoie vers les sous-pages Types de comptes, Plateformes, Conditions de trading.",
+      "fonctionnalites": [
+        { "type": "hero_banner", "nom": "En-tête Nos services", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-hero-banner>", "description": "Titre statique 'Nos services' + sous-texte.", "instructions_suggestions_tache": "Réutiliser le composant créé sur home, sans dupliquer le code." }
+        ]},
+        { "type": "card_grid", "nom": "Cartes vers sous-pages", "description": "Types de comptes, Plateformes, Conditions de trading.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-card-grid>", "description": "3 cards vers account-types, platforms, trading-conditions.", "instructions_suggestions_tache": "Créer route /nos-services et les 3 sous-routes correspondantes." }
+        ]},
+        { "type": "text_block", "nom": "Contenu nos_services", "description": "Issu de site_identifier.nos_services.", "taches": [
+          { "id": 1, "titre": "Afficher le champ nos_services", "description": "{!! $siteIdentifier->nos_services !!} si champ WYSIWYG, sinon texte brut échappé.", "instructions_suggestions_tache": "Si champ riche-texte, prévoir un éditeur WYSIWYG côté Filament (ex: Filament RichEditor) et sanitizer le HTML en sortie." }
+        ]}
+      ]
+    },
+    { "id": 3, "code": "account-types", "categorie": "Public / Vitrine", "nom_fr": "Types de comptes", "nom_en": "Account Types", "route_suggeree": "/nos-services/types-de-comptes", "acces": "public", "description": "Comparatif des offres de comptes de trading (Standard, ECN, VIP, Islamique/sans swap...). Sous-page de Nos services.",
+      "fonctionnalites": [
+        { "type": "table", "nom": "Tableau comparatif des comptes", "description": "Colonnes: dépôt min, spread, levier, swap.", "taches": [
+          { "id": 1, "titre": "Créer la migration/model account_types + resource Filament", "description": "Champs: nom, depot_min, spread_min, levier_max, swap_free (bool), description.", "instructions_suggestions_tache": "Table statique gérée en CRUD admin. Afficher en tableau simple (pas de pagination nécessaire si <10 lignes, mais prévoir le composant DataTable par cohérence si la liste peut grandir)." },
+          { "id": 2, "titre": "Créer le composant réutilisable <x-data-table>", "description": "Table Livewire avec trait WithPagination, tri de colonnes, slot pour les lignes.", "instructions_suggestions_tache": "Ce composant sera réutilisé sur TOUTES les pages avec tableaux (markets, trading-conditions, trade-history, wallet, support-tickets, affiliate-dashboard, trade...). Toujours paginate(10) ou paginate(15) par défaut, jamais all()." }
+        ]},
+        { "type": "card_grid", "nom": "Cards par type de compte", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-card-grid>", "description": "Vue alternative en cards du même jeu de données account_types.", "instructions_suggestions_tache": "Toggle table/cards optionnel selon viewport (cards par défaut en mobile)." }
+        ]},
+        { "type": "floating_button", "nom": "CTA Ouvrir un compte", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-floating-button>", "description": "CTA vers /inscription.", "instructions_suggestions_tache": "Simple lien stylé bouton primaire, pas besoin de popup ici." }
+        ]}
+      ]
+    },
+    { "id": 4, "code": "platforms", "categorie": "Public / Vitrine", "nom_fr": "Plateformes de trading", "nom_en": "Trading Platforms", "route_suggeree": "/nos-services/plateformes", "acces": "public", "description": "Présentation des plateformes disponibles (WebTrader Xendaro, mobile, desktop). Sous-page de Nos services.",
+      "fonctionnalites": [
+        { "type": "card_grid", "nom": "Cards par plateforme", "description": "WebTrader, Mobile, Desktop.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-card-grid>", "description": "3 cards statiques (contenu en langue FR/EN).", "instructions_suggestions_tache": "Contenu simple, pas besoin de model dédié pour le MVP - texte via fichiers de traduction." }
+        ]},
+        { "type": "text_block", "nom": "Description des fonctionnalités par plateforme", "taches": [
+          { "id": 1, "titre": "Rédiger les sections descriptives", "description": "Bloc texte + capture d'écran illustrative par plateforme.", "instructions_suggestions_tache": "Prévoir un lien 'Essayer le WebTrader' pointant vers /trade (redirige vers /connexion si non authentifié)." }
+        ]}
+      ]
+    },
+    { "id": 5, "code": "trading-conditions", "categorie": "Public / Vitrine", "nom_fr": "Spreads, leviers & conditions", "nom_en": "Spreads, Leverage & Conditions", "route_suggeree": "/nos-services/conditions-de-trading", "acces": "public", "description": "Détail des conditions de trading, alimenté par market_instruments (spread, levier max). Sous-page de Nos services.",
+      "fonctionnalites": [
+        { "type": "table", "nom": "Tableau des conditions par instrument", "description": "Alimenté par market_instruments (spread, levier max).", "taches": [
+          { "id": 1, "titre": "Créer la migration/model MarketInstrument + resource Filament", "description": "Champs listés dans modeles_de_reference_globaux.market_instruments (nom, symbole_interne, categorie, symbole_provider_externe, provider, spread, levier_max, est_actif, icone).", "instructions_suggestions_tache": "C'est LA table centrale du projet: en Filament, prévoir un champ texte 'symbole_provider_externe' avec aide contextuelle 'Code du symbole TradingView (ex: FX:EURUSD, BINANCE:BTCUSDT, OANDA:XAUUSD)'. Créer un seeder avec ~15 instruments (majors forex, BTC/ETH, XAUUSD, quelques indices)." },
+          { "id": 2, "titre": "Réutiliser <x-data-table>", "description": "Lister les instruments actifs avec leurs conditions.", "instructions_suggestions_tache": "Query: MarketInstrument::where('est_actif', true)->paginate(15)." }
+        ]},
+        { "type": "select_filter", "nom": "Filtre par catégorie d'instrument", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-select-filter>", "description": "Select Livewire (wire:model.live) filtrant la table par categorie.", "instructions_suggestions_tache": "Réutiliser sur markets, client-markets, watchlist de trade, education, market-news." }
+        ]}
+      ]
+    },
+    { "id": 6, "code": "about", "categorie": "Public / Vitrine", "nom_fr": "À propos", "nom_en": "About Us", "route_suggeree": "/a-propos", "acces": "public", "description": "Présentation du broker (contenu about_us de site_identifier), sécurité/régulation, chiffres clés.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Contenu About Us", "description": "Issu de site_identifier.about_us.", "taches": [
+          { "id": 1, "titre": "Afficher site_identifier.about_us", "description": "Vue simple consommant le SiteIdentifierService.", "instructions_suggestions_tache": "Réutiliser le pattern du champ riche-texte défini sur our-services." }
+        ]},
+        { "type": "stats_cards", "nom": "Chiffres clés", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-stat-card>", "description": "Reprendre StatsPublicService avec 3-4 chiffres clés.", "instructions_suggestions_tache": "Réutilisation directe, aucun nouveau composant." }
+        ]},
+        { "type": "icon_block", "nom": "Valeurs/engagements", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-icon-feature>", "description": "Liste des valeurs de l'entreprise.", "instructions_suggestions_tache": "Contenu statique via fichiers de traduction." }
+        ]}
+      ]
+    },
+    { "id": 7, "code": "markets", "categorie": "Public / Vitrine", "nom_fr": "Marchés", "nom_en": "Markets", "route_suggeree": "/marches", "acces": "public", "description": "Vue publique des instruments disponibles (market_instruments): Forex, Crypto, Or/Métaux, Matières premières, Indices, Actions.",
+      "fonctionnalites": [
+        { "type": "search_input", "nom": "Recherche d'instrument", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-search-input>", "description": "Input Livewire wire:model.live.debounce.400ms lié à une propriété $search.", "instructions_suggestions_tache": "Réutiliser sur client-markets, watchlist de trade, education, market-news, faq, support-tickets. Toujours debounce >=300ms pour limiter les requêtes." }
+        ]},
+        { "type": "select_filter", "nom": "Filtre par catégorie", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-select-filter>", "description": "Filtrer MarketInstrument::where('categorie', $filter).", "instructions_suggestions_tache": "Composant déjà créé sur trading-conditions." }
+        ]},
+        { "type": "table", "nom": "Tableau des instruments (public)", "description": "Prix, variation 24h, spread - paginé.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table>", "description": "Colonnes: icône+nom, prix, variation 24h (couleur succes/danger), spread.", "instructions_suggestions_tache": "Prix/variation simulés pour le MVP via un MarketPriceService (valeurs mock rafraîchies côté client par polling toutes les 3-5s, remplaçable plus tard par un vrai flux)." }
+        ]}
+      ]
+    },
+    { "id": 8, "code": "market-detail", "categorie": "Public / Vitrine", "nom_fr": "Détail d'un instrument", "nom_en": "Instrument Detail", "route_suggeree": "/marches/{symbole}", "acces": "public", "description": "Fiche publique d'un instrument tradable: cours, graphique, spread, effet de levier.",
+      "fonctionnalites": [
+        { "type": "graph", "nom": "Graphique de l'instrument", "description": "Widget provider externe (TradingView) via market_instruments.symbole_provider_externe.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-trading-chart>", "description": "Wrapper Blade+JS embarquant le widget TradingView (script officiel) avec le symbole passé en prop.", "instructions_suggestions_tache": "Exemple JS: `new TradingView.widget({ symbol: '{{ $instrument->symbole_provider_externe }}', theme: 'dark', container_id: 'tv-chart' })`. Prévoir un fallback (message 'graphique indisponible') si le symbole est vide. Ce composant sera réutilisé (en version enrichie avec toolbar) sur la page Trade." }
+        ]},
+        { "type": "text_block", "nom": "Infos instrument", "description": "Spread, levier, horaires de marché.", "taches": [
+          { "id": 1, "titre": "Afficher les infos de MarketInstrument", "description": "Bloc récapitulatif spread/levier_max/catégorie.", "instructions_suggestions_tache": "Route model binding sur symbole_interne: Route::get('/marches/{instrument:symbole_interne}', ...)." }
+        ]}
+      ]
+    },
+    { "id": 9, "code": "promotions", "categorie": "Public / Vitrine", "nom_fr": "Promotions & Bonus", "nom_en": "Promotions & Bonuses", "route_suggeree": "/promotions", "acces": "public", "description": "Liste des offres promotionnelles en cours.",
+      "fonctionnalites": [
+        { "type": "card_grid", "nom": "Cards de promotions actives", "taches": [
+          { "id": 1, "titre": "Créer la migration/model Promotion + resource Filament", "description": "Champs: titre, description, image, date_debut, date_fin, est_active.", "instructions_suggestions_tache": "Réutiliser <x-card-grid> pour l'affichage. Query: Promotion::where('est_active', true)->where('date_fin', '>=', now())." }
+        ]},
+        { "type": "popup_modal", "nom": "Détail d'une promotion", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-modal>", "description": "Modale Alpine.js (x-data, x-show, transition) déclenchable via un événement global.", "instructions_suggestions_tache": "API suggérée: `<x-modal name=\"promo-detail\">...</x-modal>` + déclenchement via `$dispatch('open-modal', { name: 'promo-detail' })`. Ce composant est LE composant popup réutilisé pour 95% des formulaires du projet (dépôt, retrait, KYC, profil, tickets, trade rapide...)." }
+        ]}
+      ]
+    },
+    { "id": 10, "code": "affiliate-program", "categorie": "Public / Vitrine", "nom_fr": "Programme de parrainage / Partenaires", "nom_en": "Affiliate / IB Program", "route_suggeree": "/parrainage", "acces": "public", "description": "Présentation du programme d'affiliation/IB, incitation à l'inscription.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Présentation du programme", "taches": [
+          { "id": 1, "titre": "Rédiger le contenu de présentation", "instructions_suggestions_tache": "Texte via traductions, mise en avant du % de commission." }
+        ]},
+        { "type": "stats_cards", "nom": "Barème de commissions", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-stat-card>", "description": "Afficher les paliers de commission (donnée statique de config pour le MVP).", "instructions_suggestions_tache": "config/affiliate.php avec les paliers, modifiable facilement." }
+        ]},
+        { "type": "floating_button", "nom": "CTA Devenir affilié", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-floating-button>", "description": "CTA vers /inscription.", "instructions_suggestions_tache": "Réutilisation simple." }
+        ]}
+      ]
+    },
+    { "id": 11, "code": "education", "categorie": "Public / Vitrine", "nom_fr": "Académie de trading", "nom_en": "Trading Academy", "route_suggeree": "/academie", "acces": "public", "description": "Liste des ressources pédagogiques: cours, glossaire, webinaires.",
+      "fonctionnalites": [
+        { "type": "search_input", "nom": "Recherche de ressource", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-search-input>", "instructions_suggestions_tache": "Recherche full-text simple sur le titre (LIKE %term%) suffisante pour le MVP." }
+        ]},
+        { "type": "select_filter", "nom": "Filtre par catégorie/niveau", "taches": [
+          { "id": 1, "titre": "Créer la migration/model générique Category (type='education')", "description": "Table categories réutilisable (nom, type, slug).", "instructions_suggestions_tache": "Cette table 'categories' générique (colonne type) sera réutilisée par market-news (type='news') et faq (type='faq'), conformément à referentiels_admin_uniquement.categories." },
+          { "id": 2, "titre": "Réutiliser <x-select-filter>", "instructions_suggestions_tache": "Filtrer EducationResource::where('category_id', $filter)." }
+        ]},
+        { "type": "card_grid", "nom": "Liste des cours/articles - paginée", "taches": [
+          { "id": 1, "titre": "Créer la migration/model EducationResource + resource Filament", "description": "Champs: titre_fr/en, slug, contenu_fr/en, category_id, image, type (cours/glossaire/webinaire).", "instructions_suggestions_tache": "Réutiliser <x-card-grid> + pagination Livewire (WithPagination)." }
+        ]}
+      ]
+    },
+    { "id": 12, "code": "education-article", "categorie": "Public / Vitrine", "nom_fr": "Détail d'un article/cours", "nom_en": "Article/Course Detail", "route_suggeree": "/academie/{slug}", "acces": "public", "description": "Contenu détaillé d'une ressource pédagogique.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Contenu de l'article/cours", "taches": [
+          { "id": 1, "titre": "Créer la vue de détail", "description": "Route model binding sur slug.", "instructions_suggestions_tache": "Route::get('/academie/{resource:slug}', ...)." }
+        ]},
+        { "type": "card_grid", "nom": "Articles/cours liés", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-card-grid>", "description": "EducationResource::where('category_id', $current->category_id)->where('id','!=',$current->id)->limit(3).", "instructions_suggestions_tache": "Réutilisation directe du composant." }
+        ]}
+      ]
+    },
+    { "id": 13, "code": "market-news", "categorie": "Public / Vitrine", "nom_fr": "Actualités & Analyses de marché", "nom_en": "Market News & Analysis", "route_suggeree": "/actualites", "acces": "public", "description": "Liste des actualités et analyses financières.",
+      "fonctionnalites": [
+        { "type": "select_filter", "nom": "Filtre par instrument/catégorie", "taches": [
+          { "id": 1, "titre": "Créer la migration/model NewsArticle + resource Filament", "description": "Champs: titre_fr/en, slug, contenu_fr/en, category_id, instrument_id (nullable), image, publie_le.", "instructions_suggestions_tache": "Réutiliser la table categories (type='news')." }
+        ]},
+        { "type": "card_grid", "nom": "Liste des actualités - paginée", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-card-grid> + pagination", "description": "NewsArticle::latest('publie_le')->paginate(9).", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]}
+      ]
+    },
+    { "id": 14, "code": "news-detail", "categorie": "Public / Vitrine", "nom_fr": "Détail d'une actualité", "nom_en": "News Detail", "route_suggeree": "/actualites/{slug}", "acces": "public", "description": "Contenu détaillé d'une actualité/analyse.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Contenu de l'actualité", "taches": [
+          { "id": 1, "titre": "Créer la vue de détail", "description": "Route model binding sur slug.", "instructions_suggestions_tache": "Identique au pattern education-article." }
+        ]}
+      ]
+    },
+    { "id": 15, "code": "economic-calendar", "categorie": "Public / Vitrine", "nom_fr": "Calendrier économique", "nom_en": "Economic Calendar", "route_suggeree": "/calendrier-economique", "acces": "public", "description": "Calendrier des évènements macro-économiques impactant les marchés.",
+      "fonctionnalites": [
+        { "type": "select_filter", "nom": "Filtre par devise/importance", "taches": [
+          { "id": 1, "titre": "Créer la migration/model EconomicEvent + resource Filament", "description": "Champs: titre, devise, importance (faible/moyenne/haute), date_heure, valeur_precedente, valeur_prevue, valeur_reelle.", "instructions_suggestions_tache": "Pour le MVP, données saisies manuellement en admin (pas d'API externe branchée)." }
+        ]},
+        { "type": "table", "nom": "Tableau des évènements économiques - paginé", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table>", "description": "Trié par date_heure, badge couleur selon importance.", "instructions_suggestions_tache": "Réutilisation directe du composant DataTable." }
+        ]}
+      ]
+    },
+    { "id": 16, "code": "trading-tools", "categorie": "Public / Vitrine", "nom_fr": "Outils de trading", "nom_en": "Trading Tools", "route_suggeree": "/outils", "acces": "public", "description": "Calculatrices (pip, marge, profit, conversion de devises).",
+      "fonctionnalites": [
+        { "type": "tabs", "nom": "Onglets calculatrices", "description": "Pip, marge, profit, conversion.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-tabs>", "description": "Onglets Alpine.js (x-data avec index actif).", "instructions_suggestions_tache": "Réutilisable partout où des vues à onglets sont nécessaires (ex: trade-history démo/réel, KYC étapes)." }
+        ]},
+        { "type": "form", "nom": "Formulaire de calcul", "description": "Résultat instantané, sans rechargement (Livewire/Ajax).", "taches": [
+          { "id": 1, "titre": "Créer les composants Livewire de calcul", "description": "PipCalculator, MarginCalculator, ProfitCalculator, CurrencyConverter.", "instructions_suggestions_tache": "Chaque composant recalcule en temps réel via wire:model.live sur les inputs, formules standards de trading (pip value = (0.0001 / prix) * taille_lot * contract_size)." }
+        ]}
+      ]
+    },
+    { "id": 17, "code": "faq", "categorie": "Public / Vitrine", "nom_fr": "Foire aux questions", "nom_en": "FAQ", "route_suggeree": "/faq", "acces": "public", "description": "Questions fréquentes issues du model faq_content, classées par catégorie.",
+      "fonctionnalites": [
+        { "type": "search_input", "nom": "Recherche dans la FAQ", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-search-input>", "instructions_suggestions_tache": "Filtre sur question_fr/question_en LIKE." }
+        ]},
+        { "type": "select_filter", "nom": "Filtre par catégorie", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-select-filter>", "description": "Catégories issues de la table categories (type='faq').", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]},
+        { "type": "list", "nom": "Liste accordéon des questions/réponses", "description": "Issue de faq_content.", "taches": [
+          { "id": 1, "titre": "Créer la migration/model FaqContent + resource Filament", "description": "Champs listés dans modeles_de_reference_globaux.faq_content.", "instructions_suggestions_tache": "Champ 'categorie_id' à confirmer avec le client (lien vers table categories type='faq') ; en attendant, prévoir la colonne nullable pour ne pas bloquer le développement." },
+          { "id": 2, "titre": "Créer le composant réutilisable <x-accordion>", "description": "Accordéon Alpine.js (x-collapse ou transition height).", "instructions_suggestions_tache": "Réutilisable pour toute liste de type question/réponse ou détails repliables." }
+        ]}
+      ]
+    },
+    { "id": 18, "code": "contact", "categorie": "Public / Vitrine", "nom_fr": "Contact", "nom_en": "Contact Us", "route_suggeree": "/contact", "acces": "public", "description": "Formulaire de contact + coordonnées issues de site_identifier (téléphones, emails, adresse).",
+      "fonctionnalites": [
+        { "type": "form", "nom": "Formulaire de contact", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire ContactForm", "description": "Nom, email, sujet, message ; validation ; envoi de mail (Mailable ContactMessageMail).", "instructions_suggestions_tache": "Utiliser les règles de validation Laravel standards + toast de succès (composant toast global) après envoi. Prévoir un throttle basique anti-spam (rate limiter)." }
+        ]},
+        { "type": "icon_block", "nom": "Coordonnées", "description": "Téléphones, emails, adresse issus de site_identifier.", "taches": [
+          { "id": 1, "titre": "Afficher les coordonnées", "description": "phone_contact_1/2, email_pro_1/2, location_adresse.", "instructions_suggestions_tache": "Réutiliser <x-icon-feature> en variante 'contact'." }
+        ]},
+        { "type": "text_block", "nom": "Carte/localisation (optionnel)", "taches": [
+          { "id": 1, "titre": "Intégrer une carte statique (optionnel MVP)", "instructions_suggestions_tache": "Peut être une simple image/iframe Google Maps embed, non prioritaire pour le MVP." }
+        ]}
+      ]
+    },
+    { "id": 19, "code": "why-us", "categorie": "Public / Vitrine", "nom_fr": "Pourquoi Xendaro Fox / Sécurité", "nom_en": "Why Us / Security", "route_suggeree": "/securite", "acces": "public", "description": "Argumentaire de confiance: sécurité des fonds, régulation, protection des données.",
+      "fonctionnalites": [
+        { "type": "icon_block", "nom": "Arguments de confiance", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-icon-feature>", "instructions_suggestions_tache": "Réutilisation directe du composant créé sur home." }
+        ]},
+        { "type": "text_block", "nom": "Sécurité, régulation, protection des données", "taches": [
+          { "id": 1, "titre": "Rédiger le contenu", "instructions_suggestions_tache": "Texte via fichiers de traduction." }
+        ]}
+      ]
+    },
+    { "id": 20, "code": "cgv", "categorie": "Public / Vitrine", "nom_fr": "Conditions Générales de Vente", "nom_en": "Terms & Conditions", "route_suggeree": "/cgv", "acces": "public", "description": "Texte légal issu de site_identifier.cvg.",
+      "fonctionnalites": [ { "type": "text_block", "nom": "Texte CGV", "description": "Issu de site_identifier.cvg.", "taches": [
+        { "id": 1, "titre": "Créer la vue légale générique <x-legal-page>", "description": "Composant réutilisable affichant un titre + un champ HTML/texte de site_identifier.", "instructions_suggestions_tache": "Réutiliser ce même composant pour policies, cookies, risk-disclosure, aml-policy (seul le champ source change)." }
+      ]}]
+    },
+    { "id": 21, "code": "policies", "categorie": "Public / Vitrine", "nom_fr": "Politique de confidentialité", "nom_en": "Privacy Policy", "route_suggeree": "/confidentialite", "acces": "public", "description": "Texte légal issu de site_identifier.policies.",
+      "fonctionnalites": [ { "type": "text_block", "nom": "Texte politique de confidentialité", "description": "Issu de site_identifier.policies.", "taches": [
+        { "id": 1, "titre": "Réutiliser <x-legal-page>", "description": "Avec source = site_identifier.policies.", "instructions_suggestions_tache": "Réutilisation directe." }
+      ]}]
+    },
+    { "id": 22, "code": "cookies", "categorie": "Public / Vitrine", "nom_fr": "Politique de cookies", "nom_en": "Cookies Policy", "route_suggeree": "/cookies", "acces": "public", "description": "Texte légal issu de site_identifier.cookies + gestion du bandeau consentement.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Texte politique cookies", "description": "Issu de site_identifier.cookies.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-legal-page>", "description": "Avec source = site_identifier.cookies.", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]},
+        { "type": "popup_modal", "nom": "Bandeau de consentement cookies", "taches": [
+          { "id": 1, "titre": "Créer le bandeau de consentement cookies", "description": "Composant Alpine.js persistant via localStorage, affiché tant que non accepté.", "instructions_suggestions_tache": "Boutons 'Accepter' / 'Refuser' (choix minimaliste pour le MVP), stocker le choix en localStorage + cookie technique." }
+        ]}
+      ]
+    },
+    { "id": 23, "code": "risk-disclosure", "categorie": "Public / Vitrine", "nom_fr": "Avertissement sur les risques", "nom_en": "Risk Disclosure", "route_suggeree": "/avertissement-risques", "acces": "public", "description": "Avertissement légal sur les risques liés au trading avec effet de levier.",
+      "fonctionnalites": [ { "type": "text_block", "nom": "Avertissement sur les risques", "taches": [
+        { "id": 1, "titre": "Réutiliser <x-legal-page>", "instructions_suggestions_tache": "Texte statique via traduction si non stocké en base." }
+      ]}]
+    },
+    { "id": 24, "code": "aml-policy", "categorie": "Public / Vitrine", "nom_fr": "Politique AML / KYC", "nom_en": "AML / KYC Policy", "route_suggeree": "/politique-aml", "acces": "public", "description": "Texte légal sur la lutte anti-blanchiment et les exigences KYC.",
+      "fonctionnalites": [ { "type": "text_block", "nom": "Texte politique AML/KYC", "taches": [
+        { "id": 1, "titre": "Réutiliser <x-legal-page>", "instructions_suggestions_tache": "Texte statique via traduction si non stocké en base." }
+      ]}]
+    },
+    { "id": 25, "code": "register", "categorie": "Authentification", "nom_fr": "Inscription", "nom_en": "Register", "route_suggeree": "/inscription", "acces": "public", "description": "Création de compte, design responsive 2 colonnes (formulaire + panneau de branding), voir images_design_ui/login_design.jpg.",
+      "fonctionnalites": [
+        { "type": "layout_2_colonnes", "nom": "Layout 2 colonnes responsive", "description": "Référence: images_design_ui/login_design.jpg. Colonne gauche = formulaire (dans une card), colonne droite = grand panneau arrondi avec branding, adaptés au thème 100% Dark de Xendaro Fox.", "taches": [
+          { "id": 1, "titre": "Créer le layout resources/views/layouts/auth.blade.php", "description": "2 colonnes: gauche formulaire (slot), droite panneau de branding fixe.", "instructions_suggestions_tache": "Adapter le fond clair de la maquette dribbble en fond fond_secondaire_surface Dark, garder la structure (logo en haut à gauche, card arrondie à droite avec dégradé, carte flottante témoignage/stat en bas). En mobile: colonne droite masquée ou empilée sous le formulaire." }
+        ]},
+        { "type": "form", "nom": "Formulaire d'inscription", "description": "Nom, email, mot de passe, confirmation, acceptation CGV/policies, bouton d'inscription.", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire RegisterForm", "description": "Validation (email unique, mot de passe confirmé, checkbox CGV obligatoire), création User + Wallet associé.", "instructions_suggestions_tache": "Créer la migration/model Wallet (user_id, solde_reel decimal, solde_demo decimal default 10000, devise) en relation hasOne sur User. Au register: créer automatiquement le Wallet avec solde_demo = 10000 (capital démo de départ) et solde_reel = 0." },
+          { "id": 2, "titre": "Déclencher la vérification email (OTP)", "description": "Après inscription, rediriger vers verify-email.", "instructions_suggestions_tache": "Utiliser Laravel Notifications (Mail) pour envoyer un code OTP à 6 chiffres, stocké temporairement (cache ou colonne otp_code + otp_expires_at)." }
+        ]},
+        { "type": "text_block", "nom": "Panneau de branding", "description": "Logo, message de bienvenue, slogan/description issus de site_identifier, + carte flottante de mise en avant (façon témoignage/stat).", "taches": [
+          { "id": 1, "titre": "Injecter le contenu de site_identifier dans le panneau", "instructions_suggestions_tache": "Réutiliser SiteIdentifierService::current() pour logo/slogan; carte flottante avec un chiffre clé (ex: nombre de traders)." }
+        ]},
+        { "type": "menu", "nom": "Lien vers Connexion", "description": "Pour les utilisateurs déjà inscrits.", "taches": [
+          { "id": 1, "titre": "Ajouter le lien de bascule", "instructions_suggestions_tache": "Simple lien vers /connexion sous le formulaire." }
+        ]}
+      ]
+    },
+    { "id": 26, "code": "login", "categorie": "Authentification", "nom_fr": "Connexion", "nom_en": "Login", "route_suggeree": "/connexion", "acces": "public", "description": "Connexion à l'espace client, design responsive 2 colonnes (formulaire + panneau de branding), voir images_design_ui/login_design.jpg.",
+      "fonctionnalites": [
+        { "type": "layout_2_colonnes", "nom": "Layout 2 colonnes responsive", "description": "Référence: images_design_ui/login_design.jpg, adapté au thème Dark.", "taches": [
+          { "id": 1, "titre": "Réutiliser layouts/auth.blade.php", "instructions_suggestions_tache": "Même layout que register, contenu de la colonne gauche différent (formulaire de connexion)." }
+        ]},
+        { "type": "form", "nom": "Formulaire de connexion", "description": "Email, mot de passe, remember me, bouton de connexion.", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire LoginForm", "description": "Auth::attempt avec remember, gestion des erreurs, throttle (protection brute-force).", "instructions_suggestions_tache": "Utiliser Laravel Fortify ou une implémentation Livewire custom avec RateLimiter::attempt(). Rediriger vers /2fa si activé, sinon /espace-client." }
+        ]},
+        { "type": "text_block", "nom": "Panneau de branding", "description": "Logo, message de bienvenue, slogan issus de site_identifier.", "taches": [
+          { "id": 1, "titre": "Réutiliser le panneau de branding de register", "instructions_suggestions_tache": "Réutilisation directe du composant/section." }
+        ]},
+        { "type": "menu", "nom": "Liens Inscription / Mot de passe oublié", "taches": [
+          { "id": 1, "titre": "Ajouter les liens de bascule", "instructions_suggestions_tache": "Vers /inscription et /mot-de-passe-oublie." }
+        ]}
+      ]
+    },
+    { "id": 27, "code": "forgot-password", "categorie": "Authentification", "nom_fr": "Mot de passe oublié", "nom_en": "Forgot Password", "route_suggeree": "/mot-de-passe-oublie", "acces": "public", "description": "Demande de réinitialisation du mot de passe.",
+      "fonctionnalites": [ { "type": "form", "nom": "Formulaire de demande de réinitialisation", "taches": [
+        { "id": 1, "titre": "Utiliser le système natif Laravel Password::sendResetLink", "description": "Composant Livewire simple avec champ email.", "instructions_suggestions_tache": "Réutiliser le layout auth (colonne gauche uniquement, panneau branding conservé)." }
+      ]}]
+    },
+    { "id": 28, "code": "reset-password", "categorie": "Authentification", "nom_fr": "Réinitialisation du mot de passe", "nom_en": "Reset Password", "route_suggeree": "/reinitialiser-mot-de-passe/{token}", "acces": "public", "description": "Définition d'un nouveau mot de passe via lien reçu par email.",
+      "fonctionnalites": [ { "type": "form", "nom": "Formulaire de nouveau mot de passe", "taches": [
+        { "id": 1, "titre": "Utiliser Password::reset natif Laravel", "description": "Composant Livewire avec token caché, nouveau mot de passe + confirmation.", "instructions_suggestions_tache": "Réutiliser le layout auth." }
+      ]}]
+    },
+    { "id": 29, "code": "verify-email", "categorie": "Authentification", "nom_fr": "Vérification de l'email", "nom_en": "Verify Email", "route_suggeree": "/verification-email", "acces": "authentifie", "description": "Vérification de l'adresse email via code OTP.",
+      "fonctionnalites": [ { "type": "form", "nom": "Formulaire de saisie du code OTP", "taches": [
+        { "id": 1, "titre": "Créer le composant Livewire VerifyEmailForm", "description": "6 inputs OTP + bouton renvoyer le code (avec cooldown).", "instructions_suggestions_tache": "Comparer au otp_code stocké lors du register ; si valide, email_verified_at = now() puis redirect /espace-client." }
+      ]}]
+    },
+    { "id": 30, "code": "two-factor-auth", "categorie": "Authentification", "nom_fr": "Authentification à deux facteurs", "nom_en": "Two-Factor Authentication", "route_suggeree": "/2fa", "acces": "authentifie", "description": "Étape de vérification 2FA à la connexion.",
+      "fonctionnalites": [ { "type": "form", "nom": "Formulaire de saisie du code 2FA", "taches": [
+        { "id": 1, "titre": "Créer le composant Livewire TwoFactorForm", "description": "Code OTP envoyé par email (MVP) ou TOTP (v1 future).", "instructions_suggestions_tache": "Pour le MVP: réutiliser le même mécanisme OTP email que verify-email plutôt qu'une lib TOTP complète, plus rapide à livrer sans bug." }
+      ]}]
+    },
+    { "id": 31, "code": "client-dashboard", "categorie": "Espace Client", "nom_fr": "Accueil (Tableau de bord)", "nom_en": "Dashboard Home", "route_suggeree": "/espace-client", "acces": "authentifie", "description": "Vue d'ensemble: stats cards, graphiques, données récentes (dernières transactions/trades).",
+      "fonctionnalites": [
+        { "type": "sidebar", "nom": "Sidebar de navigation dashboard", "taches": [
+          { "id": 1, "titre": "Créer le layout layouts/dashboard.blade.php + <x-dashboard-sidebar>", "description": "Sidebar avec liens groupés par section: TRADING (Accueil, Marchés, Trade, Historique de trade), COMPTE (Wallet, KYC, Profil, Sécurité, Parrainage), SUPPORT (Notifications, Support), puis Déconnexion.", "instructions_suggestions_tache": "Inspiration DA: patterns reference_dashboard_samify. Ce layout est utilisé par toutes les pages Espace Client SAUF la page Trade (qui a son propre layout plein écran)." },
+          { "id": 2, "titre": "Ajouter le mode réduit (icônes seules) + toggle expand/collapse", "description": "Bouton toggle en haut de sidebar, largeur ~260px étendue / ~72px réduite (Alpine.js x-data, transition width), état persisté en localStorage.", "instructions_suggestions_tache": "En dessous de 768px, basculer automatiquement en drawer plein (overlay), pas en mode réduit." },
+          { "id": 3, "titre": "Ajouter les badges de notification sur les items de nav", "description": "Point/badge coloré (danger ou couleur_principale) sur 'Notifications' et 'Support' si count > 0.", "instructions_suggestions_tache": "Réutiliser <x-status-badge> en variante 'dot'." },
+          { "id": 4, "titre": "Ajouter la mini-card profil en bas de sidebar", "description": "Avatar rond + nom + email + bouton 'Modifier le profil' (ouvre la popup edit-profile).", "instructions_suggestions_tache": "Réutiliser <x-user-mini-card> créé pour la page Trade (id 37) plutôt que d'en recréer un nouveau - ajouter simplement le bouton 'Modifier le profil' en variante optionnelle du composant." }
+        ]},
+        { "type": "navbar", "nom": "Navbar dashboard", "description": "Recherche, notifications, avatar/menu utilisateur.", "taches": [
+          { "id": 1, "titre": "Créer <x-dashboard-navbar>", "description": "Barre de recherche globale + icône notifications avec badge (count non lues) + avatar cliquable.", "instructions_suggestions_tache": "Badge notifications alimenté par Auth::user()->unreadNotifications()->count() (Laravel Notifications)." },
+          { "id": 2, "titre": "Créer le composant réutilisable <x-user-menu-dropdown>", "description": "Dropdown déclenché au clic sur l'avatar: section 'OPTIONS DU COMPTE', items Paramètres (icône+libellé+chevron) -> security-settings, Mon profil -> edit-profile, Déconnexion -> ouvre la modale de confirmation (voir page logout).", "instructions_suggestions_tache": "Inspiration DA: reference_dashboard_samify. Alpine.js x-data pour l'ouverture/fermeture (x-on:click.outside pour fermer)." }
+        ]},
+        { "type": "stats_cards", "nom": "Cards de stats", "description": "Solde réel, solde démo, nombre de trades, P&L global.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-stat-card>", "description": "4 cards: Wallet->solde_reel, Wallet->solde_demo, count(TradeHistory), somme P&L.", "instructions_suggestions_tache": "Réutilisation directe, aucune nouvelle logique de composant." }
+        ]},
+        { "type": "graph", "nom": "Graphique de performance", "description": "Évolution du solde/P&L sur une période.", "taches": [
+          { "id": 1, "titre": "Créer le composant PerformanceChart (ApexCharts/Chart.js)", "description": "Courbe de l'évolution du solde sur 7/30/90 jours.", "instructions_suggestions_tache": "Alimenter via une table balance_history (snapshot journalier) ou calcul à la volée depuis trade_history pour le MVP." }
+        ]},
+        { "type": "table", "nom": "Données récentes", "description": "Derniers trades et dernières transactions - paginé.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table>", "description": "5 derniers trades + 5 dernières transactions wallet.", "instructions_suggestions_tache": "Réutilisation directe du composant DataTable en mode 'compact' (sans pagination complète, juste un lien 'Voir tout')." }
+        ]}
+      ]
+    },
+    { "id": 32, "code": "edit-profile", "categorie": "Espace Client", "nom_fr": "Modifier le profil", "nom_en": "Edit Profile", "route_suggeree": "/espace-client/profil", "acces": "authentifie", "description": "Modification des informations personnelles du client (popup).",
+      "fonctionnalites": [
+        { "type": "popup_modal", "nom": "Popup édition profil", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-modal>", "instructions_suggestions_tache": "Déclenché depuis la navbar (menu avatar) ou depuis client-dashboard." }
+        ]},
+        { "type": "form", "nom": "Formulaire profil", "description": "Nom, email, téléphone, avatar.", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire EditProfileForm", "description": "Upload avatar (WithFileUploads), validation email unique sauf soi-même.", "instructions_suggestions_tache": "Stocker l'avatar via Storage::disk('public'), valider les formats (jpg/png, max 2Mo)." }
+        ]}
+      ]
+    },
+    { "id": 33, "code": "security-settings", "categorie": "Espace Client", "nom_fr": "Sécurité", "nom_en": "Security Settings", "route_suggeree": "/espace-client/securite", "acces": "authentifie", "description": "Changement de mot de passe, activation/désactivation 2FA, sessions actives.",
+      "fonctionnalites": [
+        { "type": "form", "nom": "Formulaire changement de mot de passe", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire ChangePasswordForm", "description": "Mot de passe actuel + nouveau + confirmation.", "instructions_suggestions_tache": "Hash::check pour vérifier l'ancien mot de passe avant update." }
+        ]},
+        { "type": "toggle_switch", "nom": "Activation/désactivation 2FA", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-toggle-switch>", "description": "Toggle Alpine.js/Livewire binaire réutilisable.", "instructions_suggestions_tache": "Réutilisé plus tard pour le switch Démo/Réel de la page Trade et pour notifications (marquer lu)." }
+        ]},
+        { "type": "table", "nom": "Sessions actives", "taches": [
+          { "id": 1, "titre": "Lister les sessions actives", "description": "Table sessions Laravel (driver database).", "instructions_suggestions_tache": "Réutiliser <x-data-table>, colonne 'Terminer la session' (delete de la ligne sessions correspondante)." }
+        ]}
+      ]
+    },
+    { "id": 34, "code": "trade-history", "categorie": "Espace Client", "nom_fr": "Historique de trade", "nom_en": "Trade History", "route_suggeree": "/espace-client/historique-trade", "acces": "authentifie", "description": "Historique complet et paginé de tous les trades (démo + réel), filtrable par compte/instrument/date.",
+      "fonctionnalites": [
+        { "type": "select_filter", "nom": "Filtres", "description": "Par compte (démo/réel), instrument, date.", "taches": [
+          { "id": 1, "titre": "Créer la migration/model TradeHistory", "description": "Champs: user_id, mode (demo/reel), instrument_id, sens (buy/sell), volume, prix_ouverture, prix_cloture (nullable), stop_loss, take_profit, statut (ouvert/cloture), profit_perte, ouvert_le, cloture_le.", "instructions_suggestions_tache": "C'est LE model central de la page Trade (id 37) - à créer ici en premier car consommé par plusieurs pages. Prévoir un index composite (user_id, statut) pour les requêtes fréquentes." },
+          { "id": 2, "titre": "Réutiliser <x-select-filter>", "description": "3 filtres combinés (mode, instrument, plage de dates).", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]},
+        { "type": "table", "nom": "Tableau historique de trade - paginé", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table>", "description": "TradeHistory::where('user_id', auth()->id())->where('statut','cloture')->paginate(15).", "instructions_suggestions_tache": "Colonne profit_perte en vert/rouge selon signe." }
+        ]}
+      ]
+    },
+    { "id": 35, "code": "client-markets", "categorie": "Espace Client", "nom_fr": "Marchés", "nom_en": "Markets", "route_suggeree": "/espace-client/marches", "acces": "authentifie", "description": "Tableau de visualisation des variations de prix des instruments (lecture seule, pas de prise de trade ici).",
+      "fonctionnalites": [
+        { "type": "search_input", "nom": "Recherche d'instrument", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-search-input>", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]},
+        { "type": "select_filter", "nom": "Filtre par catégorie", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-select-filter>", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]},
+        { "type": "table", "nom": "Tableau des variations de prix (lecture seule)", "description": "Pas d'action de trade depuis cette page - renvoie vers Trade.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table> + MarketPriceService", "description": "Même source de données que markets (public), bouton 'Trader' par ligne renvoyant vers /trade?symbole=xxx.", "instructions_suggestions_tache": "Ne PAS dupliquer le service de prix: réutiliser MarketPriceService créé sur markets (id 7)." }
+        ]}
+      ]
+    },
+    { "id": 36, "code": "wallet", "categorie": "Espace Client", "nom_fr": "Wallet", "nom_en": "Wallet", "route_suggeree": "/espace-client/wallet", "acces": "authentifie", "description": "Soldes réel et démo restants, avec en dessous un grand tableau paginé de l'historique dépôt/retrait.",
+      "fonctionnalites": [
+        { "type": "stats_cards", "nom": "Soldes réel et démo", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-stat-card>", "description": "Afficher Wallet->solde_reel et Wallet->solde_demo.", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]},
+        { "type": "floating_button", "nom": "Boutons Déposer / Retirer", "taches": [
+          { "id": 1, "titre": "Ajouter les 2 boutons d'action", "description": "Ouvrent les popups Dépôt/Retrait via $dispatch('open-modal', ...).", "instructions_suggestions_tache": "Boutons stylés bouton primaire (Déposer) et secondaire/outline (Retirer)." }
+        ]},
+        { "type": "popup_modal", "nom": "Popup Dépôt", "description": "Choix de la méthode (payment_methods), montant.", "taches": [
+          { "id": 1, "titre": "Créer la migration/model PaymentMethod + resource Filament", "description": "Champs listés dans modeles_de_reference_globaux.referentiels_admin_uniquement.payment_methods.", "instructions_suggestions_tache": "AUCUNE page client dédiée pour ce model: uniquement CRUD Filament + consommé en options select ici." },
+          { "id": 2, "titre": "Créer le composant Livewire DepositForm dans <x-modal>", "description": "Select PaymentMethod actifs + montant + soumission.", "instructions_suggestions_tache": "Créer migration/model WalletTransaction (user_id, type: depot/retrait, montant, payment_method_id, statut: en_attente/valide/refuse, reference). Pour le MVP, dépôt = incrémentation directe de Wallet->solde_reel après validation (simulateur), avec statut 'valide' automatique ou 'en_attente' si validation admin requise (à trancher en tâche d'implémentation)." }
+        ]},
+        { "type": "popup_modal", "nom": "Popup Retrait", "description": "Choix de la méthode (payment_methods), montant.", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire WithdrawForm dans <x-modal>", "description": "Select PaymentMethod + montant (max = solde_reel disponible).", "instructions_suggestions_tache": "Réutiliser WalletTransaction (type='retrait'). Validation: montant <= solde_reel, décrémenter le solde uniquement quand statut passe à 'valide' (via Filament côté admin pour le MVP)." }
+        ]},
+        { "type": "table", "nom": "Grand tableau historique dépôt/retrait - paginé", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table>", "description": "WalletTransaction::where('user_id', auth()->id())->latest()->paginate(15).", "instructions_suggestions_tache": "Badge de statut coloré (en_attente=jaune, valide=vert, refuse=rouge)." }
+        ]}
+      ]
+    },
+    { "id": 37, "code": "trade", "categorie": "Trading", "nom_fr": "Trade", "nom_en": "Trade", "route_suggeree": "/trade", "acces": "authentifie", "description": "Coeur du projet: dashboard de trade complet en plein écran, SANS la sidebar ni la navbar du dashboard client.", "layout_specifique": "Layout dédié, indépendant du layout Espace Client (pas de sidebar/navbar dashboard).",
+      "fonctionnalites": [
+        { "type": "layout_plein_ecran", "nom": "Layout Trade dédié", "description": "Page en plein écran, sans la sidebar ni la navbar de l'espace client.", "taches": [
+          { "id": 1, "titre": "Créer layouts/trade.blade.php", "description": "Layout indépendant: grid CSS 3 colonnes (sidebar gauche / centre graph+form / sidebar droite), 100vh, sans header/footer.", "instructions_suggestions_tache": "grid-template-columns: 280px 1fr 280px; sur desktop. En mobile: passage en onglets (Graph / Watchlist / Positions) via <x-tabs>." }
+        ]},
+        { "type": "graph", "nom": "Graphique central", "description": "Zone centrale large, widget de type TradingView, alimenté par market_instruments.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-trading-chart> en version enrichie", "description": "Même composant que market-detail, mais avec toolbar complète et hauteur adaptative à la zone centrale.", "instructions_suggestions_tache": "Le composant doit accepter un symbole dynamique rechargeable sans reload de page: exposer une méthode JS `window.updateChartSymbol(symbol)` appelée via wire:ignore + événement Livewire au clic sur un instrument du watchlist." }
+        ]},
+        { "type": "chart_toolbar", "nom": "Dropdowns du graphique", "description": "Changement de timeframe (M1/M5/M15/M30/H1/H4/D1/W1/MN) et de type de graphique (bougies/ligne/barres), comme dans MT5.", "taches": [
+          { "id": 1, "titre": "Ajouter les dropdowns timeframe/type de graphique", "description": "2 selects au-dessus du graph, pilotant les options du widget TradingView (interval, style).", "instructions_suggestions_tache": "Mapping: M1=1, M5=5, M15=15, M30=30, H1=60, H4=240, D1=D, W1=W, MN=M (paramètre 'interval' du widget)." }
+        ]},
+        { "type": "chart_toolbar", "nom": "Outils/indicateurs", "description": "Outils de dessin + dropdown d'indicateurs techniques (MA, RSI, MACD, Bollinger).", "taches": [
+          { "id": 1, "titre": "Activer les outils natifs du widget TradingView", "description": "Options withdateranges, hide_side_toolbar: false, studies: ['MASimple', 'RSI', 'MACD', 'BB'].", "instructions_suggestions_tache": "Le widget officiel TradingView embarque déjà ces outils - configuration uniquement, pas de dev custom nécessaire pour le MVP." }
+        ]},
+        { "type": "sidebar", "nom": "Sidebar gauche - rangée haute: Watchlist", "description": "Search_input + select_filter en tête, liste des instruments avec prix/variation en temps réel, clic = chargement dans le graph central.", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire Watchlist", "description": "Réutilise <x-search-input> + <x-select-filter> + MarketPriceService pour prix/variation live.", "instructions_suggestions_tache": "Au clic sur une ligne: $dispatch('symbol-selected', { symbol: $instrument->symbole_provider_externe, id: $instrument->id }) capté par le graph et l'order form." },
+          { "id": 2, "titre": "Créer le composant Livewire QuickTradeTrigger", "description": "Icône 'trade rapide' par ligne du watchlist ouvrant le dialog sans overlay.", "instructions_suggestions_tache": "Voir tâche dédiée sous 'Dialog de prise de trade rapide'." }
+        ]},
+        { "type": "table", "nom": "Sidebar gauche - rangée basse: Historique de trade", "description": "Tableau paginé des trades clôturés du compte actif.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table> en version compacte", "description": "TradeHistory::where('user_id', auth()->id())->where('mode', $modeActif)->where('statut','cloture')->paginate(10).", "instructions_suggestions_tache": "$modeActif = démo ou réel selon le toggle actif (propriété Livewire partagée entre les composants de la page, via un événement 'mode-changed')." }
+        ]},
+        { "type": "popup_modal", "nom": "Dialog de prise de trade rapide (sans overlay)", "description": "Popup flottant type MT5, sans overlay assombrissant, déclenché depuis le watchlist/graph, reprend le même formulaire que sous le graph.", "taches": [
+          { "id": 1, "titre": "Créer une variante <x-modal без-overlay> (floating-panel)", "description": "Même composant <x-modal> mais avec un prop `overlay=false` (pas de fond assombri, juste position absolute proche du déclencheur).", "instructions_suggestions_tache": "CSS: position:absolute (au lieu de fixed+backdrop), z-index élevé, fermeture au clic extérieur (x-on:click.outside)." },
+          { "id": 2, "titre": "Injecter le OrderForm à l'intérieur", "description": "Le même composant Livewire OrderForm (voir fonctionnalité order_form) est rendu dans ce dialog.", "instructions_suggestions_tache": "Ne pas dupliquer le formulaire: passer le symbole sélectionné en paramètre au composant OrderForm partagé." }
+        ]},
+        { "type": "order_form", "nom": "Formulaire de prise de trade (sous le graph)", "description": "Volume (lot), Stop Loss, Take Profit, type d'ordre (Marché/Buy Limit/Sell Limit/Buy Stop/Sell Stop), bouton Sell (rouge) et Buy (vert légèrement foncé).", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire OrderForm", "description": "Champs: volume (stepper, pas de 0.01 lot), stop_loss, take_profit, type_ordre (select), boutons Sell/Buy.", "instructions_suggestions_tache": "Au submit: vérifier solde suffisant (marge requise = volume * contract_size / levier_max), créer une ligne TradeHistory (statut='ouvert', prix_ouverture=prix actuel), décrémenter la marge bloquée du wallet actif (démo ou réel selon toggle)." },
+          { "id": 2, "titre": "Afficher la marge requise en direct", "description": "Calcul live à chaque changement de volume.", "instructions_suggestions_tache": "marge = (volume * contract_size * prix) / levier_max ; recalcul via wire:model.live sur le champ volume." }
+        ]},
+        { "type": "toggle_switch", "nom": "Switch Démo / Réel (formulaire)", "description": "Bascule le compte actif utilisé pour la prise de trade.", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-toggle-switch>", "description": "Propriété Livewire partagée $modeActif ('demo'|'reel'), diffusée aux autres composants de la page via événement.", "instructions_suggestions_tache": "Stocker le mode actif en session pour persister le choix entre les visites de la page Trade." }
+        ]},
+        { "type": "sidebar", "nom": "Sidebar droite - rangée haute: Profil", "description": "Avatar rond avec point de statut vert en bas à droite, username, email en dessous, 2 soldes alignés (démo/réel) avec icônes différenciées, + toggle démo/réel.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-user-mini-card>", "description": "Avatar (image ou initiales) dans un cercle + span absolute bottom-right w-3 h-3 bg-succes rounded-full border-2 (point de statut).", "instructions_suggestions_tache": "Sous l'avatar: username puis email en texte_secondaire plus petit. En dessous: 2 lignes soldes avec icônes différentes (ex: icône billets pour réel, icône flacon/simulation pour démo)." },
+          { "id": 2, "titre": "Réutiliser <x-toggle-switch>", "description": "Second toggle démo/réel, synchronisé avec celui du formulaire (même propriété Livewire).", "instructions_suggestions_tache": "Éviter la duplication d'état: utiliser un seul Livewire component parent 'TradePage' qui détient $modeActif et le passe en prop aux enfants, ou un événement global écouté par les deux toggles." }
+        ]},
+        { "type": "position_table", "nom": "Sidebar droite - rangée basse: Positions ouvertes", "description": "Trade(s) en cours avec P&L live (vert/rouge), mise à jour temps réel, fermeture rapide - comme MT5.", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire OpenPositions", "description": "TradeHistory::where('user_id',...)->where('mode',$modeActif)->where('statut','ouvert')->get().", "instructions_suggestions_tache": "P&L flottant = (prix_actuel - prix_ouverture) * volume * contract_size * (sens=='buy' ? 1 : -1). Rafraîchir via wire:poll.3s (MVP) ou Laravel Echo si le broadcasting temps réel est en place." },
+          { "id": 2, "titre": "Ajouter le bouton de clôture rapide par position", "description": "Action closePosition($tradeId): met à jour prix_cloture, profit_perte, statut='cloture', cloture_le=now(), et crédite/débite le wallet actif.", "instructions_suggestions_tache": "C'est la mise à jour du model trade_history mentionnée par le client: 'on le met à jour quand la position est clôturée'. Toast de confirmation après clôture." }
+        ]},
+        { "type": "account_summary", "nom": "Résumé de compte", "description": "Solde, équité, marge utilisée, marge libre, niveau de marge.", "taches": [
+          { "id": 1, "titre": "Créer le composant AccountSummary", "description": "Calculs: équité = solde + somme(P&L flottant positions ouvertes) ; marge libre = équité - marge utilisée ; niveau de marge = équité / marge utilisée * 100.", "instructions_suggestions_tache": "Placer ce résumé en haut de la sidebar droite ou juste au-dessus de OrderForm, format compact type MT5 (4 valeurs alignées)." }
+        ]},
+        { "type": "price_ticker", "nom": "Ticker prix live", "description": "Bid/Ask en direct de l'instrument sélectionné, avec spread.", "taches": [
+          { "id": 1, "titre": "Créer le composant PriceTicker", "description": "Affiche Bid/Ask/Spread de l'instrument actif dans le graph, mis à jour via polling ou Echo.", "instructions_suggestions_tache": "Pour le MVP: MarketPriceService simule une légère variation aléatoire toutes les 2-3s (base = prix stocké), avec flash vert/rouge CSS au changement (classe temporaire ajoutée/retirée en JS)." }
+        ]},
+        { "type": "integration_donnees", "nom": "Liaison trade_history", "description": "Toute prise de trade crée une entrée dans le model trade_history (compte, instrument, sens, volume, SL/TP, prix ouverture, statut ouvert); à la clôture, la même entrée est mise à jour (prix clôture, P&L, statut clôturé).", "taches": [
+          { "id": 1, "titre": "Écrire les tests Pest/PHPUnit du cycle de vie d'un trade", "description": "Test: ouverture (création ligne + décrément solde/marge), clôture (mise à jour ligne + crédit/débit solde).", "instructions_suggestions_tache": "Conformément à verification-before-completion: aucune fonctionnalité de la page Trade ne doit être livrée sans test couvrant au minimum le happy path d'ouverture et de clôture de position." }
+        ]}
+      ]
+    },
+    { "id": 38, "code": "kyc-verification", "categorie": "Espace Client", "nom_fr": "Vérification d'identité (KYC)", "nom_en": "KYC Verification", "route_suggeree": "/espace-client/kyc", "acces": "authentifie", "description": "Téléversement des documents d'identité et justificatif de domicile, suivi du statut de validation.",
+      "fonctionnalites": [
+        { "type": "form", "nom": "Formulaire de téléversement de documents", "taches": [
+          { "id": 1, "titre": "Créer la migration/model KycDocument + resource Filament", "description": "Champs: user_id, type_document (piece_identite/justificatif_domicile), fichier_path, statut (en_attente/valide/refuse), commentaire_admin.", "instructions_suggestions_tache": "Créer le composant Livewire KycUploadForm (WithFileUploads), validation mimes:jpg,png,pdf|max:5120. Stockage sur disk privé (storage/app/kyc) non exposé publiquement." }
+        ]},
+        { "type": "badge", "nom": "Statut de vérification", "description": "En attente / Validé / Refusé.", "taches": [
+          { "id": 1, "titre": "Créer le composant réutilisable <x-status-badge>", "description": "Badge coloré générique (statut, couleur).", "instructions_suggestions_tache": "Réutiliser pour wallet transactions, kyc, support-tickets." }
+        ]}
+      ]
+    },
+    { "id": 39, "code": "notifications", "categorie": "Espace Client", "nom_fr": "Notifications", "nom_en": "Notifications", "route_suggeree": "/espace-client/notifications", "acces": "authentifie", "description": "Centre de notifications du client (paginé).",
+      "fonctionnalites": [
+        { "type": "list", "nom": "Liste des notifications - paginée", "taches": [
+          { "id": 1, "titre": "Mettre en place Laravel Notifications (canal database)", "description": "php artisan notifications:table + migration.", "instructions_suggestions_tache": "Réutiliser <x-data-table> ou une variante <x-list> pour l'affichage paginé (Auth::user()->notifications()->paginate(15))." }
+        ]},
+        { "type": "toggle_switch", "nom": "Marquer comme lu / tout marquer comme lu", "taches": [
+          { "id": 1, "titre": "Ajouter les actions markAsRead", "instructions_suggestions_tache": "Bouton 'Tout marquer comme lu' -> Auth::user()->unreadNotifications->markAsRead()." }
+        ]}
+      ]
+    },
+    { "id": 40, "code": "support-tickets", "categorie": "Espace Client", "nom_fr": "Support / Tickets d'assistance", "nom_en": "Support Tickets", "route_suggeree": "/espace-client/support", "acces": "authentifie", "description": "Liste paginée des tickets de support, création d'un nouveau ticket (popup).",
+      "fonctionnalites": [
+        { "type": "table", "nom": "Tableau des tickets - paginé", "taches": [
+          { "id": 1, "titre": "Créer les migrations/models Ticket + TicketMessage + resources Filament", "description": "Ticket: user_id, sujet, statut (ouvert/en_cours/ferme). TicketMessage: ticket_id, auteur_id, message, est_admin.", "instructions_suggestions_tache": "Réutiliser <x-data-table> + <x-status-badge>." }
+        ]},
+        { "type": "floating_button", "nom": "Bouton Nouveau ticket", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-floating-button>", "instructions_suggestions_tache": "Ouvre la popup de création." }
+        ]},
+        { "type": "popup_modal", "nom": "Popup création de ticket", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-modal> + créer NewTicketForm", "description": "Sujet + message initial.", "instructions_suggestions_tache": "Crée le Ticket + le premier TicketMessage en une transaction DB." }
+        ]}
+      ]
+    },
+    { "id": 41, "code": "ticket-detail", "categorie": "Espace Client", "nom_fr": "Détail d'un ticket", "nom_en": "Ticket Detail", "route_suggeree": "/espace-client/support/{id}", "acces": "authentifie", "description": "Fil de discussion d'un ticket de support avec l'équipe Xendaro Fox.",
+      "fonctionnalites": [
+        { "type": "list", "nom": "Fil de discussion du ticket", "taches": [
+          { "id": 1, "titre": "Afficher TicketMessage::where('ticket_id',...)->orderBy('created_at')", "instructions_suggestions_tache": "Bulles de message alignées gauche/droite selon est_admin, réutiliser le style toast/card pour cohérence visuelle." }
+        ]},
+        { "type": "form", "nom": "Formulaire de réponse", "taches": [
+          { "id": 1, "titre": "Créer le composant Livewire ReplyTicketForm", "instructions_suggestions_tache": "Ajoute un TicketMessage, notifie l'admin (Laravel Notification)." }
+        ]}
+      ]
+    },
+    { "id": 42, "code": "affiliate-dashboard", "categorie": "Espace Client", "nom_fr": "Mon espace affilié", "nom_en": "My Affiliate Dashboard", "route_suggeree": "/espace-client/parrainage", "acces": "authentifie", "description": "Lien de parrainage personnel, liste des filleuls, suivi des commissions.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Lien de parrainage personnel", "taches": [
+          { "id": 1, "titre": "Ajouter la colonne referral_code (users) + parrain_id (nullable, self-referencing)", "description": "Migration d'ajout de colonnes sur users.", "instructions_suggestions_tache": "Générer referral_code unique à l'inscription (Str::random(8)). URL de parrainage: /inscription?ref={code}, pré-remplit parrain_id au register." }
+        ]},
+        { "type": "stats_cards", "nom": "Total filleuls / commissions", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-stat-card>", "description": "count(users where parrain_id = auth()->id()), somme des commissions.", "instructions_suggestions_tache": "Créer la migration/model AffiliateCommission (parrain_id, filleul_id, montant, statut) pour tracer les gains." }
+        ]},
+        { "type": "table", "nom": "Liste des filleuls - paginée", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-data-table>", "description": "User::where('parrain_id', auth()->id())->paginate(15).", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]}
+      ]
+    },
+    { "id": 43, "code": "logout", "categorie": "Espace Client", "nom_fr": "Déconnexion", "nom_en": "Logout", "route_suggeree": "/deconnexion", "acces": "authentifie", "description": "Action de déconnexion (pas de vue dédiée), invalide la session et redirige vers Accueil.",
+      "fonctionnalites": [
+        { "type": "popup_modal", "nom": "Confirmation de déconnexion", "description": "Modale affichée avant toute déconnexion effective (inspirée de reference_dashboard_samify).", "taches": [
+          { "id": 1, "titre": "Réutiliser <x-modal> pour la confirmation", "description": "Titre 'Confirmer la déconnexion', texte incluant l'email du compte (Auth::user()->email), boutons Annuler (outline, ferme la modale) / Se déconnecter (plein).", "instructions_suggestions_tache": "Déclenchée depuis <x-user-menu-dropdown> (item Déconnexion) et depuis le lien sidebar. Pas de bascule multi-compte (hors scope MVP), contrairement à la référence Samify." }
+        ]},
+        { "type": "action", "nom": "Déconnexion", "description": "Invalide la session et redirige vers Accueil, uniquement après confirmation dans la modale.", "taches": [
+          { "id": 1, "titre": "Créer la route/action logout", "description": "Auth::logout() + session()->invalidate() + regenerateToken().", "instructions_suggestions_tache": "POST /deconnexion (jamais en GET pour éviter le CSRF via lien), déclenché par le bouton 'Se déconnecter' de la modale de confirmation, redirection vers /." }
+        ]}
+      ]
+    },
+    { "id": 44, "code": "error-404", "categorie": "Utilitaire", "nom_fr": "Page introuvable (404)", "nom_en": "Not Found (404)", "route_suggeree": "/404", "acces": "public", "description": "Page d'erreur 404 personnalisée au design du site.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Message d'erreur 404", "taches": [
+          { "id": 1, "titre": "Créer resources/views/errors/404.blade.php", "instructions_suggestions_tache": "Reprendre le layout public minimal (header/footer) + illustration CSS simple." }
+        ]},
+        { "type": "floating_button", "nom": "Retour à l'accueil", "taches": [
+          { "id": 1, "titre": "Ajouter le bouton retour accueil", "instructions_suggestions_tache": "Lien simple vers /." }
+        ]}
+      ]
+    },
+    { "id": 45, "code": "error-500", "categorie": "Utilitaire", "nom_fr": "Erreur serveur (500)", "nom_en": "Server Error (500)", "route_suggeree": "/500", "acces": "public", "description": "Page d'erreur 500 personnalisée.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Message d'erreur 500", "taches": [
+          { "id": 1, "titre": "Créer resources/views/errors/500.blade.php", "instructions_suggestions_tache": "Même structure que 404, message générique (ne jamais exposer la stack trace en prod: APP_DEBUG=false)." }
+        ]},
+        { "type": "floating_button", "nom": "Retour à l'accueil", "taches": [
+          { "id": 1, "titre": "Réutiliser le bouton retour accueil", "instructions_suggestions_tache": "Réutilisation directe." }
+        ]}
+      ]
+    },
+    { "id": 46, "code": "maintenance", "categorie": "Utilitaire", "nom_fr": "Page de maintenance", "nom_en": "Maintenance Page", "route_suggeree": "/maintenance", "acces": "public", "description": "Page affichée pendant les opérations de maintenance planifiée du site.",
+      "fonctionnalites": [
+        { "type": "text_block", "nom": "Message de maintenance", "taches": [
+          { "id": 1, "titre": "Personnaliser la vue de maintenance Laravel", "description": "resources/views/errors/503.blade.php, utilisée automatiquement par php artisan down.", "instructions_suggestions_tache": "php artisan down --render=\"errors::503\" pour afficher cette vue custom au thème Dark." }
+        ]}
+      ]
+    }
+  ]
+}
