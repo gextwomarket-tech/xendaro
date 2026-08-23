@@ -224,3 +224,29 @@ Les 3 sous-agents lancés en parallèle sur ce périmètre ont chacun terminé e
 **Vérifications** : `php -l` OK sur les 9 vues + les 2 fichiers de langue. `npm run build` OK (aucune régression asset). Smoke-test `curl` sur `/actualites`, `/actualites/{slug réel}`, `/faq`, `/contact`, `/cgv`, `/confidentialite`, `/cookies`, `/avertissement-risques`, `/politique-aml` : **100% HTTP 200**. Contenu vérifié par grep sur les marqueurs clés (bannière "À la une", badges CTA FAQ, champs du formulaire Livewire).
 
 **Commits locaux** (pas de push, pas de remote configuré) : pages légales groupées en un commit, `market-news`+`news-detail` en un commit, `faq`+`contact` en un commit. Les fichiers de langue ont été inclus dans le commit d'un agent concurrent voisin (`141dec4`) du fait du travail en parallèle sur les mêmes fichiers partagés - contenu vérifié intact après coup, aucune perte de clé.
+
+## 2026-08-23 - Refonte visuelle : accueil, hub services et pages institutionnelles
+
+**Périmètre** : sous-agent dédié à la refonte DA des 7 pages vitrine les plus stratégiques, en réutilisant exclusivement la boîte à outils déjà posée par l'orchestrateur (`x-page-hero`, `x-reveal`, `x-photo-card`, `x-floating-badge`, `x-animated-counter`, `x-card-grid`/`x-card-item`, `x-icon-feature`, `x-data-table`, `x-stat-card`) : `home.blade.php`, `our-services.blade.php`, `account-types.blade.php`, `platforms.blade.php`, `trading-conditions.blade.php`, `about.blade.php`, `why-us.blade.php`. Aucune route/contrôleur/modèle touché ; `markets.blade.php` (déjà refondu par l'orchestrateur) utilisé comme référence de composition.
+
+**home** (page la plus importante) : hero animé + 8 sections au layout volontairement différent d'une section à l'autre (jamais deux motifs identiques consécutifs) - bandeau de stats animées (`x-animated-counter`), showcase marchés en split image/texte avec `x-photo-card`+`x-floating-badge` et mini-grille de catégories, grille "pourquoi Xendaro Fox" en 4 `x-icon-feature`, bannière plein cadre plateformes, split comptes (image à droite, alternance), bloc académie en carte scindée image/texte, 3 témoignages avec avatar photo superposé au coin de la carte (pattern F), bannière teaser parrainage/promotions en fin de page (ne duplique pas le CTA global déjà présent dans le footer). Toutes les données dynamiques existantes conservées (`site_identifier`, `MarketInstrument::count()`).
+
+**our-services** (page hub) : bannière plein cadre d'intro, puis 3 teasers alternés gauche/droite (types de comptes, plateformes, conditions de trading) chacun avec sa propre photo + floating-badge, bande de confiance (pills), contenu `site_identifier->nos_services` conservé en fin de page.
+
+**account-types** : hero + section d'intro split image/texte, comparatif réel (`AccountType::where('est_actif', true)`) conservé intégralement (table desktop `x-data-table` + cards mobile), bannière CTA plein cadre en fin de page. Aucune donnée du modèle retirée.
+
+**platforms** : WebTrader en split image/texte, mobile en bannière plein cadre (texte aligné à droite sur l'image), desktop en split inversé, comparatif rapide en grille 3 colonnes reprenant les 3 `x-card-item` d'origine.
+
+**trading-conditions** : hero + intro split image/texte, filtre catégorie et tableau `MarketInstrument`-driven (pagination + `withQueryString`) strictement conservés, seule la mise en page autour a changé.
+
+**about** : split mission/histoire avec le contenu `site_identifier->about_us` conservé, bandeau de stats animées, timeline horizontale/verticale des 4 grandes étapes de l'entreprise (2021-2026), bannière plein cadre "équipe", grille de 4 valeurs (`x-icon-feature`, contenu inchangé).
+
+**why-us** : bannière de confiance plein cadre, grille de 5 garanties (`x-icon-feature`, contenu sécurité/exécution/support/régulation/confidentialité inchangé), section KYC en split image/texte, bloc texte sécurité/régulation/données conservé tel quel en fin de page.
+
+**Images** : toutes en `https://picsum.photos/seed/{seed-descriptif-unique}/{w}/{h}`, un seed distinct par image (aucune réutilisation à travers les 7 pages), commentaire `TODO: remplacer par photographie sous licence Xendaro Fox avant production` en tête de chaque fichier modifié.
+
+**Traductions** : nouvelle clé `app.home.*` complète + nouvelles sous-clés ajoutées dans `app.services.*`, `app.account_types.*`, `app.platforms.*`, `app.trading_conditions.*`, `app.about.*` et `app.why_us.*` (existants), dans `lang/fr/app.php` (source) et `lang/en/app.php`. Vérification automatisée post-fusion (agents concurrents éditant les mêmes fichiers de langue en parallèle) via un script PHP comparant les clés aplaties des deux fichiers : 0 clé manquante de part et d'autre.
+
+**Vérifications** : `php -l` OK sur `lang/fr/app.php` et `lang/en/app.php`. `npm run build` OK à chaque étape (3 builds, aucune régression asset). Smoke-test `curl` sur `/`, `/nos-services`, `/nos-services/types-de-comptes`, `/nos-services/plateformes`, `/nos-services/conditions-de-trading`, `/a-propos`, `/securite` : **100% HTTP 200**, réponses grep-ées sans trace d'exception/erreur PHP.
+
+**Commits locaux** (pas de push, pas de remote configuré) : accueil en un commit dédié, hub services + 3 sous-pages en un commit groupé, about + why-us en un commit groupé.
