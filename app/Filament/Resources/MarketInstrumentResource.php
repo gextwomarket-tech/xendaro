@@ -17,7 +17,9 @@ class MarketInstrumentResource extends Resource
 {
     protected static ?string $model = MarketInstrument::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+
+    protected static ?string $navigationGroup = 'Trading';
 
     public static function form(Form $form): Form
     {

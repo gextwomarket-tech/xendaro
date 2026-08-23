@@ -16,6 +16,8 @@ class EducationResourceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
+    protected static ?string $navigationGroup = 'Contenu';
+
     protected static ?string $navigationLabel = 'Académie';
 
     protected static ?string $modelLabel = 'Ressource pédagogique';
