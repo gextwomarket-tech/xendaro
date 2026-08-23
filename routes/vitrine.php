@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
  * Module reserve aux sous-agents "vitrine" - ne pas toucher aux autres fichiers routes/*.php.
  */
 
-Route::view('/', 'vitrine.home')->name('home');
+Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::view('/nos-services', 'vitrine.our-services')->name('our-services');
 Route::view('/nos-services/types-de-comptes', 'vitrine.account-types')->name('account-types');

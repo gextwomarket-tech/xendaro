@@ -43,7 +43,81 @@
         </x-reveal>
     </section>
 
-    {{-- 2. Marches - split image/text (pattern A) + card-grid teaser --}}
+    {{-- 2. Marches en direct - zone de filtres + tableau (pattern E), juste sous les stats --}}
+    @php
+        $homeChange24h = function (\App\Models\MarketInstrument $instrument): float {
+            $hash = crc32($instrument->symbole_interne.'|'.now()->format('Y-m-d'));
+            return round((($hash % 601) - 300) / 100, 2); // -3.00% a +3.00%, meme formule que /marches
+        };
+    @endphp
+    <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <x-reveal>
+            <div class="text-center max-w-2xl mx-auto mb-8">
+                <p class="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-couleur-principale mb-3">
+                    <span class="w-1.5 h-1.5 rounded-full bg-couleur-principale animate-pulse"></span>
+                    {{ __('app.home.markets_table_eyebrow') }}
+                </p>
+                <h2 class="font-display text-2xl sm:text-3xl font-bold text-texte-principal">{{ __('app.home.markets_table_title') }}</h2>
+                <p class="mt-4 text-texte-secondaire">{{ __('app.home.markets_table_body') }}</p>
+            </div>
+        </x-reveal>
+
+        <x-reveal :delay="80">
+            <form method="GET" class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-sm bg-fond-card border border-bordure-subtile p-4 mb-6">
+                <div class="w-full sm:max-w-xs">
+                    <x-search-input name="search" value="{{ $marketSearch }}" :placeholder="__('app.markets.search_placeholder')" />
+                </div>
+                <x-select-filter
+                    name="categorie"
+                    onchange="this.form.submit()"
+                    :options="$marketCategories"
+                    :selected="$marketCategorie"
+                    :placeholder="__('app.markets.filter_all')"
+                />
+                <button type="submit" class="hidden">{{ __('app.common.filter') }}</button>
+            </form>
+        </x-reveal>
+
+        <x-reveal :delay="140">
+            <x-data-table :headers="[
+                __('app.markets.table_instrument'),
+                __('app.markets.table_price'),
+                __('app.markets.table_change'),
+                __('app.markets.table_spread'),
+                '',
+            ]">
+                @forelse($marketInstruments as $instrument)
+                    @php $variation = $homeChange24h($instrument); @endphp
+                    <tr>
+                        <td class="px-4 py-3">
+                            <a href="{{ url('/marches/'.$instrument->symbole_interne) }}" class="font-medium text-texte-principal hover:text-couleur-principale transition">
+                                {{ $instrument->nom }} <span class="text-texte-secondaire">({{ $instrument->symbole_interne }})</span>
+                            </a>
+                        </td>
+                        <td class="px-4 py-3 tabular-nums">{{ number_format((float) $instrument->prix_reference, 5) }}</td>
+                        <td class="px-4 py-3 tabular-nums {{ $variation >= 0 ? 'text-succes' : 'text-danger' }}">
+                            {{ $variation >= 0 ? '+' : '' }}{{ $variation }}%
+                        </td>
+                        <td class="px-4 py-3 tabular-nums">{{ $instrument->spread }}</td>
+                        <td class="px-4 py-3 text-right">
+                            <a href="{{ url('/marches/'.$instrument->symbole_interne) }}" class="text-couleur-principale hover:underline text-sm font-medium">{{ __('app.markets.view_detail') }}</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="px-4 py-6 text-center text-texte-secondaire">{{ __('app.common.no_results') }}</td></tr>
+                @endforelse
+            </x-data-table>
+        </x-reveal>
+
+        <div class="text-center mt-8">
+            <a href="{{ url('/marches') }}" class="inline-flex items-center gap-2 text-couleur-principale font-semibold hover:underline">
+                {{ __('app.home.markets_table_cta') }}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </a>
+        </div>
+    </section>
+
+    {{-- 3. Marches - split image/text (pattern A) + card-grid teaser --}}
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
@@ -150,9 +224,15 @@
                 <h2 class="font-display text-2xl sm:text-3xl font-bold text-texte-principal">{{ __('app.home.accounts_title') }}</h2>
                 <p class="mt-4 text-texte-secondaire leading-relaxed">{{ __('app.home.accounts_body') }}</p>
                 <div class="mt-6 space-y-3">
-                    <x-icon-feature :title="__('app.home.accounts_1_title')" :description="__('app.home.accounts_1_desc')" />
-                    <x-icon-feature :title="__('app.home.accounts_2_title')" :description="__('app.home.accounts_2_desc')" />
-                    <x-icon-feature :title="__('app.home.accounts_3_title')" :description="__('app.home.accounts_3_desc')" />
+                    <x-icon-feature :title="__('app.home.accounts_1_title')" :description="__('app.home.accounts_1_desc')">
+                        <x-slot:icon><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg></x-slot:icon>
+                    </x-icon-feature>
+                    <x-icon-feature :title="__('app.home.accounts_2_title')" :description="__('app.home.accounts_2_desc')">
+                        <x-slot:icon><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></x-slot:icon>
+                    </x-icon-feature>
+                    <x-icon-feature :title="__('app.home.accounts_3_title')" :description="__('app.home.accounts_3_desc')">
+                        <x-slot:icon><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm0 2h14v2H5v-2z" /></svg></x-slot:icon>
+                    </x-icon-feature>
                 </div>
                 <a href="{{ url('/nos-services/types-de-comptes') }}" class="mt-6 inline-flex items-center gap-2 text-couleur-principale font-semibold hover:underline">
                     {{ __('app.home.accounts_cta') }}
@@ -161,7 +241,7 @@
             </x-reveal>
             <x-reveal direction="right" :delay="100" class="order-1 lg:order-2">
                 <div class="relative">
-                    <x-photo-card src="/images/trading/trading-01.jpg" :alt="__('app.home.accounts_title')" ratio="aspect-[4/5]" :rotate="2" />
+                    <x-photo-card src="/images/trading/trading-09.jpg" :alt="__('app.home.accounts_title')" ratio="aspect-[4/3]" :rotate="2" />
                     <div class="relative">
                         <x-floating-badge position="top-left">
                             <p class="text-xs text-texte-secondaire">{{ __('app.account_types.table_leverage') }}</p>
