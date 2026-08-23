@@ -20,5 +20,7 @@
 
     <x-toast-container />
 
+    <x-cookie-consent-banner />
+
 </body>
 </html>

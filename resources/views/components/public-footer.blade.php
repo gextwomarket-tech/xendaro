@@ -17,6 +17,7 @@
             <a href="{{ url('/confidentialite') }}" class="block text-texte-secondaire hover:text-texte-principal">Confidentialité</a>
             <a href="{{ url('/cookies') }}" class="block text-texte-secondaire hover:text-texte-principal">Cookies</a>
             <a href="{{ url('/avertissement-risques') }}" class="block text-texte-secondaire hover:text-texte-principal">Risques</a>
+            <a href="{{ url('/politique-aml') }}" class="block text-texte-secondaire hover:text-texte-principal">AML / KYC</a>
         </div>
         <div class="space-y-2">
             <p class="text-texte-principal font-semibold mb-1">{{ __('app.nav.contact') }}</p>

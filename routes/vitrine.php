@@ -34,9 +34,8 @@ Route::view('/outils', 'vitrine.trading-tools')->name('trading-tools');
 Route::view('/faq', 'vitrine.faq')->name('faq');
 Route::view('/contact', 'vitrine.contact')->name('contact');
 
-// TODO (sous-agent vitrine): brancher les routes/vues suivantes en suivant xendaro-fox-plan.json > Pages (id 2 a 24)
-// Route::view('/cgv', 'vitrine.cgv')->name('cgv');
-// Route::view('/confidentialite', 'vitrine.policies')->name('policies');
-// Route::view('/cookies', 'vitrine.cookies')->name('cookies');
-// Route::view('/avertissement-risques', 'vitrine.risk-disclosure')->name('risk-disclosure');
-// Route::view('/politique-aml', 'vitrine.aml-policy')->name('aml-policy');
+Route::view('/cgv', 'vitrine.cgv')->name('cgv');
+Route::view('/confidentialite', 'vitrine.policies')->name('policies');
+Route::view('/cookies', 'vitrine.cookies')->name('cookies');
+Route::view('/avertissement-risques', 'vitrine.risk-disclosure')->name('risk-disclosure');
+Route::view('/politique-aml', 'vitrine.aml-policy')->name('aml-policy');
