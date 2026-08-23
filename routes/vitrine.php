@@ -14,10 +14,13 @@ Route::view('/nos-services/types-de-comptes', 'vitrine.account-types')->name('ac
 Route::view('/nos-services/plateformes', 'vitrine.platforms')->name('platforms');
 Route::view('/nos-services/conditions-de-trading', 'vitrine.trading-conditions')->name('trading-conditions');
 
+Route::view('/a-propos', 'vitrine.about')->name('about');
+Route::view('/securite', 'vitrine.why-us')->name('why-us');
+
+Route::get('/marches', [App\Http\Controllers\MarketController::class, 'index'])->name('markets');
+Route::get('/marches/{instrument:symbole_interne}', [App\Http\Controllers\MarketController::class, 'show'])->name('market-detail');
+
 // TODO (sous-agent vitrine): brancher les routes/vues suivantes en suivant xendaro-fox-plan.json > Pages (id 2 a 24)
-// Route::view('/a-propos', 'vitrine.about')->name('about');
-// Route::get('/marches', [App\Http\Controllers\MarketController::class, 'index'])->name('markets');
-// Route::get('/marches/{instrument:symbole_interne}', [App\Http\Controllers\MarketController::class, 'show'])->name('market-detail');
 // Route::view('/promotions', 'vitrine.promotions')->name('promotions');
 // Route::view('/parrainage', 'vitrine.affiliate-program')->name('affiliate-program');
 // Route::get('/academie', [App\Http\Controllers\EducationController::class, 'index'])->name('education');
@@ -28,7 +31,6 @@ Route::view('/nos-services/conditions-de-trading', 'vitrine.trading-conditions')
 // Route::view('/outils', 'vitrine.trading-tools')->name('trading-tools');
 // Route::view('/faq', 'vitrine.faq')->name('faq');
 // Route::view('/contact', 'vitrine.contact')->name('contact');
-// Route::view('/securite', 'vitrine.why-us')->name('why-us');
 // Route::view('/cgv', 'vitrine.cgv')->name('cgv');
 // Route::view('/confidentialite', 'vitrine.policies')->name('policies');
 // Route::view('/cookies', 'vitrine.cookies')->name('cookies');
