@@ -57,3 +57,47 @@ Ce fichier documente, en résumé, les actions effectuées sur le projet (voir r
 - `trading-conditions` (id 5) : tableau paginé des `MarketInstrument` actifs avec filtre catégorie (GET + `x-select-filter`).
 
 **Statut** : 4/23 pages vitrine du périmètre livrées et vérifiées. Reste : about, markets, market-detail, promotions, affiliate-program, education(+détail), market-news(+détail), economic-calendar, trading-tools, faq, contact, why-us, cgv, policies, cookies, risk-disclosure, aml-policy.
+
+## 2026-08-23 - Trade (Page id 37) : coeur du projet, livré complet
+
+**Périmètre** : sous-agent trade, exclusivement la page `/trade` (id 37) - les 14 fonctionnalités du plan.
+
+**Décision de modélisation MARGE / SOLDE (a lire avant de toucher a `App\Services\TradingService`)**
+- **A l'ouverture** d'une position, le solde brut du wallet (`solde_reel`/`solde_demo`) n'est **jamais** débité. On calcule une marge requise (`marge = volume * prix_actuel * 100 / levier_max`, `100` = taille de contrat simplifiée pour ce MVP au lieu des 100 000 unités d'un vrai lot forex, gardée lisible avec le solde démo par défaut de 10 000 $) et on vérifie seulement qu'elle est inférieure à la "marge libre" (solde - somme des `marge_utilisee` des positions déjà ouvertes du même mode). La marge est ensuite simplement enregistrée dans `trade_history.marge_utilisee` : elle est **tracée**, pas **bloquée physiquement**.
+- **A la clôture**, on met à jour la ligne (`prix_cloture`, `profit_perte` via `TradeHistory::calculerProfitFlottant()`, `statut='cloture'`, `cloture_le=now()`) puis on crédite/débite le wallet actif du montant exact de `profit_perte`. Comme la marge n'a jamais été soustraite à l'ouverture, il n'y a rien à "restituer" - une seule écriture comptable par cycle de vie complet.
+- Le solde affiché reste donc toujours "l'argent réellement disponible avant P&L" (= Balance MT5) ; `AccountSummaryWidget` recalcule à la volée la vue "Equity/Marge" attendue par un trader (équité = solde + P&L flottant, marge libre = équité - marge utilisée, niveau de marge = équité / marge utilisée * 100) sans jamais avoir touché au solde stocké. Ce choix est le plus simple et le moins sujet aux bugs pour un MVP (pas de risque d'oubli de "restitution" de marge, pas de double-décompte). Documenté en détail en commentaire de classe dans `app/Services/TradingService.php`.
+- Ordres en attente (`buy_limit`/`sell_limit`/`buy_stop`/`sell_stop`) : le schéma `trade_histories` ne comporte que 2 statuts (`ouvert`/`cloture`), aucun statut "en attente". Ces types sont donc exécutés immédiatement comme un ordre au marché pour ce MVP (le `type_ordre` est conservé à titre informatif/UI) ; un vrai moteur d'exécution différée est hors scope MVP.
+
+**Nouveaux services**
+- `App\Services\MarketPriceService` : simule un flux de prix "live" à partir de `MarketInstrument::prix_reference`, fluctuation pseudo-aléatoire déterministe ±0.05% (hash CRC32 symbole+seconde courante, sans toucher à l'état aléatoire global PHP). Fournit `currentPrice()` et `bidAsk()`. Clairement documenté comme simulation MVP, remplaçable plus tard par un vrai flux.
+- `App\Services\TradingService` : `calculerMarge()`, `margeUtiliseePour()`, `margeLibrePour()`, `openPosition()`, `closePosition()` - toute la logique métier d'ouverture/clôture (voir décision de modélisation ci-dessus).
+
+**Layout dédié**
+- `resources/views/components/layouts/trade.blade.php` : composant anonyme plein écran (`<x-layouts.trade>`), indépendant du layout dashboard (pas de sidebar/navbar client), juste une barre supérieure minimale (logo + lien retour `/espace-client`).
+
+**Composants Livewire** (`app/Livewire/Trade/*`, vues dans `resources/views/livewire/trade/*`)
+- `TradePage` (racine, route `/trade`) : détient `$modeActif`/`$activeInstrumentId`, persistés en session, diffusés aux enfants via les événements Livewire globaux `mode-changed` et `symbol-selected` (bus d'événements page-wide, pattern suggéré par le plan).
+- `Watchlist` (recherche + filtre catégorie + prix/variation simulés, clic = `symbol-selected`, icône trade rapide = ouvre `QuickTradeModal`). Volontairement **non paginée** (à la différence de l'historique) : la fonctionnalité watchlist du plan ne demande que recherche/filtre, et une pagination casserait l'usage "surveiller toute sa liste d'un coup d'œil" avec seulement ~15 instruments actifs.
+- `ChartPanel` : widget TradingView (`resources/js/trade-chart.js`, script officiel `s3.tradingview.com/tv.js`, wrapper `window.XendaroTradeChart`) dans un conteneur `wire:ignore`, toolbar timeframe (M1..MN) + type de graphique (bougies/ligne/barres), indicateurs (MA/RSI/MACD/Bollinger) et outils de dessin natifs du widget (config seulement, pas de dev custom). `x-trading-chart` (composant partagé prévu par la page id 8 "market-detail", hors scope de cet agent) n'existait pas encore au moment du build : le rendu est resté auto-suffisant dans `ChartPanel` pour ne pas bloquer ni risquer un conflit de fichier ; extractible plus tard si besoin.
+- `OrderForm` : volume/SL/TP/type d'ordre + boutons Buy (vert)/Sell (rouge) + toggle démo/réel. Réutilisé tel quel (même classe, 2 instances) sous le graph et dans `QuickTradeModal` (`variant='main'|'main-mobile'|'quick'`) - aucune duplication de formulaire, conformément à l'instruction du plan.
+- `QuickTradeModal` : dialog flottant **sans overlay**, réutilise `<x-modal :overlay="false">` déjà prévu pour cet usage exact.
+- `OpenPositions` : positions ouvertes, P&L flottant live (`wire:poll.3s`), fermeture rapide avec `wire:confirm`, scoping strict par `user_id` (vérifié par test : un utilisateur ne peut pas clôturer la position d'un autre).
+- `TradeHistoryPanel` : historique clôturé, **paginé** (`WithPagination`, `paginate(10)`) via `<x-data-table>`, conformément à `bonnes_pratiques_dev`.
+- `ProfileCard` : réutilise `<x-user-mini-card>` (créé entretemps par l'agent Auth/Client) + 2 soldes + toggle démo/réel synchronisé avec celui d'`OrderForm`.
+- `AccountSummaryWidget` : Solde/Équité/Marge utilisée/Marge libre/Niveau de marge (formules détaillées ci-dessus).
+- `PriceTicker` : Bid/Ask/Spread, direction (hausse/baisse) calculée **côté serveur** (propriété persistée entre deux `wire:poll`) plutôt que côté client Alpine, pour éviter toute fragilité liée aux morphs DOM du polling.
+- Mobile (`<768px`) : réutilise `<x-tabs>` (créé entretemps par l'agent vitrine) pour 3 onglets Graph/Watchlist/Positions, à la place de la grille 3 colonnes desktop.
+
+**Tests** (`tests/Feature/TradeFlowTest.php`, PHPUnit + `RefreshDatabase`, 16 tests / 80 assertions)
+- Cycle de vie complet ouverture/clôture (gain, perte, sens buy/sell), non-débit du solde à l'ouverture, formule de marge, idempotence de la clôture, refus si marge libre insuffisante.
+- Rendu HTTP complet de `/trade` (200 avec et sans instrument actif, 302 si non authentifié) - exerce tout l'arbre Blade/Livewire réel.
+- Tests au niveau composant Livewire (`Livewire::test()`) : mount de `TradePage`, `OrderForm::placerOrdre()` + événement `trade-opened`, toggle démo/réel + `mode-changed`, `Watchlist::selectInstrument()` + `symbol-selected`, `OpenPositions::closePosition()` + `trade-closed`, et isolation stricte par utilisateur.
+- Tous les tests passent (`php artisan test --filter=TradeFlowTest`), ainsi que la suite complète du projet (seul échec pré-existant et hors scope : `tests/Feature/ExampleTest.php`, stub par défaut sans `RefreshDatabase`, non lié à Trade).
+
+**Autres fichiers touchés (dans mon périmètre)**
+- `routes/trade.php` : route `/trade` branchée sur `App\Livewire\Trade\TradePage` (middleware `auth`).
+- `vite.config.js` : ajout de l'entrée `resources/js/trade-chart.js`.
+- `lang/fr/app.php` et `lang/en/app.php` : section `trade` complète (labels formulaire, catégories, types d'ordre/graphique, résumé de compte, erreurs métier).
+- `npm run build` exécuté avec succès (chunk `trade-chart-*.js` généré).
+
+**Statut** : page Trade livrée complète, testée, buildée. Prête pour test client.
