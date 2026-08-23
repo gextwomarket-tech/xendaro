@@ -38,9 +38,9 @@
         {{-- Colonne droite: panneau de branding (masque en mobile) --}}
         <div class="hidden lg:flex lg:w-[46%] xl:w-[42%] shrink-0">
             <div class="relative w-full rounded-lg overflow-hidden border border-bordure-subtile p-10 flex flex-col justify-between">
-                {{-- Image de fond, avec la couleur de base (fond-surface) posee par-dessus en semi-transparent --}}
-                <img src="/images/trading/trading-01.jpg" alt="" class="absolute inset-0 w-full h-full object-cover">
-                <div class="absolute inset-0 bg-fond-surface/85"></div>
+                {{-- Image de fond, quasi masquee derriere la couleur de base (fond-surface) posee par-dessus --}}
+                <img src="/images/trading/trading-06.jpg" alt="" class="absolute inset-0 w-full h-full object-cover opacity-40 blur-[1px]">
+                <div class="absolute inset-0 bg-fond-surface/95"></div>
 
                 {{-- Halo decoratif --}}
                 <div class="pointer-events-none absolute -top-24 -right-24 w-96 h-96 rounded-full bg-couleur-principale/10 blur-3xl"></div>
