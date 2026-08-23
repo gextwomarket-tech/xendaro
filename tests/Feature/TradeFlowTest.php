@@ -52,7 +52,8 @@ class TradeFlowTest extends TestCase
 
         $this->assertNotNull($user->wallet);
         $this->assertEquals(10000.0, (float) $user->wallet->solde_demo);
-        $this->assertEquals(0.0, (float) $user->wallet->solde_reel);
+        // 100 = bonus de bienvenue MVP credite a l'inscription (voir User::booted()).
+        $this->assertEquals(100.0, (float) $user->wallet->solde_reel);
     }
 
     public function test_ouverture_dune_position_demo_cree_une_ligne_trade_history_ouverte_sans_debiter_le_solde(): void

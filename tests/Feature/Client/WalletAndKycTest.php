@@ -36,12 +36,14 @@ class WalletAndKycTest extends TestCase
         $transaction = WalletTransaction::where('user_id', $user->id)->first();
         $this->assertNotNull($transaction);
         $this->assertEquals('en_attente', $transaction->statut);
-        $this->assertEquals(0, $user->fresh()->wallet->solde_reel);
+        // 100 = bonus de bienvenue credite a l'inscription (voir User::booted()), le depot
+        // en attente ne modifie pas encore le solde reel.
+        $this->assertEquals(100, $user->fresh()->wallet->solde_reel);
 
         WalletTransactionService::approve($transaction);
 
         $this->assertEquals('valide', $transaction->fresh()->statut);
-        $this->assertEquals(500, $user->fresh()->wallet->solde_reel);
+        $this->assertEquals(600, $user->fresh()->wallet->solde_reel);
     }
 
     public function test_withdraw_is_capped_to_available_real_balance(): void

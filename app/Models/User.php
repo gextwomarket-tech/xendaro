@@ -105,7 +105,10 @@ class User extends Authenticatable
             $user->saveQuietly();
 
             $user->wallet()->create([
-                'solde_reel' => 0,
+                // Bonus de bienvenue MVP: permet de tester le mode "reel" (dashboard, Trade,
+                // retrait...) sans devoir d'abord passer par le cycle complet depot + validation
+                // admin. Un vrai depot via WalletTransaction reste le mecanisme normal ensuite.
+                'solde_reel' => 100,
                 'solde_demo' => 10000,
                 'devise' => 'USD',
             ]);
