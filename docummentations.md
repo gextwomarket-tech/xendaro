@@ -144,3 +144,22 @@ Ce fichier documente, en résumé, les actions effectuées sur le projet (voir r
 - Suite complète du projet : **27 passed / 98 assertions** (aucune régression sur les tests Trade/vitrine déjà en place).
 
 **Statut** : Authentification + Espace Client livrés complets (12 pages), testés bout en bout, `npm run build` OK, aucun 500 constaté.
+
+## 2026-08-23 - Vitrine : pages id 6 à 18 (About à Contact)
+
+**Pages construites et testées HTTP 200** (avec données réelles issues de la base, jamais de contenu statique quand un modèle est prévu par le plan) :
+- `about` (id 6) : `site_identifier.about_us` + stats clés + valeurs de l'entreprise.
+- `why-us` (id 19, construite avec ce lot) : arguments de confiance (sécurité, exécution, support, conformité, RGPD).
+- `markets` (id 7) + `market-detail` (id 8) : `MarketController::index/show`, recherche + filtre catégorie, variation 24h simulée déterministe (hash CRC32 par instrument + jour), route model binding sur `symbole_interne`. Nouveau composant `<x-trading-chart>` (widget TradingView officiel en embed autonome lecture seule).
+- `promotions` (id 9) : `Promotion::actives()` + `<x-modal>` de détail par promo.
+- `affiliate-program` (id 10) : barème de commissions piloté par `config/affiliate.php` (nouveau fichier, paliers modifiables sans toucher aux vues).
+- `education` (id 11) + `education-article` (id 12) : `EducationController::index/show`, recherche, filtre catégorie (`Category` type=education), ressources liées.
+- `market-news` (id 13) + `news-detail` (id 14) : `NewsController::index/show`, filtre catégorie (type=news), lien vers l'instrument associé, articles liés.
+- `economic-calendar` (id 15) : `EconomicEvent` paginé, filtres devise + importance (badge coloré).
+- `trading-tools` (id 16) : 4 calculatrices (pip, marge, profit, conversion) via `<x-tabs>` + Alpine.js réactif, sans dépendance API externe (taux simulés alignés sur `MarketInstrumentSeeder`).
+- `faq` (id 17) : `FaqContent` paginé, recherche + filtre catégorie, `<x-accordion>`.
+- `contact` (id 18) : Livewire `ContactForm` (validation, throttle anti-spam `RateLimiter`, toast succès) + Mailable `ContactMessageMail` (envoi **synchrone**, volontairement sans `ShouldQueue` car aucun worker de queue n'est garanti actif pour ce MVP — un mail mis en queue non traité serait invisible) + coordonnées `site_identifier` + carte Google Maps embed. Testé via `Livewire::test()` en tinker : soumission valide → `ContactMessage` créé, zéro erreur, zéro job résiduel en base.
+
+**Nouveaux fichiers notables** : `app/Http/Controllers/MarketController.php`, `EducationController.php`, `NewsController.php` ; `app/Livewire/Vitrine/ContactForm.php` ; `app/Mail/ContactMessageMail.php` ; `config/affiliate.php` ; `resources/views/components/trading-chart.blade.php`.
+
+**Statut** : 18/23 pages du périmètre vitrine livrées et vérifiées. Reste : trading-tools ✅ (fait), cgv, policies, cookies, risk-disclosure, aml-policy (les 5 pages légales via `<x-legal-page>`, déjà créé).
