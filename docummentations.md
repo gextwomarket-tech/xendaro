@@ -204,3 +204,23 @@ Les 3 sous-agents lancés en parallèle sur ce périmètre ont chacun terminé e
 **Point d'attention pour la suite** : si un composant Livewire custom a besoin d'Alpine dans du JS, utiliser `window.Alpine` uniquement après l'évènement `livewire:init` (Livewire l'expose alors globalement) — ne jamais réinstaller/réimporter le paquet `alpinejs` séparément.
 
 **Vérifications post-fix** : suite de tests complète toujours au vert (27/27, 98 assertions) - ce bug n'était détectable qu'en navigateur réel, pas par les tests HTTP/Livewire::test() existants qui n'exécutent pas de JS. Cycle auth testé manuellement de bout en bout avec succès (inscription, OTP réel lu depuis les logs mail, dashboard, déconnexion avec modale de confirmation, connexion, changement de mot de passe vérifié en base, reconnexion avec le nouveau mot de passe).
+
+## 2026-08-23 - Refonte visuelle : actualités, FAQ, contact et pages légales
+
+**Périmètre** : sous-agent dédié à la refonte DA (hero animé, reveal au scroll, photo-card+floating-badge, variété de sections) de 9 vues vitrine, en réutilisant exclusivement la boîte à outils déjà posée par l'orchestrateur (`x-page-hero`, `x-reveal`, `x-photo-card`, `x-floating-badge`, `x-accordion`, `x-legal-page`) : `market-news.blade.php`, `news-detail.blade.php`, `faq.blade.php`, `contact.blade.php`, `cgv.blade.php`, `policies.blade.php`, `cookies.blade.php`, `risk-disclosure.blade.php`, `aml-policy.blade.php`. Aucune route/contrôleur/modèle touché.
+
+**market-news** : hero animé + bannière "À la une" full-bleed sur le dernier article publié (page 1 sans filtre catégorie uniquement, pour ne pas casser la pagination filtrée), filtre catégorie conservé, grille restylée en vraies cartes de blog (miniature photo, badge catégorie superposé, date).
+
+**news-detail** : hero utilisant l'image propre de l'article (`Storage::url`) avec repli sur une image générique finance/news si absente, contenu et articles liés encapsulés dans `x-reveal`, articles liés restylés en cartes photo.
+
+**faq** : hero support/aide, questions regroupées par catégorie (`groupBy` sur la collection paginée) et rendues en plusieurs blocs `x-accordion` distincts plutôt qu'un accordéon plat, section CTA "toujours besoin d'aide" en split image/texte (`x-photo-card` + `x-floating-badge`) avant le bandeau CTA du footer, bouton flottant support conservé.
+
+**contact** : hero dédié, composant Livewire `vitrine.contact-form` strictement inchangé (vérifié : champs `wire:model="nom|email|sujet|message"` toujours présents après restyle), bloc coordonnées enrichi d'une photo de bureaux (`x-photo-card` + `x-floating-badge` horaires) au-dessus des `x-icon-feature` et de la carte Google Maps existante, animations `x-reveal` alternées gauche/droite.
+
+**5 pages légales** (cgv, policies, cookies, risk-disclosure, aml-policy) : hero sobre `size="sm"` avec eyebrow "Informations légales" et image picsum dédiée par page, contenu encapsulé dans `x-reveal` autour du composant `x-legal-page` existant (contrat de props non modifié - seul le `$content` source change par page comme avant).
+
+**Traductions** : toutes les nouvelles chaînes ajoutées sous les clés `app.news.*`, `app.faq.*`, `app.contact.*` et `app.legal.*` dans `lang/fr/app.php` (source) et `lang/en/app.php`, aucun texte visible en dur. Vérification post-fusion (les agents concurrents éditaient les mêmes fichiers de langue en parallèle) : script PHP listant les clés des deux fichiers pour confirmer que FR et EN restent strictement synchronisés après la fusion des commits.
+
+**Vérifications** : `php -l` OK sur les 9 vues + les 2 fichiers de langue. `npm run build` OK (aucune régression asset). Smoke-test `curl` sur `/actualites`, `/actualites/{slug réel}`, `/faq`, `/contact`, `/cgv`, `/confidentialite`, `/cookies`, `/avertissement-risques`, `/politique-aml` : **100% HTTP 200**. Contenu vérifié par grep sur les marqueurs clés (bannière "À la une", badges CTA FAQ, champs du formulaire Livewire).
+
+**Commits locaux** (pas de push, pas de remote configuré) : pages légales groupées en un commit, `market-news`+`news-detail` en un commit, `faq`+`contact` en un commit. Les fichiers de langue ont été inclus dans le commit d'un agent concurrent voisin (`141dec4`) du fait du travail en parallèle sur les mêmes fichiers partagés - contenu vérifié intact après coup, aucune perte de clé.
