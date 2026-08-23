@@ -250,3 +250,29 @@ Les 3 sous-agents lancés en parallèle sur ce périmètre ont chacun terminé e
 **Vérifications** : `php -l` OK sur `lang/fr/app.php` et `lang/en/app.php`. `npm run build` OK à chaque étape (3 builds, aucune régression asset). Smoke-test `curl` sur `/`, `/nos-services`, `/nos-services/types-de-comptes`, `/nos-services/plateformes`, `/nos-services/conditions-de-trading`, `/a-propos`, `/securite` : **100% HTTP 200**, réponses grep-ées sans trace d'exception/erreur PHP.
 
 **Commits locaux** (pas de push, pas de remote configuré) : accueil en un commit dédié, hub services + 3 sous-pages en un commit groupé, about + why-us en un commit groupé.
+
+## 2026-08-23 - Refonte visuelle : marchés (détail), promotions, parrainage, outils, calendrier économique, académie
+
+**Périmètre** : sous-agent dédié à la refonte DA de 7 pages vitrine, en réutilisant exclusivement la boîte à outils posée par l'orchestrateur (`x-page-hero`, `x-reveal`, `x-photo-card`, `x-floating-badge`, `x-animated-counter`, `x-mini-chart`, `x-card-grid`/`x-card-item`, `x-icon-feature`, `x-data-table`, `x-stat-card`, `x-tabs`) : `market-detail.blade.php`, `promotions.blade.php`, `affiliate-program.blade.php`, `trading-tools.blade.php`, `economic-calendar.blade.php`, `education.blade.php`, `education-article.blade.php`. Aucune route/contrôleur/modèle touché ; `markets.blade.php` (déjà refondu par l'orchestrateur) utilisé comme référence de composition.
+
+**market-detail** : hero compact (`size="sm"`) avec lien retour + CTA trade intégrés, `<x-trading-chart>` conservé tel quel comme pièce centrale, section split image superposée (spread en badge flottant) + grille de caractéristiques (`x-stat-card`), bannière plein cadre CTA vers `/trade`, grille d'instruments liés (`$related` du contrôleur) en mini-graphs TradingView live (`x-mini-chart`).
+
+**promotions** : hero + bande de stats animées (nombre d'offres actives réel via `$promotions->total()`, bonus max, délai d'activation), grille de promotions restylée en `x-photo-card`+`x-floating-badge` (image de la promo si présente, sinon placeholder par id) remplaçant les cartes plates d'origine, modales de détail par promo conservées à l'identique, bloc témoignage, bannière CTA finale. Données réelles `Promotion::actives()` inchangées.
+
+**affiliate-program** : hero, section split image/texte présentant le programme, barème de commissions (`config('affiliate.tiers')`) en compteurs animés, étapes numérotées "comment ça marche" (3 étapes), bannière CTA plein cadre. `x-floating-button` conservé.
+
+**trading-tools** : hero, section split image/texte d'intro, bloc calculateurs (pip/marge/profit/convertisseur) et sa logique Alpine.js `x-data` strictement inchangée (aucun composant Livewire trouvé dans ce fichier - implémentation 100% Alpine côté client), grille "pourquoi nos outils" (3 `x-icon-feature`), bannière CTA finale.
+
+**economic-calendar** : hero, section texte/image inversée (image à droite) expliquant l'usage du calendrier, filtres + `x-data-table` sur données réelles `EconomicEvent` strictement conservés, grille d'explication des 3 niveaux d'importance (faible/moyenne/haute), bannière CTA finale.
+
+**education** : hero, bannière plein cadre "ressource mise en avant" (générique, pas liée à une ressource précise pour rester cohérente avec pagination/filtres), bande de stats animées (nombre réel de ressources et de catégories), filtre + recherche conservés, grille de ressources restylée en `x-photo-card` (vignette réelle si `$resource->image`, sinon placeholder par id) + badge de type flottant, bloc témoignage.
+
+**education-article** : hero utilisant l'image propre de la ressource (`$resource->image` via `Storage::url`) si présente, sinon image de repli générique académie ; contenu de l'article conservé à l'identique ; nouvelle section "à retenir" (3 `x-icon-feature` génériques) ; ressources liées (`$related` du contrôleur) restylées en `x-photo-card` ; bannière CTA finale.
+
+**Images** : toutes en `https://picsum.photos/seed/{seed-descriptif-unique}/{w}/{h}`, un seed distinct par image statique (aucune réutilisation à travers les 7 pages) ; les images dynamiques par item (promotions, ressources académie) utilisent un seed dérivé de l'id pour rester uniques sans collision. Commentaire `TODO: remplacer par photographie sous licence Xendaro Fox avant production` en tête de chaque fichier modifié.
+
+**Traductions** : nouvelles sous-clés ajoutées dans `app.market_detail.*`, `app.promotions.*`, `app.affiliate.*`, `app.tools.*`, `app.calendar.*`, `app.education.*` (sections existantes) dans `lang/fr/app.php` (source) et `lang/en/app.php`, en édition ciblée (`Edit`, jamais réécriture complète du fichier) pour cohabiter avec des agents concurrents éditant les mêmes fichiers partagés en parallèle (section `home` notamment).
+
+**Vérifications** : `php -l` OK sur les 7 vues + les 2 fichiers de langue. `npm run build` OK après chaque page (7 builds, aucune régression asset). Smoke-test `curl` : `/marches/EURUSD`, `/marches/GBPUSD`, `/marches/AUDUSD`, `/marches/USDCHF` (catégories/instruments réels différents), `/promotions`, `/parrainage`, `/outils`, `/calendrier-economique`, `/calendrier-economique?devise=USD&importance=haute` (filtres), `/academie`, `/academie?search=forex` (recherche), `/academie/{slug réel}` sur 5 slugs distincts : **100% HTTP 200**. Vérification navigateur (Chrome pane) sans erreur console sur `/outils` et `/marches/EURUSD`, chargement effectif du widget TradingView.
+
+**Commits locaux** (pas de push, pas de remote configuré) : un commit par page (7 commits), lang files inclus dans le premier commit (market-detail) car modifiés dans la même passe.
