@@ -163,3 +163,15 @@ Ce fichier documente, en résumé, les actions effectuées sur le projet (voir r
 **Nouveaux fichiers notables** : `app/Http/Controllers/MarketController.php`, `EducationController.php`, `NewsController.php` ; `app/Livewire/Vitrine/ContactForm.php` ; `app/Mail/ContactMessageMail.php` ; `config/affiliate.php` ; `resources/views/components/trading-chart.blade.php`.
 
 **Statut** : 18/23 pages du périmètre vitrine livrées et vérifiées. Reste : trading-tools ✅ (fait), cgv, policies, cookies, risk-disclosure, aml-policy (les 5 pages légales via `<x-legal-page>`, déjà créé).
+
+## 2026-08-23 - Vitrine : pages légales id 20-24 + périmètre "Public / Vitrine" terminé
+
+**Pages construites (testées HTTP 200)**
+- `cgv`, `policies`, `cookies` : réutilisent `<x-legal-page>` avec `site_identifier.cvg/policies/cookies`.
+- `risk-disclosure`, `aml-policy` : aucun champ dédié sur `site_identifier` pour ces deux textes légaux — utilisation d'un texte par défaut via traductions (`app.legal.risk_default` / `aml_default`), conformément à l'instruction du plan ("texte statique via traduction si non stocké en base").
+- Nouveau composant `<x-cookie-consent-banner>` (Alpine.js + `localStorage` + cookie technique, boutons Accepter/Refuser) injecté une seule fois dans `components/layouts/public.blade.php` — visible sur toutes les pages vitrine, pas seulement `/cookies`.
+- Lien "AML / KYC" ajouté au footer public (`public-footer.blade.php`), qui ne pointait pas encore vers `/politique-aml`.
+
+**Vérification finale de régression** : les 24 routes du périmètre (home + 23 pages id 2-24) retestées en une passe, toutes en HTTP 200 ; pagination testée (`?page=2`) sur markets/academie/calendrier/faq ; les 6 nouvelles Filament resources admin répondent en 302 (redirection login, comportement attendu) et non en 500.
+
+**Périmètre "Public / Vitrine" (Pages id 2 à 24 de `xendaro-fox-plan.json`) : 23/23 pages livrées, testées et commitées.** Détail des livrables : voir les entrées précédentes de ce journal (2026-08-23, 4 entrées). Composants réutilisables créés pour ce périmètre : `x-accordion`(+item), `x-tabs`, `x-legal-page`, `x-trading-chart`, `x-cookie-consent-banner` ; `x-select-filter` étendu (prop `selected`). Modèles créés : `AccountType`, `Promotion`, `EducationResource`, `NewsArticle`, `EconomicEvent`, `ContactMessage` (+ seeders FR et CRUD Filament complet). Fix transverse : `AppServiceProvider` partage désormais `$siteIdentifier` sur `vitrine.*` (pas seulement les layouts), sans quoi le contenu piloté par `site_identifier` ne s'affichait pas réellement dans les pages (masqué par l'opérateur `??`).
