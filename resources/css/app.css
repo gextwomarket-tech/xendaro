@@ -45,3 +45,40 @@
         @apply bg-fond-principal text-texte-principal font-sans antialiased;
     }
 }
+
+/* Animation Ken Burns (zoom lent) pour les images de fond des heros de pages statiques. */
+@keyframes hero-kenburns {
+    0% { transform: scale(1) translate(0, 0); }
+    50% { transform: scale(1.08) translate(-1%, -1%); }
+    100% { transform: scale(1) translate(0, 0); }
+}
+.animate-hero-kenburns {
+    animation: hero-kenburns 24s ease-in-out infinite;
+}
+
+/*
+ * Scrollbar personnalisee (fine, theme Dark) a utiliser sur toute zone au contenu
+ * potentiellement long: contenu de popup (<x-modal>), listes, sidebars scrollables.
+ * cf. demande explicite: "toujours mettre une scrollbar propre a chaque popup".
+ */
+.scrollbar-xendaro {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-couleur-principale) transparent;
+}
+.scrollbar-xendaro::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.scrollbar-xendaro::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar-xendaro::-webkit-scrollbar-thumb {
+    background-color: var(--color-couleur-principale);
+    opacity: 0.5;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+.scrollbar-xendaro::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-couleur-principale);
+}

@@ -252,6 +252,7 @@ return [
     ],
     'markets' => [
         'title' => 'Markets',
+        'hero_title' => 'Track the markets live',
         'subtitle' => 'Explore all the instruments available on Xendaro Fox.',
         'search_placeholder' => 'Search an instrument...',
         'filter_all' => 'All categories',
@@ -541,5 +542,22 @@ return [
             'referral_date' => 'Joined on',
             'no_referrals' => 'No referrals yet.',
         ],
+    ],
+
+    'cta' => [
+        'title' => 'Ready to get started?',
+        'subtitle' => 'Open a free demo account with $10,000 in virtual capital and test your strategy risk-free.',
+    ],
+    'footer' => [
+        'account_types' => 'Account Types',
+        'platforms' => 'Platforms',
+        'legal' => 'Legal',
+        'cgv' => 'Terms & Conditions',
+        'privacy' => 'Privacy Policy',
+        'cookies' => 'Cookies Policy',
+        'risk' => 'Risk Disclosure',
+        'aml' => 'AML / KYC Policy',
+        'rights' => 'All rights reserved.',
+        'risk_reminder' => 'Leveraged trading carries a high level of risk to your capital.',
     ],
 ];

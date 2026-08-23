@@ -28,12 +28,15 @@
         x-transition:enter-start="opacity-0 scale-95"
         x-transition:enter-end="opacity-100 scale-100"
         x-on:click.outside="open = false"
-        class="relative w-full {{ $widths[$maxWidth] ?? $widths['md'] }} rounded-sm bg-fond-card border border-bordure-subtile shadow-2xl p-6"
+        class="relative flex flex-col w-full {{ $widths[$maxWidth] ?? $widths['md'] }} max-h-[85vh] rounded-sm bg-fond-card border border-bordure-subtile shadow-2xl"
     >
-        <button type="button" class="absolute top-4 right-4 text-texte-secondaire hover:text-texte-principal" x-on:click="open = false" aria-label="{{ __('app.common.close') }}">
+        <button type="button" class="absolute top-4 right-4 z-10 text-texte-secondaire hover:text-texte-principal" x-on:click="open = false" aria-label="{{ __('app.common.close') }}">
             &times;
         </button>
 
-        {{ $slot }}
+        {{-- Scrollbar fine et themee (scrollbar-xendaro, voir app.css) des que le contenu depasse la hauteur du popup. --}}
+        <div class="overflow-y-auto scrollbar-xendaro p-6">
+            {{ $slot }}
+        </div>
     </div>
 </div>

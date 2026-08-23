@@ -8,57 +8,63 @@
 @endphp
 <x-layouts.public :title="__('app.markets.title')">
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8 text-center">
-        <h1 class="font-display text-3xl sm:text-4xl font-bold text-texte-principal">{{ __('app.markets.title') }}</h1>
+    <x-page-hero image="https://picsum.photos/seed/xendaro-markets-hero/1600/900" :eyebrow="__('app.markets.title')">
+        <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.markets.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.markets.subtitle') }}</p>
-    </section>
+    </x-page-hero>
 
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-        <form method="GET" class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-            <div class="w-full sm:max-w-xs">
-                <x-search-input name="search" value="{{ $search }}" :placeholder="__('app.markets.search_placeholder')" />
-            </div>
-            <x-select-filter
-                name="categorie"
-                onchange="this.form.submit()"
-                :options="$categories"
-                :selected="$categorie"
-                :placeholder="__('app.markets.filter_all')"
-            />
-            <button type="submit" class="hidden">{{ __('app.common.filter') }}</button>
-        </form>
+        <x-reveal>
+            <form method="GET" class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-sm bg-fond-card border border-bordure-subtile p-4">
+                <div class="w-full sm:max-w-xs">
+                    <x-search-input name="search" value="{{ $search }}" :placeholder="__('app.markets.search_placeholder')" />
+                </div>
+                <x-select-filter
+                    name="categorie"
+                    onchange="this.form.submit()"
+                    :options="$categories"
+                    :selected="$categorie"
+                    :placeholder="__('app.markets.filter_all')"
+                />
+                <button type="submit" class="hidden">{{ __('app.common.filter') }}</button>
+            </form>
+        </x-reveal>
     </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <x-data-table :headers="[
-            __('app.markets.table_instrument'),
-            __('app.markets.table_price'),
-            __('app.markets.table_change'),
-            __('app.markets.table_spread'),
-            '',
-        ]">
-            @forelse($instruments as $instrument)
+    {{-- Grille de graphs live par instrument, filtree en direct par le formulaire ci-dessus --}}
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($instruments as $i => $instrument)
                 @php $variation = $change24h($instrument); @endphp
-                <tr>
-                    <td class="px-4 py-3">
-                        <a href="{{ url('/marches/'.$instrument->symbole_interne) }}" class="font-medium text-texte-principal hover:text-couleur-principale transition">
-                            {{ $instrument->nom }} <span class="text-texte-secondaire">({{ $instrument->symbole_interne }})</span>
-                        </a>
-                    </td>
-                    <td class="px-4 py-3 tabular-nums">{{ number_format((float) $instrument->prix_reference, 5) }}</td>
-                    <td class="px-4 py-3 tabular-nums {{ $variation >= 0 ? 'text-succes' : 'text-danger' }}">
-                        {{ $variation >= 0 ? '+' : '' }}{{ $variation }}%
-                    </td>
-                    <td class="px-4 py-3 tabular-nums">{{ $instrument->spread }}</td>
-                    <td class="px-4 py-3 text-right">
-                        <a href="{{ url('/marches/'.$instrument->symbole_interne) }}" class="text-couleur-principale hover:underline text-sm font-medium">{{ __('app.markets.view_detail') }}</a>
-                    </td>
-                </tr>
+                <x-reveal :delay="($i % 3) * 80">
+                    <a href="{{ url('/marches/'.$instrument->symbole_interne) }}" class="group block rounded-sm bg-fond-card border border-bordure-subtile hover:border-couleur-principale/50 transition overflow-hidden">
+                        <div class="flex items-center justify-between px-4 pt-4">
+                            <div>
+                                <p class="font-display font-semibold text-texte-principal group-hover:text-couleur-principale transition">{{ $instrument->nom }}</p>
+                                <p class="text-xs text-texte-secondaire">{{ $instrument->symbole_interne }} &middot; {{ $categories[$instrument->categorie] ?? $instrument->categorie }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="tabular-nums text-texte-principal font-medium">{{ number_format((float) $instrument->prix_reference, 5) }}</p>
+                                <p class="tabular-nums text-xs {{ $variation >= 0 ? 'text-succes' : 'text-danger' }}">
+                                    {{ $variation >= 0 ? '+' : '' }}{{ $variation }}%
+                                </p>
+                            </div>
+                        </div>
+                        @if($instrument->symbole_provider_externe)
+                            <div class="mt-2 pointer-events-none">
+                                <x-mini-chart :symbol="$instrument->symbole_provider_externe" :height="140" />
+                            </div>
+                        @else
+                            <div class="mt-2 h-[140px] flex items-center justify-center text-xs text-texte-secondaire">{{ __('app.market_detail.chart_unavailable') }}</div>
+                        @endif
+                    </a>
+                </x-reveal>
             @empty
-                <tr><td colspan="5" class="px-4 py-6 text-center text-texte-secondaire">{{ __('app.common.no_results') }}</td></tr>
+                <p class="col-span-full text-center text-texte-secondaire py-12">{{ __('app.common.no_results') }}</p>
             @endforelse
-            <x-slot:pagination>{{ $instruments->links() }}</x-slot:pagination>
-        </x-data-table>
+        </div>
+
+        <div class="mt-8">{{ $instruments->links() }}</div>
     </section>
 
 </x-layouts.public>

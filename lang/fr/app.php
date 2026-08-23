@@ -252,6 +252,7 @@ return [
     ],
     'markets' => [
         'title' => 'Marchés',
+        'hero_title' => 'Suivez les marchés en direct',
         'subtitle' => 'Explorez l\'ensemble des instruments disponibles sur Xendaro Fox.',
         'search_placeholder' => 'Rechercher un instrument...',
         'filter_all' => 'Toutes les catégories',
@@ -541,5 +542,22 @@ return [
             'referral_date' => 'Inscrit le',
             'no_referrals' => 'Aucun filleul pour le moment.',
         ],
+    ],
+
+    'cta' => [
+        'title' => 'Prêt à passer à l\'action ?',
+        'subtitle' => 'Ouvrez un compte démo gratuit avec 10 000 $ de capital virtuel et testez votre stratégie sans risque.',
+    ],
+    'footer' => [
+        'account_types' => 'Types de comptes',
+        'platforms' => 'Plateformes',
+        'legal' => 'Légal',
+        'cgv' => 'Conditions Générales de Vente',
+        'privacy' => 'Politique de confidentialité',
+        'cookies' => 'Politique de cookies',
+        'risk' => 'Avertissement sur les risques',
+        'aml' => 'Politique AML / KYC',
+        'rights' => 'Tous droits réservés.',
+        'risk_reminder' => 'Le trading avec effet de levier comporte un risque élevé de perte en capital.',
     ],
 ];
