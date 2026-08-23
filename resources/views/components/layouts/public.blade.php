@@ -7,6 +7,14 @@
     <title>{{ $siteIdentifier->nom_plateforme ?? 'Xendaro Fox' }}{{ $title ? ' - '.$title : '' }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{--
+        @livewireStyles/@livewireScripts explicites: sur les pages publiques sans aucun
+        composant Livewire (home, markets, etc.), Livewire n'injecte ses assets QUE si un
+        composant Livewire est reellement rendu dans la requete - sinon son JS (qui embarque
+        Alpine.js) ne charge jamais, cassant tous les x-data (menu mobile, bandeau cookies,
+        animations x-reveal/x-page-hero). Ces directives forcent le chargement partout.
+    --}}
+    @livewireStyles
 </head>
 <body class="bg-fond-principal text-texte-principal font-sans min-h-screen flex flex-col">
 
@@ -22,5 +30,6 @@
 
     <x-cookie-consent-banner />
 
+    @livewireScripts
 </body>
 </html>

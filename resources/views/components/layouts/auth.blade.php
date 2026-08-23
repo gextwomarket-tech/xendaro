@@ -14,6 +14,7 @@
     <title>{{ $siteIdentifier->nom_plateforme ?? 'Xendaro Fox' }}{{ $title ? ' - '.$title : '' }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
 </head>
 <body class="bg-fond-principal text-texte-principal font-sans antialiased min-h-screen">
 
@@ -74,5 +75,6 @@
 
     <x-toast-container />
 
+    @livewireScripts
 </body>
 </html>
