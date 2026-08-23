@@ -79,6 +79,21 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'parrain_id');
     }
 
+    public function tickets(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function kycDocuments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(KycDocument::class);
+    }
+
+    public function affiliateCommissionsGagnees(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AffiliateCommission::class, 'parrain_id');
+    }
+
     protected static function booted(): void
     {
         static::created(function (self $user) {

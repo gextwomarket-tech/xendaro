@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SiteIdentifierSeeder::class,
             MarketInstrumentSeeder::class,
+            PaymentMethodSeeder::class,
         ]);
 
         User::factory()->create([
