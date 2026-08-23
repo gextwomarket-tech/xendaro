@@ -4,7 +4,7 @@
 @endphp
 <x-layouts.public :title="__('app.account_types.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-accounts-hero/1600/900" :eyebrow="__('app.account_types.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-05.jpg" :eyebrow="__('app.account_types.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.account_types.title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.account_types.subtitle') }}</p>
     </x-page-hero>
@@ -25,7 +25,7 @@
             </x-reveal>
             <x-reveal direction="right" :delay="100">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-accounts-intro/900/700" :alt="__('app.account_types.title')" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-10.jpg" :alt="__('app.account_types.title')" :rotate="-2" />
                     <div class="relative">
                         <x-floating-badge position="bottom-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.account_types.table_swap') }}</p>
@@ -123,7 +123,7 @@
     {{-- 3. CTA banner (pattern D) --}}
     <section class="relative overflow-hidden py-20 mt-4">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-accounts-cta/1920/600" alt="" class="w-full h-full object-cover">
+            <img src="/images/trading/trading-17.jpg" alt="" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal via-fond-principal/85 to-fond-principal"></div>
         </div>
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

@@ -1,7 +1,7 @@
 {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
 <x-layouts.public :title="__('app.platforms.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-platforms-hero/1600/900" :eyebrow="__('app.platforms.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-04.jpg" :eyebrow="__('app.platforms.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.platforms.title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.platforms.subtitle') }}</p>
     </x-page-hero>
@@ -11,7 +11,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-platforms-webtrader/1000/750" :alt="__('app.platforms.webtrader_title')" ratio="aspect-[4/3]" />
+                    <x-photo-card src="/images/trading/trading-14.jpg" :alt="__('app.platforms.webtrader_title')" ratio="aspect-[4/3]" />
                     <div class="relative">
                         <x-floating-badge position="bottom-left">
                             <p class="text-xs text-texte-secondaire">{{ __('app.platforms.webtrader_badge') }}</p>
@@ -33,7 +33,7 @@
     {{-- 2. Mobile - full-bleed banner (pattern D) --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-platforms-mobile/1920/700" alt="" class="w-full h-full object-cover">
+            <img src="/images/trading/trading-11.jpg" alt="" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-l from-fond-principal via-fond-principal/85 to-fond-principal/40"></div>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,7 +65,7 @@
             </x-reveal>
             <x-reveal direction="right" :delay="100" class="order-1 lg:order-2">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-platforms-desktop/1000/750" :alt="__('app.platforms.desktop_title')" ratio="aspect-[4/3]" :rotate="2" />
+                    <x-photo-card src="/images/trading/trading-03.jpg" :alt="__('app.platforms.desktop_title')" ratio="aspect-[4/3]" :rotate="2" />
                     <div class="relative">
                         <x-floating-badge position="top-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.platforms.desktop_badge') }}</p>

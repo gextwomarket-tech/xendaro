@@ -1,7 +1,7 @@
 <x-layouts.public :title="__('app.contact.title')">
 
     {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
-    <x-page-hero image="https://picsum.photos/seed/xendaro-contact-hero/1600/900" :eyebrow="__('app.contact.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-20.jpg" :eyebrow="__('app.contact.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.contact.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.contact.subtitle') }}</p>
     </x-page-hero>
@@ -20,7 +20,7 @@
             <x-reveal direction="right" :delay="120" class="lg:col-span-2 space-y-6">
                 <div class="relative">
                     {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-contact-office/700/500" :alt="__('app.contact.office_badge_title')" ratio="aspect-[4/3]" :rotate="2" />
+                    <x-photo-card src="/images/trading/trading-02.jpg" :alt="__('app.contact.office_badge_title')" ratio="aspect-[4/3]" :rotate="2" />
                     <x-floating-badge position="bottom-left">
                         <p class="text-sm font-semibold text-texte-principal">{{ __('app.contact.office_badge_title') }}</p>
                         <p class="text-xs text-texte-secondaire mt-0.5">{{ __('app.contact.office_badge_text') }}</p>

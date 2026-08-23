@@ -13,7 +13,7 @@
 @endphp
 <x-layouts.public :title="__('app.trading_conditions.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-conditions-hero/1600/900" :eyebrow="__('app.trading_conditions.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-13.jpg" :eyebrow="__('app.trading_conditions.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.trading_conditions.title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.trading_conditions.subtitle') }}</p>
     </x-page-hero>
@@ -23,7 +23,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-conditions-intro/900/700" :alt="__('app.trading_conditions.title')" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-15.jpg" :alt="__('app.trading_conditions.title')" :rotate="-2" />
                     <div class="relative">
                         <x-floating-badge position="bottom-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.trading_conditions.table_spread') }}</p>

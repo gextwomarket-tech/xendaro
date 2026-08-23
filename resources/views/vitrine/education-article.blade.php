@@ -1,7 +1,7 @@
 @php
     $heroImage = $resource->image
         ? \Illuminate\Support\Facades\Storage::url($resource->image)
-        : 'https://picsum.photos/seed/xendaro-academy-article-hero/1600/700';
+        : '/images/trading/trading-01.jpg';
     // TODO: remplacer par photographie sous licence Xendaro Fox avant production
 @endphp
 <x-layouts.public :title="$resource->titre()">
@@ -75,7 +75,7 @@
                     <x-reveal :delay="($i % 3) * 100">
                         <a href="{{ url('/academie/'.$item->slug) }}" class="group block">
                             <x-photo-card
-                                :src="$item->image ? \Illuminate\Support\Facades\Storage::url($item->image) : 'https://picsum.photos/seed/xendaro-academy-related-'.$item->id.'/700/500'"
+                                :src="$item->image ? \Illuminate\Support\Facades\Storage::url($item->image) : '/images/trading/trading-'.str_pad((($item->id % 20) + 1), 2, '0', STR_PAD_LEFT).'.jpg'"
                                 :alt="$item->titre()"
                                 ratio="aspect-[16/10]"
                             />
@@ -93,7 +93,7 @@
     {{-- Banniere full-bleed CTA --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-academy-article-banner/1600/500" alt="" class="w-full h-full object-cover opacity-25">
+            <img src="/images/trading/trading-18.jpg" alt="" class="w-full h-full object-cover opacity-25">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal/70 via-fond-principal/90 to-fond-principal"></div>
         </div>
         <x-reveal direction="scale">

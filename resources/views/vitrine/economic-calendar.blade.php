@@ -21,7 +21,7 @@
 @endphp
 <x-layouts.public :title="__('app.calendar.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-calendar-hero/1600/900" :eyebrow="__('app.calendar.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-12.jpg" :eyebrow="__('app.calendar.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.calendar.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.calendar.subtitle') }}</p>
     </x-page-hero>
@@ -35,7 +35,7 @@
             </x-reveal>
             <x-reveal direction="right" :delay="100" class="order-1 md:order-2">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-calendar-analyst/900/700" :alt="__('app.calendar.title')" :rotate="1" />
+                    <x-photo-card src="/images/trading/trading-11.jpg" :alt="__('app.calendar.title')" :rotate="1" />
                     <x-floating-badge position="bottom-left">
                         <p class="text-xs text-texte-secondaire uppercase tracking-wide">{{ __('app.calendar.table_importance') }}</p>
                         <p class="text-sm font-display font-semibold text-couleur-principale">{{ __('app.calendar.importance_haute') }}</p>
@@ -134,7 +134,7 @@
     {{-- Banniere full-bleed CTA --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-calendar-banner/1600/500" alt="" class="w-full h-full object-cover opacity-25">
+            <img src="/images/trading/trading-06.jpg" alt="" class="w-full h-full object-cover opacity-25">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal/70 via-fond-principal/90 to-fond-principal"></div>
         </div>
         <x-reveal direction="scale">

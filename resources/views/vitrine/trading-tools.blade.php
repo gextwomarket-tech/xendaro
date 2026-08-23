@@ -13,7 +13,7 @@
 @endphp
 <x-layouts.public :title="__('app.tools.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-tools-hero/1600/900" :eyebrow="__('app.tools.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-08.jpg" :eyebrow="__('app.tools.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.tools.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.tools.subtitle') }}</p>
     </x-page-hero>
@@ -23,7 +23,7 @@
         <div class="grid md:grid-cols-2 gap-10 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-tools-calculator/900/700" alt="{{ __('app.tools.hero_title') }}" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-16.jpg" alt="{{ __('app.tools.hero_title') }}" :rotate="-2" />
                     <x-floating-badge position="bottom-right">
                         <p class="text-xs text-texte-secondaire uppercase tracking-wide">{{ __('app.tools.tab_pip') }}</p>
                         <p class="text-lg font-display font-semibold text-couleur-principale">100% {{ __('app.tools.why_2_title') }}</p>
@@ -211,7 +211,7 @@
     {{-- Banniere full-bleed CTA --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-tools-banner/1600/500" alt="" class="w-full h-full object-cover opacity-25">
+            <img src="/images/trading/trading-14.jpg" alt="" class="w-full h-full object-cover opacity-25">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal/70 via-fond-principal/90 to-fond-principal"></div>
         </div>
         <x-reveal direction="scale">

@@ -2,7 +2,7 @@
     // TODO: remplacer par photographie sous licence Xendaro Fox avant production
     $heroImage = $article->image
         ? \Illuminate\Support\Facades\Storage::url($article->image)
-        : 'https://picsum.photos/seed/xendaro-news-detail-generic/1600/900';
+        : '/images/trading/trading-05.jpg';
 @endphp
 <x-layouts.public :title="$article->titre()">
 
@@ -48,7 +48,7 @@
                         <a href="{{ url('/actualites/'.$item->slug) }}" class="group block rounded-lg bg-fond-card border border-bordure-subtile overflow-hidden hover:border-couleur-principale/50 transition h-full">
                             <div class="relative aspect-[4/3] overflow-hidden">
                                 <img
-                                    src="{{ $item->image ? \Illuminate\Support\Facades\Storage::url($item->image) : 'https://picsum.photos/seed/xendaro-news-related-'.$item->id.'/600/450' }}"
+                                    src="{{ $item->image ? \Illuminate\Support\Facades\Storage::url($item->image) : '/images/trading/trading-'.str_pad((($item->id % 20) + 1), 2, '0', STR_PAD_LEFT).'.jpg' }}"
                                     alt="{{ $item->titre() }}"
                                     loading="lazy"
                                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"

@@ -8,7 +8,7 @@
 @endphp
 <x-layouts.public :title="__('app.education.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-academy-hero/1600/900" :eyebrow="__('app.education.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-15.jpg" :eyebrow="__('app.education.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.education.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.education.subtitle') }}</p>
     </x-page-hero>
@@ -16,7 +16,7 @@
     {{-- Banniere full-bleed ressource mise en avant --}}
     <section class="relative overflow-hidden py-16">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-academy-featured/1600/500" alt="" class="w-full h-full object-cover opacity-30">
+            <img src="/images/trading/trading-19.jpg" alt="" class="w-full h-full object-cover opacity-30">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal/70 via-fond-principal/90 to-fond-principal"></div>
         </div>
         <x-reveal direction="scale">
@@ -83,7 +83,7 @@
                         <a href="{{ url('/academie/'.$resource->slug) }}" class="group block">
                             <div class="relative">
                                 <x-photo-card
-                                    :src="$resource->image ? \Illuminate\Support\Facades\Storage::url($resource->image) : 'https://picsum.photos/seed/xendaro-academy-course-'.$resource->id.'/700/500'"
+                                    :src="$resource->image ? \Illuminate\Support\Facades\Storage::url($resource->image) : '/images/trading/trading-'.str_pad((($resource->id % 20) + 1), 2, '0', STR_PAD_LEFT).'.jpg'"
                                     :alt="$resource->titre()"
                                     ratio="aspect-[16/10]"
                                 />
@@ -110,7 +110,7 @@
             <div class="relative rounded-sm bg-fond-card border border-bordure-subtile p-8 sm:p-10 text-center">
                 <p class="font-display text-xl sm:text-2xl italic text-texte-principal leading-relaxed">&laquo; {{ __('app.education.testimonial_quote') }} &raquo;</p>
                 <div class="mt-6 flex items-center justify-center gap-3">
-                    <img src="https://picsum.photos/seed/xendaro-academy-testimonial/100/100" alt="{{ __('app.education.testimonial_name') }}" class="w-10 h-10 rounded-full object-cover border border-bordure-subtile">
+                    <x-avatar-initials :name="__('app.education.testimonial_name')" size="w-10 h-10" class="border border-bordure-subtile" />
                     <p class="text-sm text-texte-secondaire">{{ __('app.education.testimonial_name') }}</p>
                 </div>
             </div>

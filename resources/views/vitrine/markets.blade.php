@@ -8,7 +8,7 @@
 @endphp
 <x-layouts.public :title="__('app.markets.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-markets-hero/1600/900" :eyebrow="__('app.markets.title')">
+    <x-page-hero image="/images/trading/trading-16.jpg" :eyebrow="__('app.markets.title')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.markets.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.markets.subtitle') }}</p>
     </x-page-hero>

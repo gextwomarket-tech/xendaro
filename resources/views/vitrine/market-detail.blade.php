@@ -7,7 +7,11 @@
 @endphp
 <x-layouts.public :title="$instrument->nom">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-market-detail-{{ $instrument->categorie }}/1600/700" :eyebrow="__('app.market_detail.hero_eyebrow')" align="left" size="sm">
+    @php
+        $categoryImages = ['forex' => 5, 'crypto' => 9, 'metal' => 6, 'commodite' => 12, 'indice' => 1, 'action' => 17];
+        $heroImg = '/images/trading/trading-'.str_pad($categoryImages[$instrument->categorie] ?? 1, 2, '0', STR_PAD_LEFT).'.jpg';
+    @endphp
+    <x-page-hero :image="$heroImg" :eyebrow="__('app.market_detail.hero_eyebrow')" align="left" size="sm">
         <a href="{{ url('/marches') }}" class="text-sm text-texte-secondaire hover:text-texte-principal transition inline-flex items-center gap-1 mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             {{ __('app.market_detail.back_to_markets') }}
@@ -37,7 +41,7 @@
         <div class="grid md:grid-cols-2 gap-10 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-market-detail-analysis/900/700" :alt="$instrument->nom" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-06.jpg" :alt="$instrument->nom" :rotate="-2" />
                     <x-floating-badge position="bottom-right">
                         <p class="text-xs text-texte-secondaire uppercase tracking-wide">{{ __('app.market_detail.spread') }}</p>
                         <p class="text-lg font-display font-semibold text-couleur-principale">{{ $instrument->spread }}</p>
@@ -64,7 +68,7 @@
     {{-- Banniere full-bleed CTA --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-market-detail-banner/1600/500" alt="" class="w-full h-full object-cover opacity-25">
+            <img src="/images/trading/trading-08.jpg" alt="" class="w-full h-full object-cover opacity-25">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal/70 via-fond-principal/90 to-fond-principal"></div>
         </div>
         <x-reveal direction="scale">

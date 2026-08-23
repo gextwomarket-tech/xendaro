@@ -16,7 +16,7 @@
 <x-layouts.public :title="__('app.faq.title')">
 
     {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
-    <x-page-hero image="https://picsum.photos/seed/xendaro-faq-support/1600/900" :eyebrow="__('app.faq.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-07.jpg" :eyebrow="__('app.faq.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.faq.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.faq.subtitle') }}</p>
     </x-page-hero>
@@ -70,7 +70,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center rounded-lg bg-fond-card border border-bordure-subtile p-6 sm:p-10">
                 <div class="relative">
                     {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-faq-contact-cta/700/560" :alt="__('app.faq.cta_title')" ratio="aspect-[4/3]" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-03.jpg" :alt="__('app.faq.cta_title')" ratio="aspect-[4/3]" :rotate="-2" />
                     <x-floating-badge position="bottom-right">
                         <p class="text-sm font-semibold text-texte-principal">{{ __('app.faq.cta_badge_title') }}</p>
                         <p class="text-xs text-texte-secondaire mt-0.5">{{ __('app.faq.cta_badge_text') }}</p>

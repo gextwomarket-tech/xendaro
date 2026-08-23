@@ -2,7 +2,7 @@
 <x-layouts.public>
 
     {{-- Hero --}}
-    <x-page-hero image="https://picsum.photos/seed/xendaro-home-hero/1920/1080" :eyebrow="__('app.home.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-08.jpg" :eyebrow="__('app.home.hero_eyebrow')">
         <h1 class="font-display text-4xl sm:text-6xl font-bold text-texte-principal max-w-3xl mx-auto">
             {{ $siteIdentifier->nom_plateforme ?? 'Xendaro Fox' }}
         </h1>
@@ -48,7 +48,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-home-markets/900/1100" :alt="__('app.home.markets_title')" ratio="aspect-[4/5]" />
+                    <x-photo-card src="/images/trading/trading-07.jpg" :alt="__('app.home.markets_title')" ratio="aspect-[4/5]" />
                     <div class="relative">
                         <x-floating-badge position="bottom-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.home.stat_instruments') }}</p>
@@ -119,7 +119,7 @@
     {{-- 4. Plateformes - full-bleed banner (pattern D) --}}
     <section class="relative overflow-hidden py-20 my-14">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-home-platforms/1920/700" alt="" class="w-full h-full object-cover">
+            <img src="/images/trading/trading-07.jpg" alt="" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-r from-fond-principal via-fond-principal/85 to-fond-principal/40"></div>
         </div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -161,7 +161,7 @@
             </x-reveal>
             <x-reveal direction="right" :delay="100" class="order-1 lg:order-2">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-home-accounts/900/1100" :alt="__('app.home.accounts_title')" ratio="aspect-[4/5]" :rotate="2" />
+                    <x-photo-card src="/images/trading/trading-01.jpg" :alt="__('app.home.accounts_title')" ratio="aspect-[4/5]" :rotate="2" />
                     <div class="relative">
                         <x-floating-badge position="top-left">
                             <p class="text-xs text-texte-secondaire">{{ __('app.account_types.table_leverage') }}</p>
@@ -178,7 +178,7 @@
         <div class="rounded-lg border border-bordure-subtile bg-fond-card overflow-hidden">
             <div class="grid grid-cols-1 lg:grid-cols-2">
                 <x-reveal direction="scale">
-                    <img src="https://picsum.photos/seed/xendaro-home-academy/1000/800" alt="{{ __('app.home.academy_title') }}" loading="lazy" class="w-full h-64 lg:h-full object-cover">
+                    <img src="/images/trading/trading-08.jpg" alt="{{ __('app.home.academy_title') }}" loading="lazy" class="w-full h-64 lg:h-full object-cover">
                 </x-reveal>
                 <x-reveal direction="right" :delay="100">
                     <div class="p-8 sm:p-12">
@@ -211,9 +211,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             @php
                 $testimonials = [
-                    ['quote' => __('app.home.t1_quote'), 'name' => __('app.home.t1_name'), 'role' => __('app.home.t1_role'), 'seed' => 'xendaro-home-avatar-1'],
-                    ['quote' => __('app.home.t2_quote'), 'name' => __('app.home.t2_name'), 'role' => __('app.home.t2_role'), 'seed' => 'xendaro-home-avatar-2'],
-                    ['quote' => __('app.home.t3_quote'), 'name' => __('app.home.t3_name'), 'role' => __('app.home.t3_role'), 'seed' => 'xendaro-home-avatar-3'],
+                    ['quote' => __('app.home.t1_quote'), 'name' => __('app.home.t1_name'), 'role' => __('app.home.t1_role')],
+                    ['quote' => __('app.home.t2_quote'), 'name' => __('app.home.t2_name'), 'role' => __('app.home.t2_role')],
+                    ['quote' => __('app.home.t3_quote'), 'name' => __('app.home.t3_name'), 'role' => __('app.home.t3_role')],
                 ];
             @endphp
             @foreach($testimonials as $i => $t)
@@ -225,7 +225,7 @@
                             <p class="mt-4 font-semibold text-texte-principal">{{ $t['name'] }}</p>
                             <p class="text-xs text-texte-secondaire">{{ $t['role'] }}</p>
                         </div>
-                        <img src="https://picsum.photos/seed/{{ $t['seed'] }}/120/120" alt="{{ $t['name'] }}" loading="lazy" class="absolute top-0 left-6 w-14 h-14 rounded-full border-4 border-fond-principal object-cover shadow-lg">
+                        <x-avatar-initials :name="$t['name']" class="absolute top-0 left-6" />
                     </div>
                 </x-reveal>
             @endforeach
@@ -236,7 +236,7 @@
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14">
         <x-reveal direction="scale">
             <div class="relative overflow-hidden rounded-lg border border-bordure-subtile">
-                <img src="https://picsum.photos/seed/xendaro-home-affiliate/1600/500" alt="" class="w-full h-56 sm:h-64 object-cover">
+                <img src="/images/trading/trading-11.jpg" alt="" class="w-full h-56 sm:h-64 object-cover">
                 <div class="absolute inset-0 bg-gradient-to-r from-fond-principal via-fond-principal/80 to-transparent flex items-center">
                     <div class="px-8 sm:px-12 max-w-lg">
                         <p class="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-couleur-principale mb-2">

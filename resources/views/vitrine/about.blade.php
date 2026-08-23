@@ -1,7 +1,7 @@
 {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
 <x-layouts.public :title="__('app.about.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-about-hero/1600/900" :eyebrow="__('app.about.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-10.jpg" :eyebrow="__('app.about.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.about.title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.about.subtitle') }}</p>
     </x-page-hero>
@@ -11,7 +11,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-about-team/900/1100" :alt="__('app.about.team_title')" ratio="aspect-[4/5]" />
+                    <x-photo-card src="/images/trading/trading-01.jpg" :alt="__('app.about.team_title')" ratio="aspect-[4/5]" />
                     <div class="relative">
                         <x-floating-badge position="bottom-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.about.milestone_1_year') }}</p>
@@ -101,7 +101,7 @@
     {{-- 4. Notre equipe - full-bleed banner (pattern D) --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-about-office/1920/700" alt="" class="w-full h-full object-cover">
+            <img src="/images/trading/trading-09.jpg" alt="" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-fond-principal via-fond-principal/85 to-fond-principal/40"></div>
         </div>
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

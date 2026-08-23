@@ -6,7 +6,7 @@
 <x-layouts.public :title="__('app.news.title')">
 
     {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
-    <x-page-hero image="https://picsum.photos/seed/xendaro-news-hero/1600/900" :eyebrow="__('app.news.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-16.jpg" :eyebrow="__('app.news.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.news.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.news.subtitle') }}</p>
     </x-page-hero>
@@ -17,7 +17,7 @@
             <x-reveal direction="scale">
                 <a href="{{ url('/actualites/'.$featured->slug) }}" class="group relative block overflow-hidden rounded-lg border border-bordure-subtile min-h-[320px] sm:min-h-[420px]">
                     <img
-                        src="{{ $featured->image ? \Illuminate\Support\Facades\Storage::url($featured->image) : 'https://picsum.photos/seed/xendaro-news-featured-fallback/1600/900' }}"
+                        src="{{ $featured->image ? \Illuminate\Support\Facades\Storage::url($featured->image) : '/images/trading/trading-09.jpg' }}"
                         alt="{{ $featured->titre() }}"
                         class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     >
@@ -67,7 +67,7 @@
                         <a href="{{ url('/actualites/'.$article->slug) }}" class="group block rounded-lg bg-fond-card border border-bordure-subtile overflow-hidden hover:border-couleur-principale/50 transition h-full">
                             <div class="relative aspect-[4/3] overflow-hidden">
                                 <img
-                                    src="{{ $article->image ? \Illuminate\Support\Facades\Storage::url($article->image) : 'https://picsum.photos/seed/xendaro-news-thumb-'.$article->id.'/600/450' }}"
+                                    src="{{ $article->image ? \Illuminate\Support\Facades\Storage::url($article->image) : '/images/trading/trading-'.str_pad((($article->id % 20) + 1), 2, '0', STR_PAD_LEFT).'.jpg' }}"
                                     alt="{{ $article->titre() }}"
                                     loading="lazy"
                                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"

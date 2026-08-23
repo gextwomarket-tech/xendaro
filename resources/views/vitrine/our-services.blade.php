@@ -1,7 +1,7 @@
 {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
 <x-layouts.public :title="__('app.services.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-services-hero/1600/900" :eyebrow="__('app.services.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-15.jpg" :eyebrow="__('app.services.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.services.title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.services.subtitle') }}</p>
     </x-page-hero>
@@ -9,7 +9,7 @@
     {{-- 1. Full-bleed banner (pattern D) --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-services-banner/1920/700" alt="" class="w-full h-full object-cover">
+            <img src="/images/trading/trading-12.jpg" alt="" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-fond-principal via-fond-principal/85 to-fond-principal/50"></div>
         </div>
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -25,7 +25,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-services-accounts/900/700" :alt="__('app.services.account_types_title')" />
+                    <x-photo-card src="/images/trading/trading-13.jpg" :alt="__('app.services.account_types_title')" />
                     <div class="relative">
                         <x-floating-badge position="bottom-left">
                             <p class="text-xs text-texte-secondaire">{{ __('app.account_types.table_deposit') }}</p>
@@ -55,7 +55,7 @@
             </x-reveal>
             <x-reveal direction="right" :delay="100" class="order-1 lg:order-2">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-services-platforms/900/700" :alt="__('app.services.platforms_title')" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-04.jpg" :alt="__('app.services.platforms_title')" :rotate="-2" />
                     <div class="relative">
                         <x-floating-badge position="top-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.platforms.mobile_badge') }}</p>
@@ -68,7 +68,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-services-conditions/900/700" :alt="__('app.services.trading_conditions_title')" :rotate="2" />
+                    <x-photo-card src="/images/trading/trading-10.jpg" :alt="__('app.services.trading_conditions_title')" :rotate="2" />
                     <div class="relative">
                         <x-floating-badge position="bottom-right">
                             <p class="text-xs text-texte-secondaire">{{ __('app.account_types.table_spread') }}</p>

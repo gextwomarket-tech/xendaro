@@ -4,7 +4,7 @@
 @endphp
 <x-layouts.public :title="__('app.affiliate.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-affiliate-hero/1600/900" :eyebrow="__('app.affiliate.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-09.jpg" :eyebrow="__('app.affiliate.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.affiliate.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.affiliate.subtitle') }}</p>
     </x-page-hero>
@@ -14,7 +14,7 @@
         <div class="grid md:grid-cols-2 gap-10 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-affiliate-partners/900/700" :alt="__('app.affiliate.intro_image_alt')" :rotate="2" />
+                    <x-photo-card src="/images/trading/trading-09.jpg" :alt="__('app.affiliate.intro_image_alt')" :rotate="2" />
                     <x-floating-badge position="bottom-right">
                         <p class="text-xs text-texte-secondaire uppercase tracking-wide">{{ __('app.affiliate.tier_3_label') }}</p>
                         <p class="text-lg font-display font-semibold text-couleur-principale">40%</p>
@@ -106,7 +106,7 @@
     {{-- Banniere full-bleed CTA --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-affiliate-banner/1600/500" alt="" class="w-full h-full object-cover opacity-25">
+            <img src="/images/trading/trading-12.jpg" alt="" class="w-full h-full object-cover opacity-25">
             <div class="absolute inset-0 bg-gradient-to-b from-fond-principal/70 via-fond-principal/90 to-fond-principal"></div>
         </div>
         <x-reveal direction="scale">

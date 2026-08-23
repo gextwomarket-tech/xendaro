@@ -1,7 +1,7 @@
 {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
 <x-layouts.public :title="__('app.why_us.title')">
 
-    <x-page-hero image="https://picsum.photos/seed/xendaro-security-hero/1600/900" :eyebrow="__('app.why_us.hero_eyebrow')">
+    <x-page-hero image="/images/trading/trading-07.jpg" :eyebrow="__('app.why_us.hero_eyebrow')">
         <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.why_us.title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.why_us.subtitle') }}</p>
     </x-page-hero>
@@ -9,7 +9,7 @@
     {{-- 1. Full-bleed trust banner (pattern D) --}}
     <section class="relative overflow-hidden py-20">
         <div class="absolute inset-0 -z-10">
-            <img src="https://picsum.photos/seed/xendaro-security-banner/1920/700" alt="" class="w-full h-full object-cover">
+            <img src="/images/trading/trading-09.jpg" alt="" class="w-full h-full object-cover">
             <div class="absolute inset-0 bg-gradient-to-t from-fond-principal via-fond-principal/85 to-fond-principal/50"></div>
         </div>
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -69,7 +69,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <x-reveal direction="left">
                 <div class="relative">
-                    <x-photo-card src="https://picsum.photos/seed/xendaro-security-kyc/900/700" :alt="__('app.why_us.kyc_title')" :rotate="-2" />
+                    <x-photo-card src="/images/trading/trading-01.jpg" :alt="__('app.why_us.kyc_title')" :rotate="-2" />
                     <div class="relative">
                         <x-floating-badge position="bottom-right">
                             <p class="text-xs text-texte-secondaire">KYC</p>
