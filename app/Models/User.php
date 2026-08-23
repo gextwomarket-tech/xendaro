@@ -22,6 +22,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'avatar_path',
+        'referral_code',
+        'parrain_id',
+        'two_factor_enabled',
     ];
 
     /**
@@ -44,6 +49,47 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'otp_expires_at' => 'datetime',
+            'two_factor_enabled' => 'boolean',
         ];
+    }
+
+    public function wallet(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function tradeHistories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TradeHistory::class);
+    }
+
+    public function walletTransactions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WalletTransaction::class);
+    }
+
+    public function parrain(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'parrain_id');
+    }
+
+    public function filleuls(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'parrain_id');
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (self $user) {
+            $user->referral_code ??= strtoupper(\Illuminate\Support\Str::random(8));
+            $user->saveQuietly();
+
+            $user->wallet()->create([
+                'solde_reel' => 0,
+                'solde_demo' => 10000,
+                'devise' => 'USD',
+            ]);
+        });
     }
 }
