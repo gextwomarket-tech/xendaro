@@ -324,3 +324,9 @@ Suite à la demande du client ("démarre avec l'installation de filament et la c
 **Vérification** : connexion admin réelle en navigateur (`marcosseko.travail@gmail.com`), les 4 nouvelles pages testées sans erreur (`/admin/manage-site-identifier` pré-rempli avec les vraies données, `/admin/users` liste + formulaire d'édition avec champ mot de passe vide confirmé, `/admin/wallets`, `/admin/trade-histories` liste + formulaire de création avec les nouveaux selects). Menu admin vérifié : 20 entrées (19 resources/pages + tableau de bord), aucune erreur. Suite de tests complète toujours 27/27.
 
 **Couverture finale** : 19 resources/pages Filament couvrant 19 tables métier sur 19 (100% des tables non-framework). CRUD complet conforme à l'objectif initial du projet ("Les super admin pourront gérer les CRUD de toutes les tables sql de la bdd").
+
+## 2026-08-23 - Comble la dette technique : test de régression pour le périmètre Vitrine
+
+Point relevé dans le bilan de session du même jour : le sous-agent Vitrine avait vérifié manuellement les 24 pages (curl + Livewire::test() en session) mais n'avait laissé aucun test automatisé, contrairement aux autres périmètres (Auth, Client, Trade). Ajouté `tests/Feature/Vitrine/PublicPagesSmokeTest.php` : les 21 pages 100% statiques (`Route::view`) testées en une passe, plus 3 tests dédiés pour les pages à paramètre dynamique (`market-detail`, `education-article`, `news-detail`) avec un enregistrement réel créé en base pour chacune. Sert de filet de sécurité contre toute régression future sur ce périmètre (ex: si une prochaine modification casse un composant partagé comme `x-page-hero` ou `x-reveal`, ce test le détecterait immédiatement).
+
+**Résultat** : suite de tests complète désormais à **31 passed (122 assertions)**, contre 27 avant. Aucune régression détectée sur le travail de refonte visuelle des 3 sous-agents.
