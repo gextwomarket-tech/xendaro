@@ -22,11 +22,13 @@ Route::get('/marches/{instrument:symbole_interne}', [App\Http\Controllers\Market
 Route::view('/promotions', 'vitrine.promotions')->name('promotions');
 Route::view('/parrainage', 'vitrine.affiliate-program')->name('affiliate-program');
 
+Route::get('/academie', [App\Http\Controllers\EducationController::class, 'index'])->name('education');
+Route::get('/academie/{resource:slug}', [App\Http\Controllers\EducationController::class, 'show'])->name('education-article');
+
+Route::get('/actualites', [App\Http\Controllers\NewsController::class, 'index'])->name('market-news');
+Route::get('/actualites/{article:slug}', [App\Http\Controllers\NewsController::class, 'show'])->name('news-detail');
+
 // TODO (sous-agent vitrine): brancher les routes/vues suivantes en suivant xendaro-fox-plan.json > Pages (id 2 a 24)
-// Route::get('/academie', [App\Http\Controllers\EducationController::class, 'index'])->name('education');
-// Route::get('/academie/{resource:slug}', [App\Http\Controllers\EducationController::class, 'show'])->name('education-article');
-// Route::get('/actualites', [App\Http\Controllers\NewsController::class, 'index'])->name('market-news');
-// Route::get('/actualites/{article:slug}', [App\Http\Controllers\NewsController::class, 'show'])->name('news-detail');
 // Route::view('/calendrier-economique', 'vitrine.economic-calendar')->name('economic-calendar');
 // Route::view('/outils', 'vitrine.trading-tools')->name('trading-tools');
 // Route::view('/faq', 'vitrine.faq')->name('faq');
