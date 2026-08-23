@@ -27,6 +27,10 @@ class User extends Authenticatable
         'referral_code',
         'parrain_id',
         'two_factor_enabled',
+        // otp_code/otp_expires_at pilotes par le mecanisme OTP email des pages
+        // id 25/29/30 (register/verify-email/two-factor-auth), voir app/Livewire/Auth/*.
+        'otp_code',
+        'otp_expires_at',
     ];
 
     /**
