@@ -372,6 +372,7 @@ return [
         'message' => 'Message',
         'submit' => 'Send message',
         'success' => 'Your message has been sent, our team will get back to you shortly.',
+        'throttled' => 'Too many attempts, please try again in a few minutes.',
         'coordinates_title' => 'Our contact details',
         'phone_label' => 'Phone',
         'email_label' => 'Email',

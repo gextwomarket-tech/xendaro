@@ -31,9 +31,10 @@ Route::get('/actualites/{article:slug}', [App\Http\Controllers\NewsController::c
 Route::view('/calendrier-economique', 'vitrine.economic-calendar')->name('economic-calendar');
 Route::view('/outils', 'vitrine.trading-tools')->name('trading-tools');
 
+Route::view('/faq', 'vitrine.faq')->name('faq');
+Route::view('/contact', 'vitrine.contact')->name('contact');
+
 // TODO (sous-agent vitrine): brancher les routes/vues suivantes en suivant xendaro-fox-plan.json > Pages (id 2 a 24)
-// Route::view('/faq', 'vitrine.faq')->name('faq');
-// Route::view('/contact', 'vitrine.contact')->name('contact');
 // Route::view('/cgv', 'vitrine.cgv')->name('cgv');
 // Route::view('/confidentialite', 'vitrine.policies')->name('policies');
 // Route::view('/cookies', 'vitrine.cookies')->name('cookies');
