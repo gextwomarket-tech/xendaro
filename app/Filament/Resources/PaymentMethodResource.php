@@ -28,9 +28,20 @@ class PaymentMethodResource extends Resource
                 Forms\Components\TextInput::make('nom')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('type')
+                Forms\Components\Select::make('type')
+                    ->options([
+                        'crypto' => 'Crypto',
+                        'e-wallet' => 'E-wallet',
+                        'virement' => 'Virement bancaire',
+                        'carte' => 'Carte bancaire',
+                    ])
                     ->required(),
                 Forms\Components\Textarea::make('instructions')
+                    ->helperText('Texte explicatif affiche au client (visible avant les details de depot).')
+                    ->columnSpanFull(),
+                Forms\Components\Textarea::make('details_paiement')
+                    ->label('Détails du dépôt')
+                    ->helperText('Adresse crypto, email PayPal, identifiant Perfect Money, IBAN... affiche au client avec un bouton copier (+ QR code si type = crypto).')
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('frais')
                     ->required()

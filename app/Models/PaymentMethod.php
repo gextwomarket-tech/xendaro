@@ -10,6 +10,7 @@ class PaymentMethod extends Model
         'nom',
         'type',
         'instructions',
+        'details_paiement',
         'frais',
         'delai_traitement',
         'est_actif',

@@ -48,6 +48,9 @@ class DepositForm extends Component
     {
         return view('livewire.client.deposit-form', [
             'paymentMethods' => PaymentMethod::where('est_actif', true)->get(),
+            'selectedMethod' => $this->payment_method_id
+                ? PaymentMethod::find($this->payment_method_id)
+                : null,
         ]);
     }
 }

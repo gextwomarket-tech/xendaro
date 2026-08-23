@@ -15,7 +15,14 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <x-stat-card :label="__('app.client.wallet.balance_real')" :value="'$'.number_format($wallet->solde_reel ?? 0, 2)" />
-        <x-stat-card :label="__('app.client.wallet.balance_demo')" :value="'$'.number_format($wallet->solde_demo ?? 0, 2)" />
+        <div class="relative">
+            <x-stat-card :label="__('app.client.wallet.balance_demo')" :value="'$'.number_format($wallet->solde_demo ?? 0, 2)" />
+            <button type="button" x-on:click="$dispatch('open-modal', { name: 'topup-demo' })"
+                class="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-sm bg-couleur-secondaire/10 text-couleur-secondaire text-xs font-medium px-2.5 py-1.5 hover:bg-couleur-secondaire/20 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                {{ __('app.client.wallet.topup_demo_button') }}
+            </button>
+        </div>
     </div>
 
     <div>
@@ -38,11 +45,15 @@
         </x-data-table>
     </div>
 
-    <x-modal name="deposit" max-width="sm">
+    <x-modal name="deposit" max-width="md">
         <livewire:client.deposit-form />
     </x-modal>
 
     <x-modal name="withdraw" max-width="sm">
         <livewire:client.withdraw-form />
+    </x-modal>
+
+    <x-modal name="topup-demo" max-width="sm">
+        <livewire:client.top-up-demo-form />
     </x-modal>
 </div>
