@@ -101,3 +101,46 @@ Ce fichier documente, en résumé, les actions effectuées sur le projet (voir r
 - `npm run build` exécuté avec succès (chunk `trade-chart-*.js` généré).
 
 **Statut** : page Trade livrée complète, testée, buildée. Prête pour test client.
+
+## 2026-08-23 - Authentification + Espace Client : Pages id 25-36, 38-42 livrées
+
+**Périmètre** : sous-agent auth + espace client (routes/auth.php, routes/client.php, resources/views/auth+client, app/Livewire/Auth+Client). Page Trade (id 37) et vitrine hors scope, non touchées.
+
+**Layout auth (2 colonnes)**
+- `resources/views/components/layouts/auth.blade.php` : adapté de `images_design_ui/login_design.jpg` au thème 100% Dark - colonne gauche = formulaire dans une card `fond-card`, colonne droite = panneau `fond-surface` avec halos décoratifs `couleur-principale`/`couleur-secondaire` en blur + carte flottante "rejoignez des milliers de traders". Masqué en mobile (`<lg`).
+- Enregistré dans le `View::composer` de `AppServiceProvider` (ajout additif de `components.layouts.dashboard` à la liste existante, sans toucher aux entrées des autres agents).
+
+**Authentification (id 25-30)** - mécanisme OTP email unique, réutilisé partout (register, verify-email, 2FA) :
+- `RegisterForm` : crée le `User` (le `Wallet` apparaît automatiquement via l'event déjà en place), gère `?ref=CODE` pour `parrain_id`, envoie un OTP 6 chiffres (`OtpCodeNotification`), connecte l'utilisateur puis redirige vers `/verification-email`.
+- `LoginForm` : `Auth::validate()` + `RateLimiter` (5 tentatives/60s), puis `Auth::login()` ; si `two_factor_enabled` renvoie vers `/2fa` (flag session `needs_2fa`), sinon vers `/verification-email` ou `/espace-client`.
+- `ForgotPasswordForm` / `ResetPasswordForm` : mécanisme natif Laravel `Password::sendResetLink` / `Password::reset`, aucune réponse différenciée si l'email n'existe pas (anti-énumération).
+- `VerifyEmailForm` / `TwoFactorForm` : même pattern OTP (6 inputs, cooldown de renvoi 60s en Alpine.js), comparaison `hash_equals` + expiration 10 min.
+- Middlewares `EnsureEmailIsVerifiedOtp` et `EnsureTwoFactorVerified` appliqués sur tout le groupe `espace-client` (jamais sur `/verification-email` et `/2fa` eux-mêmes, pour éviter la boucle de redirection).
+- `LogoutController` : `POST /deconnexion` (jamais GET), déclenché uniquement depuis la modale de confirmation (voir ci-dessous).
+
+**Bugs corrigés dans du code partagé déjà existant** (nécessaires pour débloquer mon périmètre, changements additifs uniquement) :
+- `App\Models\User::$fillable` ne listait pas `otp_code`/`otp_expires_at` (colonnes pourtant déjà présentes en DB depuis les fondations) : `User::create([...'otp_code'=>...])` échouait silencieusement (mass assignment ignoré sans erreur). Ajouté les 2 clés au tableau `$fillable`.
+- Ajouté 3 méthodes de relation sur `User` (`tickets()`, `kycDocuments()`, `affiliateCommissionsGagnees()`) pour mes 4 nouveaux modèles, en suivant le pattern déjà en place (`wallet()`, `tradeHistories()`...). Édition strictement additive, aucun champ/comportement existant modifié.
+- `tests/Feature/ExampleTest.php` (stub par défaut) : ajouté le `use RefreshDatabase;` manquant (commenté dans le stub d'origine) - il échouait sur base vide dès qu'une vraie page a commencé à interroger la DB. Fix d'1 ligne, aucun conflit de scope.
+
+**Espace Client (id 31-36, 38-42)** - layout Samify-inspired :
+- `resources/views/components/layouts/dashboard.blade.php` : sidebar 2 états (étendue 260px/réduite 72px, toggle Alpine.js persisté en `localStorage`), drawer plein écran en mobile (`<lg`), 3 groupes de nav (TRADING/COMPTE/SUPPORT) avec pilule active `couleur-principale/15`, badges point/nombre sur Notifications (unread) et Support (tickets ouverts), mini-card profil en bas de sidebar (`<x-user-mini-card>`), navbar avec recherche + cloche notifications + `<x-user-menu-dropdown>`. Modales globales embarquées dans le layout : `edit-profile` (`<livewire:client.edit-profile-form>`) et `logout-confirm` (formulaire `POST` vers la route `logout`, email du compte affiché).
+- Composants réutilisables créés : `x-user-mini-card` (avatar + point de statut vert + nom/email + bouton optionnel "Modifier le profil", conçu générique pour être réutilisé tel quel par la sidebar droite de Trade - confirmé fait par l'agent Trade) et `x-user-menu-dropdown` (Paramètres/Mon profil/Déconnexion).
+- `Dashboard` (id 31) : 4 stat cards (solde réel/démo, nb trades, P&L), graphique de performance en SVG polyline calculé serveur (pas de dépendance JS/npm supplémentaire), tables compactes trades/transactions récents.
+- `EditProfileForm` (id 32) : popup, upload avatar (`WithFileUploads`, disk `public`, 2 Mo max).
+- `SecuritySettings` (id 33) : changement de mot de passe (`Hash::check` sur l'ancien), toggle 2FA (`x-toggle-switch`), liste des sessions actives (table `sessions`, driver database) avec terminaison individuelle (jamais la session courante).
+- `TradeHistoryPage` (id 34) / `MarketsReadOnly` (id 35) : filtres + pagination 15, `MarketsReadOnly` réutilise **`MarketPriceService`** déjà créé par l'agent Trade (aucune duplication de service de prix), bouton "Trader" renvoie vers `/trade?symbole=xxx`.
+- `WalletPage` + `DepositForm`/`WithdrawForm` (id 36) : **décision d'implémentation** - dépôt/retrait créent une `WalletTransaction` en statut `en_attente` ; le crédit/débit réel de `solde_reel` n'intervient qu'à la validation admin (nouveau `WalletTransactionResource` Filament avec actions `Valider`/`Refuser` déclenchant `App\Services\WalletTransactionService::approve()/reject()`). Seedé `PaymentMethodSeeder` (carte bancaire, virement bancaire, crypto USDT) car la table était vide.
+- `KycUploadForm` (id 38) : upload pièce d'identité + justificatif de domicile sur disk **privé** `local` (`storage/app/private/kyc/{user_id}`, jamais exposé publiquement), statuts en_attente/valide/refusé.
+- `Notifications` (id 39) : canal `database` de Laravel Notifications (migration générée), mark as read / tout marquer comme lu.
+- `SupportTickets` + `TicketDetail` (id 40-41) : nouveaux modèles `Ticket`/`TicketMessage`, création transactionnelle ticket+premier message, fil de discussion avec bulles gauche/droite selon `est_admin`, `ReplyTicketForm` (rouvre le ticket si fermé), autorisation stricte par `user_id` (403 si tentative d'accès à un ticket d'un autre utilisateur, couvert par test).
+- `AffiliateDashboard` (id 42) : lien `/inscription?ref=CODE` (copie presse-papiers Alpine), nouveau modèle `AffiliateCommission`, stats filleuls/commissions, liste paginée.
+- `logout` (id 43) : modale de confirmation (`<x-modal name="logout-confirm">`) intégrée au layout dashboard, déclenchée depuis la sidebar ET le dropdown navbar - jamais de déconnexion instantanée.
+
+**Filament (admin)** : resources CRUD générées et enrichies pour les 4 nouveaux modèles (`TicketResource`, `TicketMessageResource`, `KycDocumentResource`, `AffiliateCommissionResource` - selects enum, badges de statut colorés, filtres) + `WalletTransactionResource` (actions Valider/Refuser ci-dessus).
+
+**Tests** (`tests/Feature/Auth/RegisterLoginDashboardTest.php`, `tests/Feature/Client/{DashboardPagesSmokeTest,TicketDetailTest,WalletAndKycTest}.php`) :
+- Parcours complet register → OTP → dashboard, login (succès/échec), 9 pages Espace Client en 200, autorisation ticket (403 cross-user), dépôt/retrait + approbation admin (crédite bien le wallet), upload KYC.
+- Suite complète du projet : **27 passed / 98 assertions** (aucune régression sur les tests Trade/vitrine déjà en place).
+
+**Statut** : Authentification + Espace Client livrés complets (12 pages), testés bout en bout, `npm run build` OK, aucun 500 constaté.
