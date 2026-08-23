@@ -1,21 +1,33 @@
 <x-layouts.public :title="__('app.contact.title')">
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10 text-center">
-        <h1 class="font-display text-3xl sm:text-4xl font-bold text-texte-principal">{{ __('app.contact.title') }}</h1>
+    {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
+    <x-page-hero image="https://picsum.photos/seed/xendaro-contact-hero/1600/900" :eyebrow="__('app.contact.hero_eyebrow')">
+        <h1 class="font-display text-3xl sm:text-5xl font-bold text-texte-principal">{{ __('app.contact.hero_title') }}</h1>
         <p class="mt-4 text-lg text-texte-secondaire max-w-2xl mx-auto">{{ __('app.contact.subtitle') }}</p>
-    </section>
+    </x-page-hero>
 
     <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {{-- Formulaire --}}
-            <div class="lg:col-span-3 rounded-sm bg-fond-card border border-bordure-subtile p-6 sm:p-8">
-                <h2 class="font-display text-xl font-semibold text-texte-principal mb-5">{{ __('app.contact.form_title') }}</h2>
-                @livewire('vitrine.contact-form')
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-10">
+            {{-- Formulaire (composant Livewire inchange) --}}
+            <x-reveal direction="left" class="lg:col-span-3">
+                <div class="rounded-lg bg-fond-card border border-bordure-subtile p-6 sm:p-8 h-full">
+                    <h2 class="font-display text-xl font-semibold text-texte-principal mb-5">{{ __('app.contact.form_title') }}</h2>
+                    @livewire('vitrine.contact-form')
+                </div>
+            </x-reveal>
 
             {{-- Coordonnees --}}
-            <div class="lg:col-span-2 space-y-6">
-                <div class="rounded-sm bg-fond-card border border-bordure-subtile p-6 sm:p-8">
+            <x-reveal direction="right" :delay="120" class="lg:col-span-2 space-y-6">
+                <div class="relative">
+                    {{-- TODO: remplacer par photographie sous licence Xendaro Fox avant production --}}
+                    <x-photo-card src="https://picsum.photos/seed/xendaro-contact-office/700/500" :alt="__('app.contact.office_badge_title')" ratio="aspect-[4/3]" :rotate="2" />
+                    <x-floating-badge position="bottom-left">
+                        <p class="text-sm font-semibold text-texte-principal">{{ __('app.contact.office_badge_title') }}</p>
+                        <p class="text-xs text-texte-secondaire mt-0.5">{{ __('app.contact.office_badge_text') }}</p>
+                    </x-floating-badge>
+                </div>
+
+                <div class="rounded-lg bg-fond-card border border-bordure-subtile p-6 sm:p-8">
                     <h2 class="font-display text-xl font-semibold text-texte-principal mb-5">{{ __('app.contact.coordinates_title') }}</h2>
                     <div class="space-y-5">
                         @if($siteIdentifier?->phone_contact_1)
@@ -44,16 +56,17 @@
 
                 {{-- Carte statique (optionnel MVP) --}}
                 @if($siteIdentifier?->location_adresse)
-                    <div class="rounded-sm bg-fond-card border border-bordure-subtile overflow-hidden">
+                    <div class="rounded-lg bg-fond-card border border-bordure-subtile overflow-hidden">
                         <iframe
                             class="w-full h-56 grayscale invert-[0.9]"
                             loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"
+                            title="{{ __('app.contact.map_alt') }}"
                             src="https://www.google.com/maps?q={{ urlencode($siteIdentifier->location_adresse) }}&output=embed">
                         </iframe>
                     </div>
                 @endif
-            </div>
+            </x-reveal>
         </div>
     </section>
 
