@@ -16,6 +16,13 @@ class DatabaseSeeder extends Seeder
             SiteIdentifierSeeder::class,
             MarketInstrumentSeeder::class,
             PaymentMethodSeeder::class,
+            CategorySeeder::class,
+            FaqContentSeeder::class,
+            AccountTypeSeeder::class,
+            PromotionSeeder::class,
+            EducationResourceSeeder::class,
+            NewsArticleSeeder::class,
+            EconomicEventSeeder::class,
         ]);
 
         User::factory()->create([

@@ -9,11 +9,12 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'vitrine.home')->name('home');
 
+Route::view('/nos-services', 'vitrine.our-services')->name('our-services');
+Route::view('/nos-services/types-de-comptes', 'vitrine.account-types')->name('account-types');
+Route::view('/nos-services/plateformes', 'vitrine.platforms')->name('platforms');
+Route::view('/nos-services/conditions-de-trading', 'vitrine.trading-conditions')->name('trading-conditions');
+
 // TODO (sous-agent vitrine): brancher les routes/vues suivantes en suivant xendaro-fox-plan.json > Pages (id 2 a 24)
-// Route::view('/nos-services', 'vitrine.our-services')->name('our-services');
-// Route::view('/nos-services/types-de-comptes', 'vitrine.account-types')->name('account-types');
-// Route::view('/nos-services/plateformes', 'vitrine.platforms')->name('platforms');
-// Route::view('/nos-services/conditions-de-trading', 'vitrine.trading-conditions')->name('trading-conditions');
 // Route::view('/a-propos', 'vitrine.about')->name('about');
 // Route::get('/marches', [App\Http\Controllers\MarketController::class, 'index'])->name('markets');
 // Route::get('/marches/{instrument:symbole_interne}', [App\Http\Controllers\MarketController::class, 'show'])->name('market-detail');
