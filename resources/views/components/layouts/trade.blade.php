@@ -16,7 +16,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/trade-chart.js'])
     @livewireStyles
 </head>
-<body class="bg-fond-principal text-texte-principal font-sans antialiased h-screen overflow-hidden flex flex-col" x-cloak>
+<body class="bg-fond-principal text-texte-principal font-sans antialiased h-screen overflow-hidden flex flex-col">
+    {{--
+        x-cloak ne doit JAMAIS etre pose sur <body> lui-meme: Alpine ne le retire pas de facon fiable
+        sur l'element racine du tree-walk (contrairement aux elements x-show a l'interieur d'un x-data),
+        ce qui laisse la regle CSS [x-cloak]{display:none!important} bloquer TOUTE la page en display:none
+        indefiniment - page Trade entierement invisible/inutilisable malgre un rendu HTML correct.
+        x-cloak reste legitime sur des elements x-show individuels (voir <x-modal>), jamais sur body/html.
+    --}}
 
     {{-- Barre superieure minimale et independante, propre a la page Trade (PAS le header/navbar dashboard) --}}
     <header class="flex items-center justify-between gap-3 px-4 h-12 border-b border-bordure-subtile bg-fond-surface shrink-0">
