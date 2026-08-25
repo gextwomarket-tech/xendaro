@@ -99,6 +99,7 @@ return [
         'resend_code' => 'Resend code',
         'resend_code_in' => 'Resend code in :seconds s',
         'otp_resent' => 'A new code has been sent.',
+        'otp_resend_failed' => 'The email could not be sent. Please try again shortly.',
         'two_factor_title' => 'Two-factor authentication',
         'two_factor_text' => 'A security code has been sent to :email.',
         'referral_applied' => 'Referral code applied.',

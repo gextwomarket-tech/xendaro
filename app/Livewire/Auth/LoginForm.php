@@ -3,7 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
-use App\Notifications\OtpCodeNotification;
+use App\Services\OtpMailerService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Layout;
@@ -67,7 +67,7 @@ class LoginForm extends Component
                 'otp_code' => $otp,
                 'otp_expires_at' => now()->addMinutes(10),
             ])->save();
-            $user->notify(new OtpCodeNotification($otp, 'two_factor'));
+            OtpMailerService::send($user, $otp, 'two_factor');
 
             session()->put('needs_2fa', true);
             $this->redirectRoute('two-factor-auth', navigate: false);

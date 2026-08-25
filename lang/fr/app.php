@@ -99,6 +99,7 @@ return [
         'resend_code' => 'Renvoyer le code',
         'resend_code_in' => 'Renvoyer le code dans :seconds s',
         'otp_resent' => 'Un nouveau code a été envoyé.',
+        'otp_resend_failed' => "L'envoi de l'email a échoué. Réessayez dans un instant.",
         'two_factor_title' => 'Authentification à deux facteurs',
         'two_factor_text' => 'Un code de sécurité a été envoyé à :email.',
         'referral_applied' => 'Code de parrainage appliqué.',

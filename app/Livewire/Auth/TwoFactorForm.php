@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Auth;
 
-use App\Notifications\OtpCodeNotification;
+use App\Services\OtpMailerService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -73,10 +73,10 @@ class TwoFactorForm extends Component
             'otp_expires_at' => now()->addMinutes(10),
         ])->save();
 
-        $user->notify(new OtpCodeNotification($otp, 'two_factor'));
+        $sent = OtpMailerService::send($user, $otp, 'two_factor');
 
         $this->resendAvailableAt = now()->addSeconds(60)->timestamp;
-        $this->dispatch('toast', type: 'success', message: __('app.auth.otp_resent'));
+        $this->dispatch('toast', type: $sent ? 'success' : 'error', message: $sent ? __('app.auth.otp_resent') : __('app.auth.otp_resend_failed'));
     }
 
     public function render()

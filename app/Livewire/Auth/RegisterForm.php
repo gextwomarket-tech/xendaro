@@ -3,7 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
-use App\Notifications\OtpCodeNotification;
+use App\Services\OtpMailerService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Layout;
@@ -67,7 +67,7 @@ class RegisterForm extends Component
             'otp_expires_at' => now()->addMinutes(10),
         ]);
 
-        $user->notify(new OtpCodeNotification($otp, 'verification'));
+        OtpMailerService::send($user, $otp, 'verification');
 
         Auth::login($user);
 
