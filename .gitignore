@@ -20,7 +20,8 @@
 /public/storage
 /storage/*.key
 /storage/pail
-/vendor
+# vendor reste volontairement versionne, meme raison que public/build : le serveur cPanel
+# est mis a jour par "git pull" direct sans acces terminal pour lancer composer install.
 Homestead.json
 Homestead.yaml
 Thumbs.db
