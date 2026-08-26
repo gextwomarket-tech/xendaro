@@ -1,27 +1,13 @@
-*.log
-.DS_Store
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
 /auth.json
-/node_modules
-# public/build reste versionne : le deploiement cPanel se fait par "git pull" direct,
-# sans etape npm run build sur le serveur (voir docummentations.md) - les assets Vite
-# compiles doivent donc etre dans le repo pour que le site fonctionne apres un pull.
+# public/build, vendor et node_modules restent volontairement verses : le deploiement cPanel
+# se fait par "git pull" direct, sans acces pour lancer composer install / npm install /
+# npm run build sur le serveur (voir docummentations.md) - tout ce qui est necessaire a
+# l'execution doit donc deja etre dans le repo. Seuls les secrets (.env*, auth.json) et les
+# artefacts generes propres a une machine (symlink storage, cle de chiffrement de test)
+# restent ignores.
 /public/hot
 /public/storage
 /storage/*.key
-/storage/pail
-# vendor reste volontairement versionne, meme raison que public/build : le serveur cPanel
-# est mis a jour par "git pull" direct sans acces terminal pour lancer composer install.
-Homestead.json
-Homestead.yaml
-Thumbs.db
