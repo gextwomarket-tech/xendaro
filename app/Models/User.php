@@ -4,11 +4,13 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -55,7 +57,18 @@ class User extends Authenticatable
             'password' => 'hashed',
             'otp_expires_at' => 'datetime',
             'two_factor_enabled' => 'boolean',
+            'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Sans cette restriction, Filament v3 autorise par defaut tout utilisateur authentifie a
+     * acceder a n'importe quel panel - n'importe quel client inscrit pouvait donc charger /admin
+     * avec son propre compte. Voir migration add_is_admin_to_users_table.
+     */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_admin;
     }
 
     public function wallet(): \Illuminate\Database\Eloquent\Relations\HasOne
