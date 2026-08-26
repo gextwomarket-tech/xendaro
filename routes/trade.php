@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TradeChartController;
 use App\Livewire\Trade\TradePage;
 use Illuminate\Support\Facades\Route;
 
@@ -11,4 +12,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/trade', TradePage::class)->name('trade');
+    Route::get('/trade/chart-data/{instrument}', [TradeChartController::class, 'history'])->name('trade.chart-data');
 });

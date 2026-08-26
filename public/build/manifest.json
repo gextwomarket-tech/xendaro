@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DrSta5vc.css",
+    "file": "assets/app-D2tX1lD3.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -15,7 +15,7 @@
     "isEntry": true
   },
   "resources/js/trade-chart.js": {
-    "file": "assets/trade-chart-BBYfh3Ud.js",
+    "file": "assets/trade-chart-CAGlT8Ni.js",
     "name": "trade-chart",
     "src": "resources/js/trade-chart.js",
     "isEntry": true

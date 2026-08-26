@@ -9,6 +9,15 @@
         "dev"
       ],
       "port": 5173
+    },
+    {
+      "name": "app",
+      "runtimeExecutable": "C:/xampp/php/php.exe",
+      "runtimeArgs": [
+        "artisan",
+        "serve"
+      ],
+      "port": 8000
     }
   ]
 }

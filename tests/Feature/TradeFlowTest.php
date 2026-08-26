@@ -253,6 +253,46 @@ class TradeFlowTest extends TestCase
         $response->assertOk();
     }
 
+    /**
+     * Endpoint consomme par resources/js/trade-chart.js (lightweight-charts) - remplace le
+     * widget public TradingView (tv.js) qui plantait en production ("onChartReady is not a
+     * function", cette methode appartenant a la Charting Library sous licence separee, absente
+     * du script gratuit). Voir App\Services\MarketPriceService::history().
+     */
+    public function test_endpoint_chart_data_renvoie_des_bougies_ohlc_coherentes(): void
+    {
+        $user = User::factory()->create();
+        $instrument = $this->creerInstrument();
+
+        $response = $this->actingAs($user)->getJson("/trade/chart-data/{$instrument->id}?interval=60");
+
+        $response->assertOk();
+        $candles = $response->json('candles');
+
+        $this->assertCount(180, $candles);
+
+        foreach ($candles as $candle) {
+            $this->assertLessThanOrEqual($candle['high'], $candle['open']);
+            $this->assertLessThanOrEqual($candle['high'], $candle['close']);
+            $this->assertGreaterThanOrEqual($candle['low'], $candle['open']);
+            $this->assertGreaterThanOrEqual($candle['low'], $candle['close']);
+        }
+
+        // Bougies triees chronologiquement, espacees d'exactement 3600s (interval H1).
+        for ($i = 1; $i < count($candles); $i++) {
+            $this->assertSame($candles[$i - 1]['time'] + 3600, $candles[$i]['time']);
+        }
+    }
+
+    public function test_endpoint_chart_data_est_protege_par_lauthentification(): void
+    {
+        $instrument = $this->creerInstrument();
+
+        $response = $this->getJson("/trade/chart-data/{$instrument->id}?interval=60");
+
+        $response->assertUnauthorized();
+    }
+
     // ------------------------------------------------------------------
     // Tests des composants Livewire eux-memes (mount/render/actions/events),
     // au-dela de la logique metier deja couverte via TradingService ci-dessus.

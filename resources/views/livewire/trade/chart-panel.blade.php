@@ -1,5 +1,5 @@
 @php
-    $containerId = 'tv-chart-'.$this->getId();
+    $containerId = 'chart-'.$this->getId();
 @endphp
 <div class="flex flex-col h-full min-h-0">
     {{-- Toolbar: dropdowns timeframe + type de graphique (xendaro-fox-plan.json > chart_toolbar) --}}
@@ -29,8 +29,8 @@
     </div>
 
     {{--
-        Conteneur du widget TradingView - wire:ignore obligatoire: Livewire ne doit jamais
-        re-render ce DOM (le widget gere lui-meme son contenu). Piloté par resources/js/trade-chart.js
+        Conteneur du graphique - wire:ignore obligatoire: Livewire ne doit jamais re-render ce
+        DOM (lightweight-charts gere lui-meme son contenu). Piloté par resources/js/trade-chart.js
         (window.XendaroTradeChart) via des evenements navigateur dedies.
     --}}
     <div
@@ -38,17 +38,18 @@
         wire:ignore
         x-data="{}"
         x-init="
-            window.XendaroTradeChart && window.XendaroTradeChart.mount($el.querySelector('.tv-widget-container'), {
-                symbol: @js($this->instrument?->symbole_provider_externe ?: 'FX:EURUSD'),
-                interval: @js($interval),
-                style: @js($chartType),
-                locale: @js(app()->getLocale()),
-            });
+            if (window.XendaroTradeChart) {
+                window.XendaroTradeChart.mount($el.querySelector('.chart-container'), {
+                    instrumentId: @js($this->instrumentId),
+                    interval: @js($interval),
+                    style: @js($chartType),
+                });
+            }
         "
-        x-on:chart-symbol-changed.window="window.XendaroTradeChart && window.XendaroTradeChart.updateSymbol($event.detail.symbol)"
-        x-on:chart-interval-changed.window="window.XendaroTradeChart && window.XendaroTradeChart.updateInterval($event.detail.interval)"
-        x-on:chart-style-changed.window="window.XendaroTradeChart && window.XendaroTradeChart.updateStyle($event.detail.style)"
+        x-on:chart-symbol-changed.window="window.XendaroTradeChart && window.XendaroTradeChart.updateSymbol($el.querySelector('.chart-container'), $event.detail.instrumentId)"
+        x-on:chart-interval-changed.window="window.XendaroTradeChart && window.XendaroTradeChart.updateInterval($el.querySelector('.chart-container'), $event.detail.interval)"
+        x-on:chart-style-changed.window="window.XendaroTradeChart && window.XendaroTradeChart.updateStyle($el.querySelector('.chart-container'), $event.detail.style)"
     >
-        <div id="{{ $containerId }}" class="tv-widget-container absolute inset-0"></div>
+        <div id="{{ $containerId }}" class="chart-container absolute inset-0"></div>
     </div>
 </div>
