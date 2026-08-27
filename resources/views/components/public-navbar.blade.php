@@ -37,7 +37,7 @@
         <a href="{{ url('/faq') }}" class="block text-texte-secondaire hover:text-texte-principal">{{ __('app.nav.faq') }}</a>
         <a href="{{ url('/contact') }}" class="block text-texte-secondaire hover:text-texte-principal">{{ __('app.nav.contact') }}</a>
         <div class="pt-3 border-t border-bordure-subtile flex flex-col gap-2">
-            <a href="{{ url('/connexion') }}" class="text-texte-secondaire">{{ __('app.nav.login') }}</a>
+            <a href="{{ url('/connexion') }}" class="inline-flex justify-center rounded-sm border border-bordure-subtile text-texte-principal font-semibold px-4 py-2 hover:border-couleur-principale/50 transition">{{ __('app.nav.login') }}</a>
             <a href="{{ url('/inscription') }}" class="inline-flex justify-center rounded-sm bg-couleur-principale text-fond-principal font-semibold px-4 py-2">{{ __('app.nav.register') }}</a>
         </div>
     </div>

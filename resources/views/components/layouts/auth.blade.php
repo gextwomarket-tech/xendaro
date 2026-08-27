@@ -18,14 +18,12 @@
 </head>
 <body class="bg-fond-principal text-texte-principal font-sans antialiased min-h-screen">
 
-    <div class="min-h-screen flex flex-col lg:flex-row lg:p-4 lg:gap-4">
+    <x-public-navbar :site-identifier="$siteIdentifier ?? null" />
+
+    <div class="flex flex-col lg:flex-row lg:p-4 lg:gap-4">
 
         {{-- Colonne gauche: formulaire --}}
         <div class="flex-1 flex flex-col">
-            <div class="px-6 pt-6 lg:px-10 lg:pt-8">
-                <x-logo size="sm" />
-            </div>
-
             <div class="flex-1 flex items-center justify-center px-6 py-10">
                 <div class="w-full max-w-md">
                     <div class="rounded-lg bg-fond-card border border-bordure-subtile p-6 sm:p-8 shadow-2xl">
