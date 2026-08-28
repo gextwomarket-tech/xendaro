@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Mail\Transport\EmailJsTransport;
 use App\Services\SiteIdentifierService;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +24,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Transport mail custom pour EmailJS (alternative a Resend sans verification DNS
+        // de domaine requise - voir App\Mail\Transport\EmailJsTransport).
+        Mail::extend('emailjs', function (array $config) {
+            return new EmailJsTransport(
+                $config['service_id'] ?? null,
+                $config['template_id'] ?? null,
+                $config['public_key'] ?? null,
+                $config['private_key'] ?? null,
+            );
+        });
+
         // Partage site_identifier avec le layout public + le layout auth (panneau de branding) + le layout dashboard (titre onglet).
         // + toutes les pages vitrine.* (wildcard) qui consomment $siteIdentifier directement dans leur contenu
         // (le partage sur le layout seul ne se propage pas au scope de la vue appelante, voir docummentations.md).

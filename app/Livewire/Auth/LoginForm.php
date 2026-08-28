@@ -3,7 +3,6 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
-use App\Services\OtpMailerService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Layout;
@@ -11,7 +10,7 @@ use Livewire\Component;
 
 /**
  * Page id 26 "login". Auth::attempt + RateLimiter (protection brute-force),
- * redirection vers /2fa si two_factor_enabled, sinon /espace-client.
+ * redirection directe vers /espace-client (demande de code OTP/2FA desactivee).
  */
 #[Layout('components.layouts.auth')]
 class LoginForm extends Component
@@ -60,26 +59,6 @@ class LoginForm extends Component
 
         Auth::login($user, $this->remember);
         session()->regenerate();
-
-        if ($user->two_factor_enabled) {
-            $otp = (string) random_int(100000, 999999);
-            $user->forceFill([
-                'otp_code' => $otp,
-                'otp_expires_at' => now()->addMinutes(10),
-            ])->save();
-            OtpMailerService::send($user, $otp, 'two_factor');
-
-            session()->put('needs_2fa', true);
-            $this->redirectRoute('two-factor-auth', navigate: false);
-
-            return;
-        }
-
-        if (! $user->email_verified_at) {
-            $this->redirectRoute('verify-email', navigate: false);
-
-            return;
-        }
 
         $this->redirectRoute('client.dashboard', navigate: false);
     }

@@ -2,16 +2,20 @@
 
 namespace App\Livewire\Auth;
 
+use App\Mail\WelcomeMail;
 use App\Models\User;
-use App\Services\OtpMailerService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Throwable;
 
 /**
  * Page id 25 "register" - inscription + creation automatique du Wallet (event User::booted())
- * + envoi d'un OTP email pour la verification (page id 29).
+ * + envoi d'un email de bienvenue. L'unicite de l'email (regle 'unique:users,email' ci-dessous)
+ * suffit desormais : plus de verification OTP de la boite mail (flow verify-email desactive).
  */
 #[Layout('components.layouts.auth')]
 class RegisterForm extends Component
@@ -55,23 +59,32 @@ class RegisterForm extends Component
             $parrainId = User::where('referral_code', $this->ref)->value('id');
         }
 
-        $otp = (string) random_int(100000, 999999);
-
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'password' => Hash::make($validated['password']),
             'parrain_id' => $parrainId,
-            'otp_code' => $otp,
-            'otp_expires_at' => now()->addMinutes(10),
         ]);
 
-        OtpMailerService::send($user, $otp, 'verification');
+        // email_verified_at n'est pas dans $fillable (mass assignment volontairement restreint) -
+        // forceFill comme le reste du codebase le fait deja pour otp_code/otp_expires_at.
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        try {
+            Mail::to($user)->send(new WelcomeMail($user));
+        } catch (Throwable $e) {
+            // Un email de bienvenue en echec ne doit jamais bloquer l'inscription
+            // (compte deja cree en base a ce stade) - meme filet que ForgotPasswordForm/OtpMailerService.
+            Log::error('Echec envoi email de bienvenue', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         Auth::login($user);
 
-        $this->redirectRoute('verify-email', navigate: false);
+        $this->redirectRoute('client.dashboard', navigate: false);
     }
 
     public function render()
